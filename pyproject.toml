@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "lansenger-cli"
+version = "0.1.0"
+description = "CLI for Lansenger (蓝信) — send messages, manage groups, staff, departments, calendars, todos, and more"
+license = "MIT"
+requires-python = ">=3.10"
+authors = [
+    { name = "Lansenger PM Team" },
+]
+keywords = ["lansenger", "蓝信", "cli", "chatbot", "messaging", "enterprise-chat"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Communications :: Chat",
+]
+
+dependencies = [
+    "lansenger-sdk>=1.0.1",
+    "typer>=0.9",
+    "rich>=13",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7",
+]
+
+[project.scripts]
+lansenger = "lansenger_cli.main:app"
+
+[tool.setuptools.packages.find]
+where = ["src"]
