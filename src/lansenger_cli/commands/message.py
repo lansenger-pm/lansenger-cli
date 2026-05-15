@@ -101,6 +101,7 @@ def send_link_card(
     description: str = typer.Option("", "--desc", "-d", help="Card description"),
     icon_link: str = typer.Option("", "--icon", help="Icon URL"),
     pc_link: str = typer.Option("", "--pc-link", help="PC link URL"),
+    pad_link: str = typer.Option("", "--pad-link", help="Pad link URL"),
     from_name: str = typer.Option("", "--from-name", help="Source name"),
     from_icon_link: str = typer.Option("", "--from-icon", help="Source icon URL"),
     is_group: bool = typer.Option(False, "--group", "-g", help="Send as group message"),
@@ -111,7 +112,8 @@ def send_link_card(
     result = client.send_link_card(
         chat_id=chat_id, title=title, link=link,
         description=description, icon_link=icon_link,
-        pc_link=pc_link, from_name=from_name, from_icon_link=from_icon_link,
+        pc_link=pc_link, pad_link=pad_link,
+        from_name=from_name, from_icon_link=from_icon_link,
         is_group=is_group, user_token=user_token, sender_id=sender_id,
     )
     output_result(result, fields=["message_id", "msg_type", "operation"], title="Send Link Card Result")
@@ -145,6 +147,7 @@ def send_app_card(
     signature: str = typer.Option("", "--signature", help="Card signature"),
     card_link: str = typer.Option("", "--card-link", help="Card link URL"),
     pc_card_link: str = typer.Option("", "--pc-card-link", help="PC card link URL"),
+    pad_card_link: str = typer.Option("", "--pad-card-link", help="Pad card link URL"),
     is_dynamic: bool = typer.Option(False, "--dynamic", help="Enable dynamic card updates"),
     staff_id: str = typer.Option("", "--staff-id", help="Staff ID"),
     head_icon_url: str = typer.Option("", "--head-icon", help="Head icon URL"),
@@ -175,7 +178,7 @@ def send_app_card(
         chat_id=chat_id, body_title=body_title,
         head_title=head_title, body_sub_title=body_sub_title,
         body_content=body_content, signature=signature,
-        card_link=card_link, pc_card_link=pc_card_link,
+        card_link=card_link, pc_card_link=pc_card_link, pad_card_link=pad_card_link,
         is_dynamic=is_dynamic, staff_id=staff_id, head_icon_url=head_icon_url,
         head_status_info=head_status_info,
         fields=parsed_fields, links=parsed_links,
