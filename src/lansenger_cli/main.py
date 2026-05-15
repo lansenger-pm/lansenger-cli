@@ -14,6 +14,7 @@ from lansenger_cli.commands import (
     media as media_cmd,
     streaming as streaming_cmd,
     health as health_cmd,
+    chat as chat_cmd,
 )
 from lansenger_cli.utils import set_json_output
 
@@ -35,6 +36,7 @@ app.add_typer(oauth_cmd.app, name="oauth")
 app.add_typer(callback_cmd.app, name="callback")
 app.add_typer(media_cmd.app, name="media")
 app.add_typer(streaming_cmd.app, name="streaming")
+app.add_typer(chat_cmd.app, name="chat")
 app.add_typer(health_cmd.app, name="health")
 
 

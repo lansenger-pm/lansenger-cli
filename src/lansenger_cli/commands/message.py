@@ -223,6 +223,52 @@ def revoke_message(
     output_result(result, fields=["message_id", "operation"], title="Revoke Message Result")
 
 
+@app.command("send-bot-message")
+def send_bot_message(
+    msg_type: str = typer.Argument(help="Message type"),
+    msg_data: str = typer.Argument(help="Message data as JSON"),
+    chat_ids: Optional[List[str]] = typer.Option(None, "--chat-id", help="Chat IDs (or group IDs if --group)"),
+    department_ids: Optional[List[str]] = typer.Option(None, "--dept", help="Department IDs (bot channel only)"),
+    user_token: str = typer.Option("", "--user-token", help="User token"),
+    entry_id: str = typer.Option("", "--entry-id", help="App entry selector"),
+    is_group: bool = typer.Option(False, "--group", "-g", help="Send to groups instead of users"),
+):
+    import json
+    client = get_client()
+    parsed_data = json.loads(msg_data)
+    result = client.send_bot_message(
+        msg_type=msg_type, msg_data=parsed_data,
+        chat_ids=chat_ids, department_ids=department_ids,
+        user_token=user_token, entry_id=entry_id,
+        is_group=is_group,
+    )
+    output_result(result, fields=["message_id"], title="Bot Message Result")
+
+
+@app.command("send-group-message")
+def send_group_message(
+    group_id: str = typer.Argument(help="Group ID"),
+    msg_type: str = typer.Argument(help="Message type"),
+    msg_data: str = typer.Argument(help="Message data as JSON"),
+    user_token: str = typer.Option("", "--user-token", help="User token"),
+    sender_id: str = typer.Option("", "--sender-id", help="Sender staff ID"),
+    reminder_all: bool = typer.Option(False, "--mention-all", help="@all (text/formatText only)"),
+    reminder_user_ids: Optional[List[str]] = typer.Option(None, "--mention", help="User IDs to @mention (text/formatText only)"),
+    outlines: str = typer.Option("", "--outlines", help="Group notification digest"),
+    entry_id: str = typer.Option("", "--entry-id", help="App entry selector"),
+):
+    import json
+    client = get_client()
+    parsed_data = json.loads(msg_data)
+    result = client.send_group_message(
+        group_id=group_id, msg_type=msg_type, msg_data=parsed_data,
+        user_token=user_token, sender_id=sender_id,
+        reminder_all=reminder_all, reminder_user_ids=reminder_user_ids,
+        outlines=outlines, entry_id=entry_id,
+    )
+    output_result(result, fields=["message_id"], title="Group Message Result")
+
+
 @app.command("query-groups")
 def query_groups(
     page_offset: int = typer.Option(1, "--page", "-p", help="Page offset"),
