@@ -282,3 +282,81 @@ def query_groups(
             output_list(result.group_ids, columns=["Group ID"], title="Groups", row_mapper=lambda gid: [gid])
     else:
         output_result(result)
+
+
+@app.command("send-oacard")
+def send_oacard(
+    chat_id: str = typer.Argument(help="Chat ID"),
+    title: str = typer.Argument(help="OA card title"),
+    head: str = typer.Option("", "--head", help="OA card head title"),
+    sub_title: str = typer.Option("", "--sub-title", help="OA card sub title"),
+    staff_id: str = typer.Option("", "--staff-id", help="Staff ID"),
+    fields: Optional[List[str]] = typer.Option(None, "--field", help="Card field as JSON, e.g. '{\"key\":\"k\",\"value\":\"v\"}'"),
+    link: str = typer.Option("", "--link", help="Card click link URL"),
+    pc_link: str = typer.Option("", "--pc-link", help="PC link URL"),
+    pad_link: str = typer.Option("", "--pad-link", help="Pad link URL"),
+    card_action: Optional[str] = typer.Option(None, "--card-action", help="Card action as JSON dict"),
+    is_group: bool = typer.Option(False, "--group", "-g", help="Send as group message"),
+    user_token: str = typer.Option("", "--user-token", help="User token for private channel"),
+    sender_id: str = typer.Option("", "--sender-id", help="Sender staff ID for group message"),
+):
+    client = get_client()
+    parsed_fields = None
+    if fields:
+        import json
+        parsed_fields = [json.loads(f) for f in fields]
+    parsed_action = None
+    if card_action:
+        import json
+        parsed_action = json.loads(card_action)
+    result = client.send_oacard(
+        chat_id=chat_id, title=title,
+        head=head, sub_title=sub_title, staff_id=staff_id,
+        fields=parsed_fields, link=link, pc_link=pc_link, pad_link=pad_link,
+        card_action=parsed_action,
+        is_group=is_group, user_token=user_token, sender_id=sender_id,
+    )
+    output_result(result, fields=["message_id", "msg_type", "operation"], title="Send OA Card Result")
+
+
+@app.command("send-account-message")
+def send_account_message(
+    msg_type: str = typer.Argument(help="Message type"),
+    msg_data: str = typer.Argument(help="Message data as JSON"),
+    chat_ids: Optional[List[str]] = typer.Option(None, "--chat-id", help="Chat IDs"),
+    department_ids: Optional[List[str]] = typer.Option(None, "--dept", help="Department IDs"),
+    account_id: str = typer.Option("", "--account-id", help="Account ID"),
+    entry_id: str = typer.Option("", "--entry-id", help="App entry selector"),
+    attach: str = typer.Option("", "--attach", help="Attach info"),
+    user_token: str = typer.Option("", "--user-token", help="User token"),
+):
+    import json
+    client = get_client()
+    parsed_data = json.loads(msg_data)
+    result = client.send_account_message(
+        msg_type=msg_type, msg_data=parsed_data,
+        chat_ids=chat_ids, department_ids=department_ids,
+        account_id=account_id, entry_id=entry_id,
+        attach=attach, user_token=user_token,
+    )
+    output_result(result, fields=["message_id"], title="Account Message Result")
+
+
+@app.command("send-user-message")
+def send_user_message(
+    receiver_id: str = typer.Argument(help="Receiver user ID"),
+    msg_type: str = typer.Argument(help="Message type"),
+    msg_data: str = typer.Argument(help="Message data as JSON"),
+    user_token: str = typer.Option("", "--user-token", help="User token"),
+    common: Optional[str] = typer.Option(None, "--common", help="Common data as JSON dict"),
+    uuid: str = typer.Option("", "--uuid", help="Deduplication UUID"),
+):
+    import json
+    client = get_client()
+    parsed_data = json.loads(msg_data)
+    parsed_common = json.loads(common) if common else None
+    result = client.send_user_message(
+        receiver_id=receiver_id, msg_type=msg_type, msg_data=parsed_data,
+        user_token=user_token, common=parsed_common, uuid=uuid,
+    )
+    output_result(result, fields=["message_id"], title="User Message Result")
