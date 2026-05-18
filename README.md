@@ -60,7 +60,7 @@ lansenger health check
 | 命令组 | 说明 | 子命令 |
 |--------|------|--------|
 | `config` | 管理凭证配置 | `set`, `show`, `clear` |
-| `message` | 发送与管理消息 | `send-text`, `send-markdown`, `send-file`, `send-image-url`, `send-link-card`, `send-app-articles`, `send-app-card`, `update-dynamic-card`, `revoke`, `query-groups` |
+| `message` | 发送与管理消息 | `send-text`, `send-markdown`, `send-file`, `send-image-url`, `send-link-card`, `send-app-articles`, `send-app-card`, `send-oacard`, `send-bot-message`, `send-group-message`, `send-account-message`, `send-user-message`, `update-dynamic-card`, `revoke`, `query-groups` |
 | `group` | 管理群组 | `create`, `info`, `members`, `list`, `check`, `update`, `update-members` |
 | `staff` | 查询人员信息 | `basic-info`, `detail`, `ancestors`, `id-mapping`, `org-extra-fields`, `search`, `org-info` |
 | `department` | 查询部门信息 | `detail`, `children`, `staffs` |
@@ -70,6 +70,7 @@ lansenger health check
 | `callback` | 回调事件解析 | `parse-payload`, `verify-signature`, `event-types` |
 | `media` | 媒体文件操作 | `upload`, `download`, `download-to-file` |
 | `streaming` | 流式消息（AI 场景） | `create`, `fetch` |
+| `chat` | 会话与消息记录 | `list`, `messages` |
 | `health` | 连接健康检查 | `check` |
 
 ## 常用示例
@@ -98,11 +99,26 @@ lansenger message send-app-card chat123 "卡片标题" --content "正文内容" 
 # 发送多条图文（appArticles）
 lansenger message send-app-articles chat123 '{"title":"文章1","url":"https://a.com"}' '{"title":"文章2","url":"https://b.com"}'
 
+# 发送 OA 审批卡片
+lansenger message send-oacard chat123 "审批标题" --head "审批通知" --field '{"key":"申请人","value":"张三"}' --link https://app.com/approve
+
 # 群内发送并 @all
 lansenger message send-text group123 "全员通知" --group --mention-all
 
 # 群内 @指定人
 lansenger message send-text group123 "请查看" --group --mention staff001 --mention staff002
+
+# 机器人通道发送消息
+lansenger message send-bot-message text '{"content":"通知内容"}' --chat-id user001 --chat-id user002
+
+# 群消息通道发送（需要 user_token）
+lansenger message send-group-message group123 text '{"content":"群消息"}' --user-token YOUR_USER_TOKEN --sender-id staff001
+
+# 应用账号通道发送
+lansenger message send-account-message text '{"content":"账号消息"}' --chat-id user001 --account-id acct001
+
+# 用户通道发送（需要 user_token）
+lansenger message send-user-message user001 text '{"content":"私聊消息"}' --user-token YOUR_USER_TOKEN
 
 # 撤回消息
 lansenger message revoke msg001 msg002
@@ -165,21 +181,44 @@ lansenger department children dept001
 lansenger department staffs dept001
 ```
 
+### 会话与消息记录
+
+```bash
+# 获取会话列表（需要 user_token）
+lansenger chat list --user-token YOUR_USER_TOKEN
+
+# 只看群聊
+lansenger chat list --type 2 --user-token YOUR_USER_TOKEN
+
+# 搜索会话（关键词）
+lansenger chat list --type 1 --keyword 张三 --user-token YOUR_USER_TOKEN
+
+# 获取私聊消息记录
+lansenger chat messages --staff-id staff001 --user-token YOUR_USER_TOKEN
+
+# 获取群聊消息记录
+lansenger chat messages --group-id group123 --user-token YOUR_USER_TOKEN
+```
+
 ### 日程操作
 
 ```bash
 # 获取主日历
 lansenger calendar primary --user-token YOUR_USER_TOKEN
 
-# 创建日程
-lansenger calendar create-schedule cal001 "周会" \
-  '{"dateTime":"2026-01-01T09:00:00","timeZone":"Asia/Shanghai"}' \
-  '{"dateTime":"2026-01-01T10:00:00","timeZone":"Asia/Shanghai"}' \
-  '[{"staffId":"staff001"}]' \
-  --desc "每周例会"
+# 创建日程（start/end 为秒级时间戳）
+lansenger calendar create-schedule cal001 "周会" 1747539600 1747543200 \
+  '[{"staffId":"staff001","attendeeFlag":"yes"}]' \
+  --desc "每周例会" --user-token YOUR_USER_TOKEN
 
-# 查看日程列表
-lansenger calendar list-schedules cal001 1735689600 1735776000 --user-token YOUR_TOKEN
+# 查看日程列表（start/end 为秒级时间戳）
+lansenger calendar list-schedules cal001 1747539600 1747603200 --user-token YOUR_TOKEN
+
+# 查看日程详情
+lansenger calendar fetch-schedule cal001 schedule001 --user-token YOUR_TOKEN
+
+# 删除日程
+lansenger calendar delete-schedule cal001 schedule001 --user-token YOUR_TOKEN
 ```
 
 ### 待办任务

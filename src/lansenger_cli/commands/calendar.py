@@ -23,20 +23,25 @@ def fetch_primary_calendar(
 def create_schedule(
     calendar_id: str = typer.Argument(help="Calendar ID"),
     summary: str = typer.Argument(help="Schedule summary/title"),
-    start_time: str = typer.Argument(help="Start time as JSON: '{\"dateTime\":\"2026-01-01T09:00:00\",\"timeZone\":\"Asia/Shanghai\"}'"),
-    end_time: str = typer.Argument(help="End time as JSON"),
-    attendees: str = typer.Argument(help="Attendees as JSON list: '[{\"staffId\":\"xxx\"}]'"),
+    start_time: int = typer.Argument(help="Start time (unix timestamp in seconds)"),
+    end_time: int = typer.Argument(help="End time (unix timestamp in seconds)"),
+    attendees: str = typer.Argument(help="Attendees as JSON list: '[{\"staffId\":\"xxx\",\"attendeeFlag\":\"yes\"}]'"),
     description: str = typer.Option("", "--desc", "-d", help="Schedule description"),
     all_day: str = typer.Option("no", "--all-day", help="yes or no"),
-    repeat_type: str = typer.Option("no", "--repeat", help="Repeat type: no, daily, weekly, monthly, yearly"),
+    date: str = typer.Option("", "--date", help="Date string for allDay=yes, e.g. 2026-01-01"),
+    repeat_type: str = typer.Option("no", "--repeat", help="Repeat type: no, daily, weekly, monthly, yearly, work_day, custom"),
     reminder_type: str = typer.Option("yes", "--reminder", help="Reminder type: yes or no"),
+    time_zone: str = typer.Option("Asia/Shanghai", "--tz", help="Time zone, e.g. Asia/Shanghai"),
     user_token: str = typer.Option("", "--user-token", help="User token"),
     user_id: str = typer.Option("", "--user-id", help="User ID"),
 ):
     client = get_client()
-    start_time_dict = json.loads(start_time)
-    end_time_dict = json.loads(end_time)
     attendees_list = json.loads(attendees)
+    start_time_dict = {"time": start_time, "date": date, "timeZone": time_zone}
+    end_time_dict = {"time": end_time, "date": date, "timeZone": time_zone}
+    if all_day == "yes":
+        start_time_dict["timeZone"] = "UTC"
+        end_time_dict["timeZone"] = "UTC"
     result = client.create_schedule(
         calendar_id=calendar_id, summary=summary,
         start_time=start_time_dict, end_time=end_time_dict,

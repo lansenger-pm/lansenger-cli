@@ -1,3 +1,5 @@
+import dataclasses
+
 from lansenger_sdk import LansengerSyncClient, CredentialStore, LansengerConfig
 from rich import print as rprint
 from rich.console import Console
@@ -38,9 +40,17 @@ def get_client(store_path: str = "") -> LansengerSyncClient:
     return LansengerSyncClient.from_config(config)
 
 
+def _result_to_dict(result):
+    if hasattr(result, "to_dict"):
+        return result.to_dict()
+    if dataclasses.is_dataclass(result):
+        return dataclasses.asdict(result)
+    return str(result)
+
+
 def output_result(result, fields: list[str] | None = None, title: str = ""):
     if is_json_output():
-        rprint(result.to_dict())
+        rprint(_result_to_dict(result))
         return
     if not result.success:
         rprint(f"[red]Error:[/red] {result.error}")
@@ -57,12 +67,12 @@ def output_result(result, fields: list[str] | None = None, title: str = ""):
                 table.add_row(f, str(val))
         console.print(table)
     else:
-        rprint(result.to_dict())
+        rprint(_result_to_dict(result))
 
 
 def output_list(items: list, columns: list[str], title: str = "", row_mapper=None):
     if is_json_output():
-        rprint([item.to_dict() if hasattr(item, "to_dict") else item for item in items])
+        rprint([_result_to_dict(item) if hasattr(item, "to_dict") or dataclasses.is_dataclass(item) else item for item in items])
         return
     if not items:
         rprint("[yellow]No results.[/yellow]")
