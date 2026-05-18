@@ -24,7 +24,7 @@ classifiers = [
 ]
 
 dependencies = [
-    "lansenger-sdk>=1.1.0",
+    "lansenger-sdk>=1.2.0",
     "typer>=0.9",
     "rich>=13",
 ]
