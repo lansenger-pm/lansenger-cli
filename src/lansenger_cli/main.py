@@ -1,6 +1,7 @@
 import typer
 
 from lansenger_cli.utils import get_store, output_result, is_json_output, console
+from lansenger_cli.utils import set_json_output, set_active_profile, get_active_profile
 from lansenger_cli.commands import (
     config as config_cmd,
     message as message_cmd,
@@ -43,5 +44,7 @@ app.add_typer(health_cmd.app, name="health")
 @app.callback()
 def global_options(
     json: bool = typer.Option(False, "--json", "-j", help="Output raw JSON instead of formatted tables"),
+    profile: str = typer.Option("default", "--profile", "-P", help="Credential profile to use"),
 ):
     set_json_output(json)
+    set_active_profile(profile)

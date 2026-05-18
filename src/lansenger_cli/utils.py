@@ -7,6 +7,7 @@ from rich.table import Table
 
 console = Console()
 _json_output = False
+_active_profile = "default"
 
 
 def set_json_output(value: bool):
@@ -14,22 +15,31 @@ def set_json_output(value: bool):
     _json_output = value
 
 
+def set_active_profile(value: str):
+    global _active_profile
+    _active_profile = value
+
+
 def is_json_output() -> bool:
     return _json_output
 
 
+def get_active_profile() -> str:
+    return _active_profile
+
+
 def get_store() -> CredentialStore:
-    return CredentialStore()
+    return CredentialStore(profile=_active_profile)
 
 
-def get_client(store_path: str = "") -> LansengerSyncClient:
-    store = CredentialStore(path=store_path) if store_path else CredentialStore()
+def get_client() -> LansengerSyncClient:
+    store = CredentialStore(profile=_active_profile)
     creds = store.load_credentials()
     if not creds.get("app_id") or not creds.get("app_secret"):
         env_config = LansengerConfig.from_env()
         if env_config.is_configured():
             return LansengerSyncClient.from_config(env_config)
-        rprint("[red]Error:[/red] No credentials configured. Run [bold]lansenger config set[/bold] first, or set LANSENGER_APP_ID / LANSENGER_APP_SECRET env vars.")
+        rprint("[red]Error:[/red] No credentials configured for profile '{_active_profile}'. Run [bold]lansenger config set[/bold] first, or set LANSENGER_APP_ID / LANSENGER_APP_SECRET env vars.")
         raise SystemExit(1)
     config = LansengerConfig(
         app_id=creds["app_id"],
