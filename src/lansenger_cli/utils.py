@@ -60,20 +60,22 @@ def _result_to_dict(result):
 
 def output_result(result, fields: list[str] | None = None, title: str = ""):
     if is_json_output():
-        rprint(_result_to_dict(result))
+        import json
+        rprint(json.dumps(_result_to_dict(result), ensure_ascii=False, indent=2))
         return
     if not result.success:
         rprint(f"[red]Error:[/red] {result.error}")
         raise SystemExit(1)
     if fields:
-        table = Table(title=title, show_header=True, header_style="bold cyan")
-        table.add_column("Field")
-        table.add_column("Value")
+        table = Table(title=title, show_header=True, header_style="bold cyan", show_lines=True)
+        table.add_column("Field", style="bold")
+        table.add_column("Value", no_wrap=True)
         for f in fields:
             val = getattr(result, f, None)
             if val is not None:
                 if isinstance(val, (list, dict)):
-                    val = str(val)
+                    import json
+                    val = json.dumps(val, ensure_ascii=False) if isinstance(val, dict) else json.dumps(val, ensure_ascii=False)
                 table.add_row(f, str(val))
         console.print(table)
     else:
