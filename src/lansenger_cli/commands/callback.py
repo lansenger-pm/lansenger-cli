@@ -2,31 +2,61 @@ import typer
 import json
 from rich import print as rprint
 
-from lansenger_cli.utils import is_json_output, console
+from lansenger_cli.utils import is_json_output, console, get_active_profile
 
 app = typer.Typer(help="Parse and verify callback events")
+
+
+def _resolve_encoding_key(cli_value: str, profile: str = "") -> str:
+    if cli_value:
+        return cli_value
+    from lansenger_sdk import CredentialStore
+    p = profile or get_active_profile()
+    store = CredentialStore(profile=p)
+    creds = store.load_credentials()
+    val = creds.get("encoding_key", "")
+    if val:
+        rprint(f"[dim]Using encoding_key from credential store (profile: {p})[/dim]")
+    return val
+
+
+def _resolve_callback_token(cli_value: str, encoding_key: str, profile: str = "") -> str:
+    if cli_value:
+        return cli_value
+    from lansenger_sdk import CredentialStore
+    p = profile or get_active_profile()
+    store = CredentialStore(profile=p)
+    creds = store.load_credentials()
+    val = creds.get("callback_token", "")
+    if val:
+        rprint(f"[dim]Using callback_token from credential store (profile: {p})[/dim]")
+    return val
 
 
 @app.command("parse-payload")
 def parse_callback_payload(
     encrypted_data: str = typer.Argument(help="Callback data (plain JSON or encrypted dataEncrypt value)"),
-    encoding_key: str = typer.Option("", "--encoding-key", help="Base64-encoded AES key for decryption"),
-    callback_token: str = typer.Option("", "--callback-token", help="Token for signature verification (from developer center callback config; falls back to encoding_key)"),
+    encoding_key: str = typer.Option("", "--encoding-key", help="Base64-encoded AES key for decryption (reads from credential store if empty)"),
+    callback_token: str = typer.Option("", "--callback-token", help="Token for signature verification (reads from credential store if empty; falls back to encoding_key)"),
     known_app_id: str = typer.Option("", "--known-app-id", help="Known appId to help split orgId/appId during decryption"),
     verify_signature: bool = typer.Option(False, "--verify-sig", help="Verify signature before parsing"),
     timestamp: str = typer.Option("", "--timestamp", help="Timestamp for signature verification"),
     nonce: str = typer.Option("", "--nonce", help="Nonce for signature verification"),
     signature: str = typer.Option("", "--signature", help="Signature to verify"),
+    profile: str = typer.Option("", "--profile", "-P", help="Credential profile (overrides global --profile)"),
 ):
     from lansenger_sdk import parse_callback_payload
+    p = profile or get_active_profile()
+    resolved_key = _resolve_encoding_key(encoding_key, p)
+    resolved_token = _resolve_callback_token(callback_token, resolved_key, p)
     events = parse_callback_payload(
         encrypted_data,
-        encoding_key=encoding_key,
+        encoding_key=resolved_key,
         verify_signature=verify_signature,
         timestamp=timestamp,
         nonce=nonce,
         signature=signature,
-        callback_token=callback_token,
+        callback_token=resolved_token,
         known_app_id=known_app_id,
     )
     if is_json_output():
@@ -43,11 +73,17 @@ def parse_callback_payload(
 @app.command("decrypt-payload")
 def decrypt_callback_payload(
     encrypted_data: str = typer.Argument(help="Encrypted dataEncrypt value"),
-    encoding_key: str = typer.Option(..., "--encoding-key", help="Base64-encoded AES key for decryption"),
+    encoding_key: str = typer.Option("", "--encoding-key", help="Base64-encoded AES key for decryption (reads from credential store if empty)"),
     known_app_id: str = typer.Option("", "--known-app-id", help="Known appId to help split orgId/appId in decrypted result"),
+    profile: str = typer.Option("", "--profile", "-P", help="Credential profile (overrides global --profile)"),
 ):
     from lansenger_sdk import decrypt_callback_payload
-    result = decrypt_callback_payload(encrypted_data, encoding_key, known_app_id=known_app_id)
+    p = profile or get_active_profile()
+    resolved_key = _resolve_encoding_key(encoding_key, p)
+    if not resolved_key:
+        rprint("[red]Error:[/red] encoding_key is required for decryption. Pass --encoding-key or set it via [bold]lansenger config set encoding_key[/bold].")
+        raise typer.Exit(1)
+    result = decrypt_callback_payload(encrypted_data, resolved_key, known_app_id=known_app_id)
     if is_json_output():
         rprint(json.dumps(result, indent=2, ensure_ascii=False))
         return
@@ -63,12 +99,19 @@ def verify_callback_signature(
     timestamp: str = typer.Argument(help="Timestamp"),
     nonce: str = typer.Argument(help="Nonce"),
     signature: str = typer.Argument(help="Signature"),
-    encoding_key: str = typer.Argument(help="Encoding key (used as token if callback-token not provided)"),
+    encoding_key: str = typer.Option("", "--encoding-key", help="Encoding key, used as token if callback-token not provided (reads from credential store if empty)"),
     data_encrypt: str = typer.Option("", "--data-encrypt", help="The encrypted dataEncrypt value (required for correct signature verification)"),
-    callback_token: str = typer.Option("", "--callback-token", help="Token from developer center callback config (falls back to encoding_key)"),
+    callback_token: str = typer.Option("", "--callback-token", help="Token from developer center callback config (reads from credential store if empty; falls back to encoding_key)"),
+    profile: str = typer.Option("", "--profile", "-P", help="Credential profile (overrides global --profile)"),
 ):
     from lansenger_sdk import verify_callback_signature as _verify
-    valid = _verify(timestamp, nonce, signature, encoding_key, data_encrypt=data_encrypt, callback_token=callback_token)
+    p = profile or get_active_profile()
+    resolved_key = _resolve_encoding_key(encoding_key, p)
+    if not resolved_key:
+        rprint("[red]Error:[/red] encoding_key is required for signature verification. Pass --encoding-key or set it via [bold]lansenger config set encoding_key[/bold].")
+        raise typer.Exit(1)
+    resolved_token = _resolve_callback_token(callback_token, resolved_key, p)
+    valid = _verify(timestamp, nonce, signature, resolved_key, data_encrypt=data_encrypt, callback_token=resolved_token)
     if is_json_output():
         rprint(json.dumps({"valid": valid}, ensure_ascii=False))
         return
