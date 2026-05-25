@@ -7,7 +7,7 @@ from lansenger_cli.utils import get_store, get_active_profile, output_result, is
 
 app = typer.Typer(help="Manage CLI configuration (credentials, tokens)")
 
-VALID_KEYS = ["app_id", "app_secret", "api_gateway_url", "passport_url"]
+VALID_KEYS = ["app_id", "app_secret", "api_gateway_url", "passport_url", "encoding_key", "callback_token"]
 
 
 @app.command("set")
@@ -28,6 +28,8 @@ def config_set(
         app_secret=creds.get("app_secret", ""),
         api_gateway_url=creds.get("api_gateway_url", ""),
         passport_url=creds.get("passport_url", ""),
+        encoding_key=creds.get("encoding_key", ""),
+        callback_token=creds.get("callback_token", ""),
     )
     rprint(f"[green]Set[/green] {key} = {value} [dim](profile: {p})[/dim]")
 
