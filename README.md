@@ -67,7 +67,7 @@ lansenger health check
 | `calendar` | 日程操作 | `primary`, `create-schedule`, `fetch-schedule`, `delete-schedule`, `list-schedules`, `attendees`, `add-attendees`, `delete-attendees` |
 | `todo` | 待办任务管理 | `create`, `update`, `update-status`, `delete`, `list`, `fetch-by-source`, `fetch-by-id`, `status-counts`, `executor-status`, `add-executors`, `delete-executors`, `executor-list` |
 | `oauth` | OAuth2 用户认证 | `authorize-url`, `exchange-code`, `refresh-token`, `user-info`, `parse-callback`, `validate-state` |
-| `callback` | 回调事件解析 | `parse-payload`, `verify-signature`, `event-types` |
+| `callback` | 回调事件解析 | `parse-payload`, `decrypt-payload`, `verify-signature`, `event-types` |
 | `media` | 媒体文件操作 | `upload`, `download`, `download-to-file` |
 | `streaming` | 流式消息（AI 场景） | `create`, `fetch` |
 | `chat` | 会话与消息记录 | `list`, `messages` |
@@ -263,8 +263,11 @@ lansenger callback event-types
 # 解析回调数据
 lansenger callback parse-payload ENCRYPTED_DATA --encoding-key YOUR_KEY
 
+# 解密回调数据（查看 orgId/appId/events）
+lansenger callback decrypt-payload ENCRYPTED_DATA --encoding-key YOUR_KEY
+
 # 验证签名
-lansenger callback verify-signature TIMESTAMP NONCE SIGNATURE ENCODING_KEY
+lansenger callback verify-signature TIMESTAMP NONCE SIGNATURE ENCODING_KEY --data-encrypt ENCRYPTED_DATA
 ```
 
 ### 媒体文件
