@@ -61,7 +61,7 @@ def send_markdown(
 def send_file(
     chat_id: str = typer.Argument(help="Chat ID"),
     file_path: str = typer.Argument(help="Local file path"),
-    caption: str = typer.Option("", "--caption", "-c", help="Caption text"),
+    content: str = typer.Option("", "--content", "-c", help="Content/caption text"),
     media_type: Optional[int] = typer.Option(None, "--media-type", help="1=video, 2=image, 3=file"),
     cover_image: str = typer.Option("", "--cover-image", help="Cover image path for video attachments"),
     is_group: bool = typer.Option(False, "--group", "-g", help="Send as group message"),
@@ -72,7 +72,7 @@ def send_file(
     result = client.send_file(
         chat_id=chat_id,
         file_path=file_path,
-        caption=caption,
+        caption=content,
         media_type=media_type,
         cover_image_path=cover_image,
         is_group=is_group,
@@ -86,14 +86,14 @@ def send_file(
 def send_image_url(
     chat_id: str = typer.Argument(help="Chat ID"),
     image_url: str = typer.Argument(help="Image URL to send"),
-    caption: str = typer.Option("", "--caption", "-c", help="Caption text"),
+    content: str = typer.Option("", "--content", "-c", help="Content/caption text"),
     is_group: bool = typer.Option(False, "--group", "-g", help="Send as group message"),
     user_token: str = typer.Option("", "--user-token", help="User token for private channel"),
     sender_id: str = typer.Option("", "--sender-id", help="Sender staff ID for group message"),
 ):
     client = get_client()
     result = client.send_image_url(
-        chat_id=chat_id, image_url=image_url, caption=caption,
+        chat_id=chat_id, image_url=image_url, caption=content,
         is_group=is_group, user_token=user_token, sender_id=sender_id,
     )
     output_result(result, fields=["message_id", "msg_type", "operation"], title="Send Image Result")
