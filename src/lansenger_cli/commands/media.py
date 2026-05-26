@@ -8,11 +8,28 @@ app = typer.Typer(help="Upload and download media files")
 @app.command("upload")
 def upload_media(
     file_path: str = typer.Argument(help="Local file path to upload"),
-    media_type: int = typer.Option(3, "--media-type", "-t", help="1=video, 2=image, 3=file"),
+    media_type: int = typer.Option(3, "--media-type", "-t", help="1=video, 2=image, 3=file (4.5.1 core service)"),
+    user_token: str = typer.Option("", "--user-token", help="User token (optional for 4.5.1)"),
 ):
     client = get_client()
-    result = client.upload_media(file_path=file_path, media_type=media_type)
-    output_result(result, fields=["message_id"], title="Upload Media Result")
+    result = client.upload_media(file_path=file_path, media_type=media_type, user_token=user_token)
+    output_result(result, fields=["message_id", "created_time"], title="Upload Media Result (4.5.1)")
+
+
+@app.command("upload-app")
+def upload_app_media(
+    file_path: str = typer.Argument(help="Local file path to upload"),
+    media_type: str = typer.Option("file", "--media-type", "-t", help="file, video, image, audio (4.5.4 app/bot)"),
+    width: int = typer.Option(0, "--width", help="Width for video/image"),
+    height: int = typer.Option(0, "--height", help="Height for video/image"),
+    duration: int = typer.Option(0, "--duration", help="Duration in seconds for video/audio"),
+):
+    client = get_client()
+    result = client.upload_app_media(
+        file_path=file_path, media_type=media_type,
+        width=width or None, height=height or None, duration=duration or None,
+    )
+    output_result(result, fields=["message_id"], title="Upload App Media Result (4.5.4)")
 
 
 @app.command("download")
@@ -40,3 +57,13 @@ def download_media_to_file(
     )
     from rich import print as rprint
     rprint(f"[green]Saved to:[/green] {saved_path}")
+
+
+@app.command("path")
+def fetch_media_path(
+    media_id: str = typer.Argument(help="Media ID to get path for"),
+    user_token: str = typer.Option("", "--user-token", help="User token"),
+):
+    client = get_client()
+    result = client.fetch_media_path(media_id=media_id, user_token=user_token)
+    output_result(result, fields=["media_path", "name", "type", "size"], title="Media Path Result")

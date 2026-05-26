@@ -157,3 +157,65 @@ def delete_schedule_attendees(
         attendees=attendees_list, user_token=user_token, user_id=user_id,
     )
     output_result(result, fields=["schedule_id"], title="Delete Attendees Result")
+
+
+@app.command("update-schedule")
+def update_schedule(
+    calendar_id: str = typer.Argument(help="Calendar ID"),
+    schedule_id: str = typer.Argument(help="Schedule ID"),
+    summary: str = typer.Option("", "--summary", help="New schedule summary"),
+    description: str = typer.Option("", "--desc", "-d", help="New description"),
+    operation_type: str = typer.Option("modify_all", "--op", help="Operation type: modify_all, modify_current, modify_current_after"),
+    current_time: int = typer.Option(0, "--current-time", help="Required when op != modify_all"),
+    reminder_type: str = typer.Option("", "--reminder", help="Reminder type: yes or no"),
+    repeat_type: str = typer.Option("", "--repeat", help="Repeat type: no, day, week, month, year, work_day, custom"),
+    rule: str = typer.Option("", "--rule", help="RFC 5545 repeat rule"),
+    expire_date_type: str = typer.Option("", "--expire", help="Expire date type: yes or no"),
+    all_day: str = typer.Option("", "--all-day", help="All day: yes or no"),
+    attendee_permissions: str = typer.Option("", "--permissions", help="Attendee permissions: can_modify, can_invite, can_see, none"),
+    start_time: str = typer.Option("", "--start-time", help="Start time as JSON dict: {\"time\":..., \"date\":..., \"timeZone\":...}"),
+    end_time: str = typer.Option("", "--end-time", help="End time as JSON dict"),
+    user_token: str = typer.Option("", "--user-token", help="User token"),
+    user_id: str = typer.Option("", "--user-id", help="User ID"),
+):
+    client = get_client()
+    start_time_dict = json.loads(start_time) if start_time else None
+    end_time_dict = json.loads(end_time) if end_time else None
+    result = client.update_schedule(
+        calendar_id=calendar_id, schedule_id=schedule_id,
+        summary=summary or None, description=description or None,
+        operation_type=operation_type, current_time=current_time or None,
+        reminder_type=reminder_type or None,
+        repeat_type=repeat_type or None, rule=rule or None,
+        expire_date_type=expire_date_type or None,
+        all_day=all_day or None,
+        attendee_permissions=attendee_permissions or None,
+        start_time=start_time_dict, end_time=end_time_dict,
+        user_token=user_token, user_id=user_id,
+    )
+    output_result(result, fields=["schedule_ids"], title="Update Schedule Result")
+
+
+@app.command("attendee-meta")
+def update_schedule_attendee_meta(
+    calendar_id: str = typer.Argument(help="Calendar ID"),
+    schedule_id: str = typer.Argument(help="Schedule ID"),
+    rsvp_status: str = typer.Option("", "--rsvp", help="RSVP status: accept, tentative, decline"),
+    color: str = typer.Option("", "--color", help="Hex color (e.g. #FF347AFC)"),
+    permissions: str = typer.Option("", "--permissions", help="Visibility: private, public, default"),
+    busy_free_state: str = typer.Option("", "--busy-free", help="Busy/free state: busy, free"),
+    remind_times: str = typer.Option("", "--remind-times", help="Reminder offsets in minutes as JSON list, e.g. '[5,15]'"),
+    user_token: str = typer.Option("", "--user-token", help="User token"),
+    user_id: str = typer.Option("", "--user-id", help="User ID"),
+):
+    client = get_client()
+    remind_times_list = json.loads(remind_times) if remind_times else None
+    result = client.update_schedule_attendee_meta(
+        calendar_id=calendar_id, schedule_id=schedule_id,
+        rsvp_status=rsvp_status or None, color=color or None,
+        permissions=permissions or None,
+        busy_free_state=busy_free_state or None,
+        remind_times=remind_times_list,
+        user_token=user_token, user_id=user_id,
+    )
+    output_result(result, title="Update Attendee Meta Result")

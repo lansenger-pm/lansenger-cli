@@ -115,3 +115,13 @@ def update_group_members(
         user_token=user_token,
     )
     output_result(result, fields=["total_members", "added_staff_count", "deleted_staff_count"], title="Update Members Result")
+
+
+@app.command("dismiss")
+def dismiss_group(
+    group_id: str = typer.Argument(help="Group ID to dismiss/delete"),
+    user_token: str = typer.Option("", "--user-token", help="User token"),
+):
+    client = get_client()
+    result = client.dismiss_group(group_id=group_id, user_token=user_token)
+    output_result(result, title="Dismiss Group Result")

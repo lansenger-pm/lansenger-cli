@@ -363,3 +363,18 @@ def send_user_message(
         user_token=user_token, common=parsed_common, uuid=uuid,
     )
     output_result(result, fields=["message_id"], title="User Message Result")
+
+
+@app.command("send-reminder")
+def send_reminder(
+    msg_id: str = typer.Argument(help="Message ID to remind about"),
+    reminder_types: Optional[List[int]] = typer.Option(None, "--type", "-t", help="Reminder types: 1=popup, 2=SMS, 3=phone call"),
+    user_id_list: Optional[List[str]] = typer.Option(None, "--user", "-u", help="User IDs (staff openIds) to remind"),
+):
+    client = get_client()
+    result = client.send_reminder(
+        msg_id=msg_id,
+        reminder_types=reminder_types or [],
+        user_id_list=user_id_list or [],
+    )
+    output_result(result, fields=["operation"], title="Send Reminder Result")
