@@ -20,11 +20,27 @@ pip install -e .
 
 ### 1. 配置凭证
 
-通过 `config set` 命令保存 app 凭证（存储在 `~/.lansenger/sdk_state.json`，密钥脱敏显示）：
+通过 `config set` 命令保存凭证（按 appID/profile 隔离存储在 `~/.lansenger/sdk_state.json`，密钥脱敏显示，文件权限 0600）：
+
+**基本凭证（所有用户必填）**：
 
 ```bash
 lansenger config set app_id YOUR_APP_ID
 lansenger config set app_secret YOUR_APP_SECRET
+lansenger config set api_gateway_url https://apigw.lx.qianxin.com/open/apigw   # 私有部署需修改
+```
+
+**OAuth2 用户认证（需要获取 userToken 时填写）**：
+
+```bash
+lansenger config set passport_url https://passport.lx.qianxin.com   # 私有部署需修改
+```
+
+**回调接收（需要解析/验签回调 Webhook 时填写）**：
+
+```bash
+lansenger config set encoding_key YOUR_ENCODING_KEY        # 回调数据 AES 解密密钥（Base64 编码）
+lansenger config set callback_token YOUR_CALLBACK_TOKEN    # 回调签名验证 token（未填时回退到 encoding_key）
 ```
 
 也可以通过环境变量配置（适合 CI/CD 或临时使用）：
@@ -32,13 +48,8 @@ lansenger config set app_secret YOUR_APP_SECRET
 ```bash
 export LANSENGER_APP_ID=YOUR_APP_ID
 export LANSENGER_APP_SECRET=YOUR_APP_SECRET
-```
-
-可选：设置私有部署网关地址和 OAuth2 passport 地址：
-
-```bash
-lansenger config set api_gateway_url https://your-gateway.example.com/open/apigw
-lansenger config set passport_url https://your-passport.example.com
+export LANSENGER_ENCODING_KEY=YOUR_ENCODING_KEY
+export LANSENGER_CALLBACK_TOKEN=YOUR_CALLBACK_TOKEN
 ```
 
 ### 2. 查看配置
@@ -59,7 +70,7 @@ lansenger health check
 
 | 命令组 | 说明 | 子命令 |
 |--------|------|--------|
-| `config` | 管理凭证配置 | `set`, `show`, `clear` |
+| `config` | 管理凭证配置 | `set`, `show`, `clear`, `list-profiles` |
 | `message` | 发送与管理消息 | `send-text`, `send-markdown`, `send-file`, `send-image-url`, `send-link-card`, `send-app-articles`, `send-app-card`, `send-oacard`, `send-bot-message`, `send-group-message`, `send-account-message`, `send-user-message`, `update-dynamic-card`, `revoke`, `query-groups` |
 | `group` | 管理群组 | `create`, `info`, `members`, `list`, `check`, `update`, `update-members` |
 | `staff` | 查询人员信息 | `basic-info`, `detail`, `ancestors`, `id-mapping`, `org-extra-fields`, `search`, `org-info` |
@@ -315,11 +326,37 @@ lansenger --show-completion
 
 支持 bash、zsh、fish 等主流 shell。
 
+## 多应用/多机器人配置（Profile）
+
+CLI 支持多 profile，每个 profile 对应一个 appID（一个应用或一个机器人），凭证互相隔离：
+
+```bash
+# 配置第一个应用（个人机器人）
+lansenger config set app_id xxx1 --profile my-bot
+lansenger config set app_secret xxx1 --profile my-bot
+
+# 配置第二个应用（蓝信应用）
+lansenger config set app_id xxx2 --profile my-app
+lansenger config set app_secret xxx2 --profile my-app
+lansenger config set encoding_key yyy2 --profile my-app        # 此应用需要接收回调
+lansenger config set callback_token zzz2 --profile my-app
+
+# 切换应用执行命令
+lansenger message send-text staff123 "Hello" --profile my-bot
+lansenger callback parse-payload DATA --profile my-app
+
+# 查看所有已配置 profile
+lansenger config list-profiles
+
+# 查看某个 profile 详情
+lansenger config show --profile my-app
+```
+
 ## 凭证安全
 
-- 凭证存储在 `~/.lansenger/sdk_state.json`，文件权限 0600
-- `config show` 命令对 `app_id` 和 `app_secret` 脱敏显示（`***`）
-- 也支持环境变量 `LANSENGER_APP_ID` / `LANSENGER_APP_SECRET`，适合 CI/CD 场景
+- 凭证按 profile 隔离存储在 `~/.lansenger/sdk_state.json`，文件权限 0600
+- `config show` 对所有密钥类字段脱敏显示（`***`），仅 `api_gateway_url` 和 `passport_url` 明文展示
+- 支持环境变量 `LANSENGER_APP_ID` / `LANSENGER_APP_SECRET` / `LANSENGER_ENCODING_KEY` / `LANSENGER_CALLBACK_TOKEN`，适合 CI/CD 场景
 
 ## 与 SDK 的关系
 
