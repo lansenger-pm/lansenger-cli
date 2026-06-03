@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "lansenger-cli"
-version = "0.9.1"
+version = "0.9.2"
 description = "CLI for Lansenger (蓝信) — send messages, manage groups, staff, departments, calendars, todos, and more"
 readme = "README.md"
 license = "MIT"

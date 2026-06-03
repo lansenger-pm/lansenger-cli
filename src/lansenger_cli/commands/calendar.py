@@ -32,6 +32,9 @@ def create_schedule(
     repeat_type: str = typer.Option("no", "--repeat", help="Repeat type: no, daily, weekly, monthly, yearly, work_day, custom"),
     reminder_type: str = typer.Option("yes", "--reminder", help="Reminder type: yes or no"),
     time_zone: str = typer.Option("Asia/Shanghai", "--tz", help="Time zone, e.g. Asia/Shanghai"),
+    rule: str = typer.Option("", "--rule", help="RFC 5545 repeat rule JSON (for custom repeat)"),
+    expire: str = typer.Option("", "--expire", help="Expire date type: yes or no"),
+    attendee_perms: str = typer.Option("", "--attendee-perms", help="Attendee permissions: can_modify, can_invite, can_see, none"),
     user_token: str = typer.Option("", "--user-token", help="User token"),
     user_id: str = typer.Option("", "--user-id", help="User ID"),
 ):
@@ -48,6 +51,7 @@ def create_schedule(
         attendees=attendees_list, description=description,
         all_day=all_day, repeat_type=repeat_type,
         reminder_type=reminder_type,
+        rule=rule, expire_date_type=expire, attendee_permissions=attendee_perms,
         user_token=user_token, user_id=user_id,
     )
     output_result(result, fields=["schedule_id"], title="Create Schedule Result")
@@ -130,6 +134,7 @@ def add_schedule_attendees(
     calendar_id: str = typer.Argument(help="Calendar ID"),
     schedule_id: str = typer.Argument(help="Schedule ID"),
     attendees: str = typer.Argument(help="Attendee staff IDs as JSON list: '[\"id1\",\"id2\"]'"),
+    reminder_type: str = typer.Option("", "--reminder", help="Reminder type: yes or no"),
     user_token: str = typer.Option("", "--user-token", help="User token"),
     user_id: str = typer.Option("", "--user-id", help="User ID"),
 ):
@@ -137,7 +142,8 @@ def add_schedule_attendees(
     attendees_list = json.loads(attendees)
     result = client.add_schedule_attendees(
         calendar_id=calendar_id, schedule_id=schedule_id,
-        attendees=attendees_list, user_token=user_token, user_id=user_id,
+        attendees=attendees_list, reminder_type=reminder_type,
+        user_token=user_token, user_id=user_id,
     )
     output_result(result, fields=["schedule_id"], title="Add Attendees Result")
 
@@ -147,6 +153,7 @@ def delete_schedule_attendees(
     calendar_id: str = typer.Argument(help="Calendar ID"),
     schedule_id: str = typer.Argument(help="Schedule ID"),
     attendees: str = typer.Argument(help="Attendee staff IDs as JSON list"),
+    reminder_type: str = typer.Option("", "--reminder", help="Reminder type: yes or no"),
     user_token: str = typer.Option("", "--user-token", help="User token"),
     user_id: str = typer.Option("", "--user-id", help="User ID"),
 ):
@@ -154,7 +161,8 @@ def delete_schedule_attendees(
     attendees_list = json.loads(attendees)
     result = client.delete_schedule_attendees(
         calendar_id=calendar_id, schedule_id=schedule_id,
-        attendees=attendees_list, user_token=user_token, user_id=user_id,
+        attendees=attendees_list, reminder_type=reminder_type,
+        user_token=user_token, user_id=user_id,
     )
     output_result(result, fields=["schedule_id"], title="Delete Attendees Result")
 
