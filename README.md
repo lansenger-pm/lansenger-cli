@@ -360,7 +360,7 @@ lansenger config show --profile my-app
 
 ## 与 SDK 的关系
 
-本 CLI 基于 [lansenger-sdk](https://github.com/lansenger-pm/lansenger-skills-official) 的 `LansengerSyncClient` 实现，覆盖 SDK 全部同步 API，不修改 SDK 代码。
+本 CLI 基于 [lansenger-sdk-python](https://github.com/lansenger-pm/lansenger-sdk-python) 的 `LansengerSyncClient` 实现，覆盖 SDK 全部同步 API，不修改 SDK 代码。
 
 ## 许可证
 
