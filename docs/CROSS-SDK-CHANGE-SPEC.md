@@ -471,15 +471,15 @@ Use this checklist to track cross-SDK synchronization progress.
 | # | Change | Priority | Status |
 |---|--------|----------|--------|
 | 1 | `--json` flag for health, oauth, media commands | P0 | ✅ |
-| 2 | `chat messages --split-month --progress` | P1 | ❌ |
+| 2 | `chat messages --split-month --progress` | P1 | ✅ |
 | 3 | `calendar create-schedule --rule --expire --attendee-perms` | P1 | ✅ |
 | 4 | `calendar add/delete-attendees --reminder` | P1 | ✅ |
 | 5 | `callback parse-payload --callback-token --known-app-id` | P1 | ✅ |
 | 6 | NEW: `callback decrypt-payload` command | P1 | ✅ |
 | 7 | `callback verify-signature --data-encrypt --callback-token` | P1 | ✅ |
-| 8 | Credential store resolution for encoding_key/callback_token | P1 | ❌ |
+| 8 | Credential store resolution for encoding_key/callback_token | P1 | ✅ |
 | 9 | `config set` accepts encoding_key, callback_token | P1 | ✅ |
-| 10 | `ChatMessageInfo.plainText()` method | P0 | ❌ (SDK) |
+| 10 | `ChatMessageInfo.plainText()` method | P0 | ✅ (SDK) |
 | 11 | `exchangeCode()` persists expiresIn + refreshExpiresIn | P0 | ✅ |
 | 12 | CredentialStore 6-field schema | P1 | ✅ |
 | 13 | CredentialStore user_token_expiry field | P0 | ✅ |
