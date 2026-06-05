@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "lansenger-cli"
-version = "0.9.3"
+version = "0.10.0"
 description = "CLI for Lansenger (蓝信) — send messages, manage groups, staff, departments, calendars, todos, and more"
 readme = "README.md"
 license = "MIT"
@@ -24,7 +24,7 @@ classifiers = [
 ]
 
 dependencies = [
-    "lansenger-sdk>=1.3.0",
+    "lansenger-sdk>=1.5.0",
     "typer>=0.9",
     "rich>=13",
 ]

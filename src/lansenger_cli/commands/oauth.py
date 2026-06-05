@@ -1,5 +1,9 @@
 import typer
 import json
+import threading
+import time
+from http.server import HTTPServer, BaseHTTPRequestHandler
+from urllib.parse import urlparse, parse_qs
 from rich import print as rprint
 
 from lansenger_cli.utils import get_client, output_result, is_json_output
@@ -81,3 +85,103 @@ def validate_callback_state(
         rprint(json.dumps({"valid": valid}, ensure_ascii=False))
         return
     rprint(f"State valid: {valid}")
+
+
+class _OAuthCallbackHandler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        parsed = urlparse(self.path)
+        params = parse_qs(parsed.query)
+        code = params.get("code", [""])[0]
+        state = params.get("state", [""])[0]
+        error = params.get("error", [""])[0]
+
+        if error:
+            self.send_response(400)
+            self.end_headers()
+            self.wfile.write(f"OAuth2 error: {error}".encode())
+            self.server._callback_result = {"error": error}
+        elif code:
+            self.send_response(200)
+            self.end_headers()
+            self.wfile.write("Authorization successful. You can close this tab.".encode())
+            self.server._callback_result = {"code": code, "state": state}
+        else:
+            self.send_response(400)
+            self.end_headers()
+            self.wfile.write("Missing code parameter.".encode())
+            self.server._callback_result = {"error": "missing_code"}
+
+    def log_message(self, format, *args):
+        pass
+
+
+@app.command("local-callback")
+def local_callback(
+    port: int = typer.Option(8765, "--port", "-p", help="Local HTTP server port"),
+    scope: str = typer.Option("basic_userinfor", "--scope", "-s", help="OAuth2 scope"),
+    state: str = typer.Option("", "--state", help="CSRF state (auto-generated if empty)"),
+    auto_exchange: bool = typer.Option(True, "--exchange/--no-exchange", help="Auto-exchange code for userToken"),
+    timeout: int = typer.Option(120, "--timeout", "-t", help="Max wait seconds for callback"),
+):
+    """Start a local HTTP server to capture OAuth2 callback and optionally exchange the code.
+
+    Workflow:
+    1. Starts a temporary HTTP server on localhost:<port>
+    2. Prints the authorize URL with redirect_uri=localhost
+    3. Waits for the browser redirect
+    4. Captures the code, optionally exchanges it for userToken
+    5. Shuts down the server
+
+    Example:
+        lansenger oauth local-callback --port 8765
+    """
+    redirect_uri = f"http://localhost:{port}"
+    client = get_client()
+    auth_url = client.build_authorize_url(redirect_uri=redirect_uri, scope=scope, state=state)
+
+    if not is_json_output():
+        rprint("[green]Authorize URL:[/green]")
+        rprint(auth_url)
+        rprint(f"\n[yellow]Waiting for callback on port {port}...[/yellow] (timeout: {timeout}s)")
+        rprint("[dim]Open the URL above in a browser, authorize, then wait.[/dim]")
+    else:
+        rprint(json.dumps({"authorize_url": auth_url, "redirect_uri": redirect_uri, "port": port}, ensure_ascii=False))
+
+    server = HTTPServer(("localhost", port), _OAuthCallbackHandler)
+    server._callback_result = None
+    server.timeout = 1
+
+    start_time = time.time()
+    while server._callback_result is None and (time.time() - start_time) < timeout:
+        server.handle_request()
+
+    server.server_close()
+
+    if server._callback_result is None:
+        rprint("[red]Timeout: no callback received within {}s[/red]".format(timeout))
+        raise typer.Exit(1)
+
+    result = server._callback_result
+    if "error" in result:
+        rprint(f"[red]OAuth2 error: {result['error']}[/red]")
+        raise typer.Exit(1)
+
+    code = result["code"]
+    received_state = result["state"]
+
+    if not is_json_output():
+        rprint(f"[green]Received code:[/green] {code}")
+        rprint(f"[green]Received state:[/green] {received_state}")
+
+    if auto_exchange:
+        exchange_result = client.exchange_code(code=code, redirect_uri=redirect_uri)
+        output_result(exchange_result, fields=[
+            "user_token", "expires_in", "refresh_token",
+            "refresh_expires_in", "staff_id", "scope",
+        ], title="Exchange Code Result")
+    else:
+        if is_json_output():
+            rprint(json.dumps({"code": code, "state": received_state}, ensure_ascii=False))
+        else:
+            rprint(f"\n[cyan]Use this code to exchange manually:[/cyan]")
+            rprint(f"  lansenger oauth exchange-code {code} --redirect-uri {redirect_uri}")
