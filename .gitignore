@@ -7,3 +7,4 @@ build/
 .DS_Store
 package/
 skills-*.tgz
+docs/
