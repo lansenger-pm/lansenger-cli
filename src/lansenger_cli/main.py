@@ -1,5 +1,6 @@
 import typer
 
+from importlib.metadata import version as pkg_version
 from lansenger_cli.utils import get_store, output_result, is_json_output, console
 from lansenger_cli.utils import set_json_output, set_active_profile, get_active_profile
 from lansenger_cli.commands import (
@@ -41,10 +42,26 @@ app.add_typer(chat_cmd.app, name="chat")
 app.add_typer(health_cmd.app, name="health")
 
 
-@app.callback()
+@app.callback(invoke_without_command=True)
 def global_options(
+    ctx: typer.Context,
     json: bool = typer.Option(False, "--json", "-j", help="Output raw JSON instead of formatted tables"),
     profile: str = typer.Option("default", "--profile", "-P", help="Credential profile to use"),
+    version: bool = typer.Option(False, "--version", "-v", help="Show CLI and SDK versions"),
 ):
     set_json_output(json)
     set_active_profile(profile)
+    if version:
+        cli_ver = pkg_version("lansenger-cli")
+        sdk_ver = pkg_version("lansenger-sdk")
+        if is_json_output():
+            console.print_json(data={"cli_version": cli_ver, "sdk_version": sdk_ver})
+        else:
+            console.print(f"lansenger-cli {cli_ver} (SDK {sdk_ver})")
+        raise typer.Exit()
+    if not ctx.invoked_subcommand:
+        ctx.get_help()
+        raise typer.Exit()
+    if not ctx.invoked_subcommand:
+        ctx.get_help()
+        raise typer.Exit()
