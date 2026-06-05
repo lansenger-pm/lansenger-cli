@@ -464,7 +464,7 @@ Use this checklist to track cross-SDK synchronization progress.
 | 11 | `ExchangeCode()` persists expires_in + refresh_expires_in | P0 | ✅ |
 | 12 | CredentialStore 6-field schema | P1 | ✅ |
 | 13 | CredentialStore user_token_expiry field | P0 | ✅ |
-| 14 | UserTokenManager design (future) | P2 | ❌ |
+| 14 | UserTokenManager (auto-refresh) + getUserToken/setUserTokens | P0 | ❌ |
 
 ### TypeScript SDK / TS CLI
 
@@ -483,7 +483,8 @@ Use this checklist to track cross-SDK synchronization progress.
 | 11 | `exchangeCode()` persists expiresIn + refreshExpiresIn | P0 | ✅ |
 | 12 | CredentialStore 6-field schema | P1 | ✅ |
 | 13 | CredentialStore user_token_expiry field | P0 | ✅ |
-| 14 | UserTokenManager design (future) | P2 | ❌ |
+| 14 | UserTokenManager (auto-refresh) + getUserToken/setUserTokens | P0 | ✅ |
+| 15 | `oauth local-callback` CLI subcommand | P1 | ✅ |
 
 ---
 
