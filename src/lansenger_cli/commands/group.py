@@ -90,12 +90,29 @@ def update_group_info(
     name: str = typer.Option("", "--name", help="New group name"),
     description: str = typer.Option("", "--desc", help="New description"),
     owner_id: str = typer.Option("", "--owner", help="New owner ID"),
+    avatar_id: str = typer.Option("", "--avatar", help="New avatar ID"),
+    assistant: Optional[List[str]] = typer.Option(None, "--assistant", help="Staff IDs to promote to assistant"),
+    demote_assistant: Optional[List[str]] = typer.Option(None, "--demote-assistant", help="Staff IDs to demote from assistant"),
+    manage_mode: Optional[int] = typer.Option(None, "--manage-mode", help="0=all manage, 1=owner only"),
+    location_share: Optional[bool] = typer.Option(None, "--location-share", help="Enable/disable location sharing"),
+    needs_confirm: Optional[bool] = typer.Option(None, "--needs-confirm", help="Join requires confirmation"),
+    is_public: Optional[bool] = typer.Option(None, "--is-public", help="Public visibility"),
+    max_members: Optional[int] = typer.Option(None, "--max-members", help="Maximum member count"),
+    max_history_msg_count: Optional[int] = typer.Option(None, "--max-history", help="Max history message count"),
+    remind_all: Optional[bool] = typer.Option(None, "--remind-all", help="@mention enabled/disabled"),
+    send_msg_status: Optional[bool] = typer.Option(None, "--mute", help="Group mute on/off"),
     user_token: str = typer.Option("", "--user-token", help="User token"),
 ):
     client = get_client()
     result = client.update_group_info(
         group_id=group_id, name=name, description=description,
-        owner_id=owner_id, user_token=user_token,
+        owner_id=owner_id, avatar_id=avatar_id,
+        assistant=assistant, demote_assistant=demote_assistant,
+        manage_mode=manage_mode, location_share=location_share,
+        needs_confirm=needs_confirm, is_public=is_public,
+        max_members=max_members, max_history_msg_count=max_history_msg_count,
+        remind_all=remind_all, send_msg_status=send_msg_status,
+        user_token=user_token,
     )
     output_result(result, title="Update Group Result")
 

@@ -8,7 +8,7 @@ app = typer.Typer(help="Streaming message operations (for AI agent progressive o
 @app.command("create")
 def create_stream_message(
     receiver_id: str = typer.Argument(help="Receiver ID"),
-    receiver_type: str = typer.Argument(help="Receiver type: single or group"),
+    receiver_type: str = typer.Argument(help="Receiver type: staff or group"),
     stream_id: str = typer.Argument(help="Stream ID (unique per session)"),
 ):
     client = get_client()

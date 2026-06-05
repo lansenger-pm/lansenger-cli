@@ -18,7 +18,6 @@ from lansenger_cli.commands import (
     health as health_cmd,
     chat as chat_cmd,
 )
-from lansenger_cli.utils import set_json_output
 
 app = typer.Typer(
     name="lansenger",
@@ -58,9 +57,6 @@ def global_options(
             console.print_json(data={"cli_version": cli_ver, "sdk_version": sdk_ver})
         else:
             console.print(f"lansenger-cli {cli_ver} (SDK {sdk_ver})")
-        raise typer.Exit()
-    if not ctx.invoked_subcommand:
-        ctx.get_help()
         raise typer.Exit()
     if not ctx.invoked_subcommand:
         ctx.get_help()
