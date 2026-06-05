@@ -1,7 +1,8 @@
 import typer
+import json
 from rich import print as rprint
 
-from lansenger_cli.utils import get_client, output_result
+from lansenger_cli.utils import get_client, output_result, is_json_output
 
 app = typer.Typer(help="OAuth2 user authentication operations")
 
@@ -14,6 +15,9 @@ def build_authorize_url(
 ):
     client = get_client()
     url = client.build_authorize_url(redirect_uri=redirect_uri, scope=scope, state=state)
+    if is_json_output():
+        rprint(json.dumps({"authorize_url": url}, ensure_ascii=False))
+        return
     rprint(f"[green]Authorize URL:[/green] {url}")
 
 
@@ -60,6 +64,9 @@ def parse_authorize_callback(
 ):
     from lansenger_sdk import LansengerSyncClient
     params = LansengerSyncClient.parse_authorize_callback(query_string)
+    if is_json_output():
+        rprint(json.dumps(params, ensure_ascii=False))
+        return
     rprint(params)
 
 
@@ -70,4 +77,7 @@ def validate_callback_state(
 ):
     from lansenger_sdk import LansengerSyncClient
     valid = LansengerSyncClient.validate_callback_state(callback_state, expected_state)
+    if is_json_output():
+        rprint(json.dumps({"valid": valid}, ensure_ascii=False))
+        return
     rprint(f"State valid: {valid}")

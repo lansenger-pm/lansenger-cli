@@ -1,7 +1,8 @@
 import typer
 from rich import print as rprint
+import json
 
-from lansenger_cli.utils import get_client
+from lansenger_cli.utils import get_client, is_json_output
 
 app = typer.Typer(help="Health check and connection verification")
 
@@ -10,6 +11,9 @@ app = typer.Typer(help="Health check and connection verification")
 def health_check():
     client = get_client()
     result = client.health_check()
+    if is_json_output():
+        rprint(json.dumps({"healthy": result}, ensure_ascii=False))
+        return
     if result:
         rprint("[green]OK[/green] — Lansenger connection is healthy (app token obtained successfully)")
     else:

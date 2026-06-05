@@ -1,6 +1,8 @@
 import typer
+import json
+from rich import print as rprint
 
-from lansenger_cli.utils import get_client, output_result
+from lansenger_cli.utils import get_client, output_result, is_json_output
 
 app = typer.Typer(help="Upload and download media files")
 
@@ -38,8 +40,10 @@ def download_media(
 ):
     client = get_client()
     result = client.download_media(media_id=media_id)
+    if is_json_output():
+        rprint(json.dumps({"success": result.success, "size": len(result.data) if result.data else 0, "error": result.error if not result.success else ""}, ensure_ascii=False))
+        return
     if result.success:
-        from rich import print as rprint
         rprint(f"[green]Downloaded media[/green] (size: {len(result.data) if result.data else 0} bytes)")
     else:
         output_result(result)
@@ -55,7 +59,9 @@ def download_media_to_file(
     saved_path = client.download_media_to_file(
         media_id=media_id, target_path=target_path, media_type=media_type,
     )
-    from rich import print as rprint
+    if is_json_output():
+        rprint(json.dumps({"saved_path": saved_path}, ensure_ascii=False))
+        return
     rprint(f"[green]Saved to:[/green] {saved_path}")
 
 
