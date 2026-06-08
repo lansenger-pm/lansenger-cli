@@ -46,6 +46,16 @@ def refresh_user_token(
 ):
     client = get_client()
     result = client.refresh_user_token(refresh_token=refresh_token, scope=scope)
+    if result.success and result.user_token:
+        store = get_store()
+        existing = store.load_user_token()
+        old_rt = existing.get("refresh_token", "")
+        store.save_user_token(
+            result.user_token,
+            result.refresh_token or old_rt or refresh_token,
+            result.expires_in,
+            result.refresh_expires_in or 0,
+        )
     output_result(result, fields=[
         "user_token", "expires_in", "refresh_token", "staff_id",
     ], title="Refresh Token Result")

@@ -3,7 +3,7 @@ import time
 import json
 from rich import print as rprint
 
-from lansenger_cli.utils import get_client, output_result, output_list, is_json_output
+from lansenger_cli.utils import get_client, output_result, output_list, is_json_output, _result_to_dict
 
 app = typer.Typer(help="Chat list and message history (4.24 MCP)")
 
@@ -22,6 +22,10 @@ def fetch_chat_list(
         start_time=start_time, end_time=end_time,
         user_token=user_token,
     )
+    if is_json_output():
+        import json
+        print(json.dumps(_result_to_dict(result), ensure_ascii=False, indent=2))
+        return
     if result.success:
         output_result(result, fields=[], title="Chat List")
         if result.staff_infos:
@@ -58,6 +62,9 @@ def fetch_chat_messages(
             start_time=start_time, end_time=end_time,
             sender_id=sender_id, user_token=user_token,
         )
+        if is_json_output():
+            print(json.dumps(_result_to_dict(result), ensure_ascii=False, indent=2))
+            return
         if result.success:
             output_result(result, fields=["has_more", "total", "last_version", "name", "chat_type"], title="Chat Messages")
             if result.messages:
@@ -101,7 +108,7 @@ def fetch_chat_messages(
             cursor = str(getattr(result, "last_version", ""))
 
     if is_json_output():
-        rprint(json.dumps([m.to_dict() if hasattr(m, "to_dict") else str(m) for m in all_messages], indent=2, ensure_ascii=False))
+        print(json.dumps([m.to_dict() if hasattr(m, "to_dict") else str(m) for m in all_messages], indent=2, ensure_ascii=False))
         return
     if progress:
         rprint(f"[bold]Done:[/bold] {page_count} pages, {msg_count} messages across {len(months)} months")

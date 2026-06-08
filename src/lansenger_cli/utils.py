@@ -68,7 +68,7 @@ def _result_to_dict(result):
 def output_result(result, fields: list[str] | None = None, title: str = ""):
     if is_json_output():
         import json
-        rprint(json.dumps(_result_to_dict(result), ensure_ascii=False, indent=2))
+        print(json.dumps(_result_to_dict(result), ensure_ascii=False, indent=2))
         return
     if not result.success:
         rprint(f"[red]Error:[/red] {result.error}")
