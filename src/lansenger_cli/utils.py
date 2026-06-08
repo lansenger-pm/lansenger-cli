@@ -1,3 +1,4 @@
+import os
 import dataclasses
 
 from lansenger_sdk import LansengerSyncClient, CredentialStore, LansengerConfig
@@ -21,7 +22,13 @@ def set_active_profile(value: str):
 
 
 def is_json_output() -> bool:
-    return _json_output
+    global _json_output
+    if _json_output:
+        return True
+    if os.environ.get("LANSENGER_JSON", "").lower() in ("1", "true", "yes"):
+        _json_output = True
+        return True
+    return False
 
 
 def get_active_profile() -> str:
