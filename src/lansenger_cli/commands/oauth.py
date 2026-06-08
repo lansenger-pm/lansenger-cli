@@ -1,13 +1,14 @@
 import typer
 import json
-import threading
 import time
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.parse import urlparse, parse_qs
 from rich import print as rprint
+from rich.console import Console
 
-from lansenger_cli.utils import get_client, output_result, is_json_output
+from lansenger_cli.utils import get_client, get_store, output_result, is_json_output
 
+console = Console()
 app = typer.Typer(help="OAuth2 user authentication operations")
 
 
@@ -18,7 +19,7 @@ def build_authorize_url(
     state: str = typer.Option("", "--state", help="State parameter for CSRF protection"),
 ):
     client = get_client()
-    url = client.build_authorize_url(redirect_uri=redirect_uri, scope=scope, state=state)
+    url = client.build_authorize_url(redirect_uri=redirect_uri, scope=scope, state=state or None)
     if is_json_output():
         rprint(json.dumps({"authorize_url": url}, ensure_ascii=False))
         return
@@ -122,28 +123,33 @@ def local_callback(
     state: str = typer.Option("", "--state", help="CSRF state (auto-generated if empty)"),
     auto_exchange: bool = typer.Option(True, "--exchange/--no-exchange", help="Auto-exchange code for userToken"),
     timeout: int = typer.Option(120, "--timeout", "-t", help="Max wait seconds for callback"),
+    redirect_uri: str = typer.Option("", "--redirect-uri", help="Override redirect_uri (default: http://localhost:<port>)"),
 ):
-    """Start a local HTTP server to capture OAuth2 callback and optionally exchange the code.
+    """Start a local HTTP server to capture OAuth2 callback and auto-exchange the code.
 
     Workflow:
     1. Starts a temporary HTTP server on localhost:<port>
-    2. Prints the authorize URL with redirect_uri=localhost
-    3. Waits for the browser redirect
-    4. Captures the code, optionally exchanges it for userToken
-    5. Shuts down the server
+    2. Prints the authorize URL — open it in a browser to authorize
+    3. Browser redirects back to localhost with the auth code
+    4. Local server captures the code, auto-exchanges for userToken
+    5. Saves credentials and shuts down the server
 
-    Example:
-        lansenger oauth local-callback --port 8765
+    Examples:
+        lansenger oauth local-callback
+        lansenger oauth local-callback --port 9999
+        lansenger oauth local-callback --redirect-uri https://your-trusted-domain.com
     """
-    redirect_uri = f"http://localhost:{port}"
+    if not redirect_uri:
+        redirect_uri = f"http://localhost:{port}"
+
     client = get_client()
-    auth_url = client.build_authorize_url(redirect_uri=redirect_uri, scope=scope, state=state)
+    auth_url = client.build_authorize_url(redirect_uri=redirect_uri, scope=scope, state=state or None)
 
     if not is_json_output():
-        rprint("[green]Authorize URL:[/green]")
+        rprint("[green]Authorize URL — open in browser:[/green]")
         rprint(auth_url)
         rprint(f"\n[yellow]Waiting for callback on port {port}...[/yellow] (timeout: {timeout}s)")
-        rprint("[dim]Open the URL above in a browser, authorize, then wait.[/dim]")
+        rprint(f"[dim]redirect_uri={redirect_uri}[/dim]")
     else:
         rprint(json.dumps({"authorize_url": auth_url, "redirect_uri": redirect_uri, "port": port}, ensure_ascii=False))
 
@@ -175,6 +181,15 @@ def local_callback(
 
     if auto_exchange:
         exchange_result = client.exchange_code(code=code, redirect_uri=redirect_uri)
+        if exchange_result.success and exchange_result.user_token:
+            store = get_store()
+            existing = store.load_user_token()
+            rt = exchange_result.refresh_token or existing.get("refresh_token", "")
+            store.save_user_token(
+                exchange_result.user_token, rt,
+                exchange_result.expires_in, 300,
+                exchange_result.refresh_expires_in or 0,
+            )
         output_result(exchange_result, fields=[
             "user_token", "expires_in", "refresh_token",
             "refresh_expires_in", "staff_id", "scope",
