@@ -48,7 +48,7 @@ def fetch_department_ancestors(
 @app.command("id-mapping")
 def fetch_staff_id_mapping(
     org_id: str = typer.Argument(help="Organization ID"),
-    id_type: str = typer.Argument(help="ID type: phone, email, login_name, external_id"),
+    id_type: str = typer.Argument(help="ID type: employ_id, mobile, mail, login, external_id"),
     id_value: str = typer.Argument(help="ID value to map"),
     user_token: str = typer.Option("", "--user-token", help="User token"),
 ):
