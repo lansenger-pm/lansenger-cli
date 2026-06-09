@@ -163,7 +163,11 @@ def local_callback(
     else:
         rprint(json.dumps({"authorize_url": auth_url, "redirect_uri": redirect_uri, "port": port}, ensure_ascii=False))
 
-    server = HTTPServer(("localhost", port), _OAuthCallbackHandler)
+    class _ReuseAddrHTTPServer(HTTPServer):
+        allow_reuse_address = True
+        allow_reuse_port = True
+
+    server = _ReuseAddrHTTPServer(("localhost", port), _OAuthCallbackHandler)
     server._callback_result = None
     server.timeout = 1
 
