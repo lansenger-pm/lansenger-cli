@@ -298,10 +298,10 @@ lansenger callback verify-signature TIMESTAMP NONCE SIGNATURE ENCODING_KEY --dat
 ### 媒體檔案
 
 ```bash
-# 上傳核心平台檔案
+# 上載核心平台檔案
 lansenger media upload /path/to/file.pdf --media-type 3
 
-# 上傳應用/機械人媒體檔案（用於 send-text / send-file 等）
+# 上載應用/機械人媒體檔案（用於 send-text / send-file 等）
 lansenger media upload-app /path/to/file.pdf --media-type file
 
 # 下載媒體檔案到本地
