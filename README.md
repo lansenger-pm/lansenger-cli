@@ -79,7 +79,7 @@ lansenger health check
 | `todo` | 待办任务管理 | `create`, `update`, `update-status`, `delete`, `list`, `fetch-by-source`, `fetch-by-id`, `status-counts`, `executor-status`, `add-executors`, `delete-executors`, `executor-list` |
 | `oauth` | OAuth2 用户认证 | `authorize-url`, `exchange-code`, `refresh-token`, `user-info`, `parse-callback`, `validate-state` |
 | `callback` | 回调事件解析 | `parse-payload`, `decrypt-payload`, `verify-signature`, `event-types` |
-| `media` | 媒体文件操作 | `upload`, `download`, `download-to-file` |
+| `media` | 媒体文件操作 | `upload`, `upload-app`, `download`, `download-to-file` |
 | `streaming` | 流式消息（AI 场景） | `create`, `fetch` |
 | `chat` | 会话与消息记录 | `list`, `messages` |
 | `health` | 连接健康检查 | `check` |
@@ -122,7 +122,10 @@ lansenger message send-text group123 "请查看" --group --mention staff001 --me
 # 机器人通道发送消息
 lansenger message send-bot-message text '{"content":"通知内容"}' --chat-id user001 --chat-id user002
 
-# 群消息通道发送（需要 user_token）
+# 群消息通道发送（user_token 可选，无则显示为 bot）
+lansenger message send-group-message group123 text '{"content":"群消息"}'
+
+# 以人类用户身份发送（需要 user_token）
 lansenger message send-group-message group123 text '{"content":"群消息"}' --user-token YOUR_USER_TOKEN --sender-id staff001
 
 # 应用账号通道发送
@@ -147,7 +150,10 @@ lansenger group info group123
 # 查看群成员
 lansenger group members group123
 
-# 查看群列表
+# 查看群列表（bot 可查看所在的群，传 user_token 可查看用户所在的群）
+lansenger group list
+
+# 查看用户所在的群列表（需要 user_token）
 lansenger group list --user-token YOUR_USER_TOKEN
 
 # 检查用户是否在群内
@@ -207,7 +213,10 @@ lansenger chat list --type 1 --keyword 张三 --user-token YOUR_USER_TOKEN
 # 获取私聊消息记录
 lansenger chat messages --staff-id staff001 --user-token YOUR_USER_TOKEN
 
-# 获取群聊消息记录
+# 获取群聊消息记录（bot 可直接获取所在群的消息）
+lansenger chat messages --group-id group123
+
+# 获取群聊消息记录（以用户身份，需要 user_token）
 lansenger chat messages --group-id group123 --user-token YOUR_USER_TOKEN
 ```
 
@@ -284,8 +293,11 @@ lansenger callback verify-signature TIMESTAMP NONCE SIGNATURE ENCODING_KEY --dat
 ### 媒体文件
 
 ```bash
-# 上传文件
+# 上传核心平台文件
 lansenger media upload /path/to/file.pdf --media-type 3
+
+# 上传应用/机器人媒体文件（用于 send-text / send-file 等）
+lansenger media upload-app /path/to/file.pdf --media-type file
 
 # 下载媒体文件到本地
 lansenger media download-to-file MEDIA_ID --output /path/to/save.pdf
