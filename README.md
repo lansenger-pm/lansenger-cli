@@ -11,6 +11,8 @@ pip install lansenger-cli
 或从源码安装：
 
 ```bash
+git clone https://github.com/lansenger-pm/lansenger-cli.git
+cd lansenger-cli
 pip install -e .
 ```
 
@@ -369,6 +371,21 @@ lansenger config show --profile my-app
 - 凭证按 profile 隔离存储在 `~/.lansenger/sdk_state.json`，文件权限 0600
 - `config show` 对所有密钥类字段脱敏显示（`***`），仅 `api_gateway_url` 和 `passport_url` 明文展示
 - 支持环境变量 `LANSENGER_APP_ID` / `LANSENGER_APP_SECRET` / `LANSENGER_ENCODING_KEY` / `LANSENGER_CALLBACK_TOKEN`，适合 CI/CD 场景
+
+## CLI 兼容性
+
+本 CLI 与 TypeScript 版、Go 版命令语法完全一致：
+
+```bash
+# Python CLI
+pip install lansenger-cli
+
+# Go CLI
+go install github.com/lansenger-pm/lansenger-sdk-go/cmd/lansenger@latest
+
+# TypeScript CLI
+npm install -g lansenger-cli
+```
 
 ## 与 SDK 的关系
 
