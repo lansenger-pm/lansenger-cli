@@ -13,8 +13,8 @@ def create_group(
     owner_id: str = typer.Option("", "--owner", help="Owner staff ID"),
     description: str = typer.Option("", "--desc", "-d", help="Group description"),
     avatar_id: str = typer.Option("", "--avatar", help="Avatar ID"),
-    staff_id_list: Optional[List[str]] = typer.Option(None, "-S/--staff", help="Staff IDs to add"),
-    department_id_list: Optional[List[str]] = typer.Option(None, "-D/--dept", help="Department IDs to add"),
+    staff_id_list: Optional[List[str]] = typer.Option(None, "--staff", "-S", help="Staff IDs to add"),
+    department_id_list: Optional[List[str]] = typer.Option(None, "--dept", "-D", help="Department IDs to add"),
     user_token: str = typer.Option("", "--user-token", help="User token"),
 ):
     client = get_client()
@@ -120,9 +120,9 @@ def update_group_info(
 @app.command("update-members")
 def update_group_members(
     group_id: str = typer.Argument(help="Group ID"),
-    add_user: Optional[List[str]] = typer.Option(None, "-A/--add", help="Staff IDs to add"),
-    del_user: Optional[List[str]] = typer.Option(None, "-X/--remove", help="Staff IDs to remove"),
-    add_dept: Optional[List[str]] = typer.Option(None, "-D/--add-dept", help="Department IDs to add"),
+    add_user: Optional[List[str]] = typer.Option(None, "--add", "-A", help="Staff IDs to add"),
+    del_user: Optional[List[str]] = typer.Option(None, "--remove", "-X", help="Staff IDs to remove"),
+    add_dept: Optional[List[str]] = typer.Option(None, "--add-dept", "-D", help="Department IDs to add"),
     user_token: str = typer.Option("", "--user-token", help="User token"),
 ):
     client = get_client()

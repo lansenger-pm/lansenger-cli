@@ -78,8 +78,8 @@ def search_staff(
     keyword: str = typer.Argument(help="Search keyword"),
     user_token: str = typer.Option("", "--user-token", help="User token"),
     user_id: str = typer.Option("", "--user-id", help="User ID context"),
-    recursive: bool = typer.Option(True, "-R/--recursive/--no-recursive", help="Recursive search"),
-    sector_ids: Optional[List[str]] = typer.Option(None, "-S/--sector", help="Sector IDs"),
+    recursive: bool = typer.Option(True, "--recursive/--no-recursive", "-R", help="Recursive search"),
+    sector_ids: Optional[List[str]] = typer.Option(None, "--sector", "-S", help="Sector IDs"),
     page: Optional[int] = typer.Option(None, "--page", "-p", help="Page number"),
     page_size: Optional[int] = typer.Option(None, "--size", "-s", help="Page size"),
 ):

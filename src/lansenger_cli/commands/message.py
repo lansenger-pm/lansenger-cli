@@ -15,7 +15,7 @@ def send_text(
     cover_image: str = typer.Option("", "--cover-image", help="Cover image path for video attachments"),
     is_group: bool = typer.Option(False, "--group", "-g", help="Send as group message"),
     reminder_all: bool = typer.Option(False, "--mention-all", help="@all in group"),
-    reminder_user_ids: Optional[List[str]] = typer.Option(None, "-m/--mention", help="User IDs to @mention"),
+    reminder_user_ids: Optional[List[str]] = typer.Option(None, "--mention", "-m", help="User IDs to @mention"),
     user_token: str = typer.Option("", "--user-token", help="User token for private channel"),
     sender_id: str = typer.Option("", "--sender-id", help="Sender staff ID for group message"),
 ):
@@ -40,7 +40,7 @@ def send_markdown(
     chat_id: str = typer.Argument(help="Chat ID"),
     content: str = typer.Argument(help="Markdown content"),
     reminder_all: bool = typer.Option(False, "--mention-all", help="@all in group"),
-    reminder_user_ids: Optional[List[str]] = typer.Option(None, "-m/--mention", help="User IDs to @mention"),
+    reminder_user_ids: Optional[List[str]] = typer.Option(None, "--mention", "-m", help="User IDs to @mention"),
     is_group: bool = typer.Option(False, "--group", "-g", help="Send as group message"),
     user_token: str = typer.Option("", "--user-token", help="User token for private channel"),
     sender_id: str = typer.Option("", "--sender-id", help="Sender staff ID for group message"),
@@ -159,8 +159,8 @@ def send_app_card(
     head_icon_url: str = typer.Option("", "--head-icon", help="Head icon URL"),
     head_status_description: str = typer.Option("", "--status-desc", help="Head status description (div-style HTML, max 30 bytes)"),
     head_status_colour: str = typer.Option("", "--status-colour", help="Head status DOT colour (hex, e.g. #FFB116)"),
-    fields: Optional[List[str]] = typer.Option(None, "-F/--field", help="Card field as JSON key=value, e.g. '{\"key\":\"k\",\"value\":\"v\"}'"),
-    links: Optional[List[str]] = typer.Option(None, "-L/--link", help="Card link as JSON title=url, e.g. '{\"title\":\"T\",\"url\":\"U\"}'"),
+    fields: Optional[List[str]] = typer.Option(None, "--field", "-F", help="Card field as JSON key=value, e.g."),
+    links: Optional[List[str]] = typer.Option(None, "--link", "-L", help="Card link as JSON title=url, e.g."),
     is_group: bool = typer.Option(False, "--group", "-g", help="Send as group message"),
     user_token: str = typer.Option("", "--user-token", help="User token for private channel"),
     sender_id: str = typer.Option("", "--sender-id", help="Sender staff ID for group message"),
@@ -199,7 +199,7 @@ def update_dynamic_card(
     is_last_update: bool = typer.Option(False, "--last", help="Mark as last update"),
     head_status_description: str = typer.Option("", "--status-desc", help="New status description (div-style HTML, max 30 bytes)"),
     head_status_colour: str = typer.Option("", "--status-colour", help="New status DOT colour (hex)"),
-    links: Optional[List[str]] = typer.Option(None, "-L/--link", help="Updated link as JSON title=url"),
+    links: Optional[List[str]] = typer.Option(None, "--link", "-L", help="Updated link as JSON title=url"),
 ):
     client = get_client()
     head_status_info = None
@@ -236,8 +236,8 @@ def revoke_message(
 def send_bot_message(
     msg_type: str = typer.Argument(help="Message type"),
     msg_data: str = typer.Argument(help="Message data as JSON"),
-    chat_ids: Optional[List[str]] = typer.Option(None, "-ht-id", help="Chat IDs (or group IDs if --group)"),
-    department_ids: Optional[List[str]] = typer.Option(None, "ept", help="Department IDs (bot channel only)"),
+    chat_ids: Optional[List[str]] = typer.Option(None, "--chat-id", "-C", help="Chat IDs (or group IDs if --group)"),
+    department_ids: Optional[List[str]] = typer.Option(None, "--dept", "-D", help="Department IDs (bot channel only)"),
     user_token: str = typer.Option("", "--user-token", help="User token"),
     entry_id: str = typer.Option("", "--entry-id", help="App entry selector"),
     is_group: bool = typer.Option(False, "--group", "-g", help="Send to groups instead of users"),
@@ -262,7 +262,7 @@ def send_group_message(
     user_token: str = typer.Option("", "--user-token", help="User token"),
     sender_id: str = typer.Option("", "--sender-id", help="Sender staff ID"),
     reminder_all: bool = typer.Option(False, "--mention-all", help="@all (text/formatText only)"),
-    reminder_user_ids: Optional[List[str]] = typer.Option(None, "--mention", help="User IDs to @mention (text/formatText only)"),
+    reminder_user_ids: Optional[List[str]] = typer.Option(None, "--mention", "-m", help="User IDs to @mention (text/formatText only)"),
     outlines: str = typer.Option("", "--outlines", help="Group notification digest"),
     entry_id: str = typer.Option("", "--entry-id", help="App entry selector"),
 ):
@@ -300,7 +300,7 @@ def send_oacard(
     head: str = typer.Option("", "--head", help="OA card head title"),
     sub_title: str = typer.Option("", "--sub-title", help="OA card sub title"),
     staff_id: str = typer.Option("", "--staff-id", help="Staff ID"),
-    fields: Optional[List[str]] = typer.Option(None, "-F/--field", help="Card field as JSON, e.g. '{\"key\":\"k\",\"value\":\"v\"}'"),
+    fields: Optional[List[str]] = typer.Option(None, "--field", "-F", help="Card field as JSON, e.g. '{\"key\":\"k\",\"value\":\"v\"}'"),
     link: str = typer.Option("", "--link", help="Card click link URL"),
     pc_link: str = typer.Option("", "--pc-link", help="PC link URL"),
     pad_link: str = typer.Option("", "--pad-link", help="Pad link URL"),
@@ -332,8 +332,8 @@ def send_oacard(
 def send_account_message(
     msg_type: str = typer.Argument(help="Message type"),
     msg_data: str = typer.Argument(help="Message data as JSON"),
-    chat_ids: Optional[List[str]] = typer.Option(None, "-C/--chat-id", help="Chat IDs"),
-    department_ids: Optional[List[str]] = typer.Option(None, "-D/--dept", help="Department IDs"),
+    chat_ids: Optional[List[str]] = typer.Option(None, "--chat-id", "-C", help="Chat IDs"),
+    department_ids: Optional[List[str]] = typer.Option(None, "--dept", "-D", help="Department IDs"),
     account_id: str = typer.Option("", "--account-id", help="Account ID"),
     entry_id: str = typer.Option("", "--entry-id", help="App entry selector"),
     attach: str = typer.Option("", "--attach", help="Attach info"),
