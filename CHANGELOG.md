@@ -6,7 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
-## [0.10.7] - 2026-06-09
+## [0.10.11] - 2026-06-10
+
+### Changed
+
+- **send-text / send-file**: `--media-type` option now accepts string values (`file`/`video`/`image`/`audio`) instead of integers (1/2/3), matching SDK v1.6.7 upload changes.
+
+## [0.10.10] — migrated to src layout
 
 ### Fixed
 
