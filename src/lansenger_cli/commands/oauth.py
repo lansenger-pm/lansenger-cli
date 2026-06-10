@@ -54,7 +54,8 @@ def refresh_user_token(
             result.user_token,
             result.refresh_token or old_rt or refresh_token,
             result.expires_in,
-            result.refresh_expires_in or 0,
+            300,  # margin
+            result.refresh_expires_in or 0,  # refresh_expires_in
         )
     output_result(result, fields=[
         "user_token", "expires_in", "refresh_token", "staff_id",
@@ -131,7 +132,7 @@ def local_callback(
     port: int = typer.Option(8765, "--port", "-p", help="Local HTTP server port"),
     scope: str = typer.Option("basic_userinfor", "--scope", "-s", help="OAuth2 scope"),
     state: str = typer.Option("", "--state", help="CSRF state (auto-generated if empty)"),
-    auto_exchange: bool = typer.Option(True, "--exchange/--no-exchange", help="Auto-exchange code for userToken"),
+    auto_exchange: bool = typer.Option(True, "-E/--exchange/--no-exchange", help="Auto-exchange code for userToken"),
     timeout: int = typer.Option(120, "--timeout", "-t", help="Max wait seconds for callback"),
     redirect_uri: str = typer.Option("", "--redirect-uri", help="Override redirect_uri (default: http://localhost:<port>)"),
 ):

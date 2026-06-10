@@ -55,6 +55,9 @@ def fetch_chat_messages(
     user_token: str = typer.Option("", "--user-token", help="User token"),
 ):
     client = get_client()
+    if not staff_id and not group_id:
+        rprint("[red]Error:[/red] At least one of --staff-id or --group-id is required.")
+        raise typer.Exit(1)
     if not split_month:
         result = client.fetch_chat_messages(
             staff_id=staff_id, group_id=group_id,

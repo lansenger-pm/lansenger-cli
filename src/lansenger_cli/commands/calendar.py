@@ -93,8 +93,8 @@ def delete_schedule(
 @app.command("list-schedules")
 def fetch_schedule_list(
     calendar_id: str = typer.Argument(help="Calendar ID"),
-    start_time: int = typer.Argument(help="Start time (unix timestamp in microseconds)"),
-    end_time: int = typer.Argument(help="End time (unix timestamp in microseconds)"),
+    start_time: int = typer.Argument(help="Start time (unix timestamp in seconds)"),
+    end_time: int = typer.Argument(help="End time (unix timestamp in seconds)"),
     user_token: str = typer.Option("", "--user-token", help="User token"),
     user_id: str = typer.Option("", "--user-id", help="User ID"),
 ):

@@ -46,7 +46,7 @@ def get_client() -> LansengerSyncClient:
         env_config = LansengerConfig.from_env()
         if env_config.is_configured():
             return LansengerSyncClient.from_config(env_config)
-        rprint("[red]Error:[/red] No credentials configured for profile '{_active_profile}'. Run [bold]lansenger config set[/bold] first, or set LANSENGER_APP_ID / LANSENGER_APP_SECRET env vars.")
+        rprint(f"[red]Error:[/red] No credentials configured for profile '{_active_profile}'. Run [bold]lansenger config set[/bold] first, or set LANSENGER_APP_ID / LANSENGER_APP_SECRET env vars.")
         raise SystemExit(1)
     config = LansengerConfig(
         app_id=creds["app_id"],

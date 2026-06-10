@@ -10,7 +10,7 @@ app = typer.Typer(help="Upload and download media files")
 @app.command("upload")
 def upload_media(
     file_path: str = typer.Argument(help="Local file path to upload"),
-    media_type: int = typer.Option(3, "--media-type", "-t", help="1=video, 2=image, 3=file (4.5.1 core service)"),
+    media_type: int = typer.Option(2, "--media-type", "-t", help="1=video, 2=image, 3=audio (4.5.1 core service)"),
     user_token: str = typer.Option("", "--user-token", help="User token (optional for 4.5.1)"),
 ):
     client = get_client()

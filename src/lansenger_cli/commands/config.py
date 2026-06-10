@@ -9,6 +9,18 @@ app = typer.Typer(help="Manage CLI configuration (credentials, tokens)")
 
 VALID_KEYS = ["app_id", "app_secret", "api_gateway_url", "passport_url", "encoding_key", "callback_token"]
 
+_SENSITIVE_KEYS = {"app_secret", "encoding_key", "callback_token"}
+
+
+def _mask_sensitive(data: dict) -> None:
+    """Mask sensitive fields in-place for JSON output."""
+    profiles = data.get("profiles", {})
+    for profile_data in profiles.values():
+        if isinstance(profile_data, dict):
+            for key in _SENSITIVE_KEYS:
+                if key in profile_data and profile_data[key]:
+                    profile_data[key] = "***"
+
 
 @app.command("set")
 def config_set(
@@ -41,7 +53,9 @@ def config_show(
     p = profile or get_active_profile()
     store = CredentialStore(profile=p)
     if is_json_output():
-        rprint(store.load())
+        data = store.load()
+        _mask_sensitive(data)
+        rprint(data)
         return
     creds = store.load_credentials()
     has = store.has_credentials()
