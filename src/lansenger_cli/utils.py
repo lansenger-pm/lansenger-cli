@@ -53,6 +53,7 @@ def get_client() -> LansengerSyncClient:
         app_secret=creds["app_secret"],
         api_gateway_url=creds.get("api_gateway_url", "https://open.e.lanxin.cn/open/apigw"),
         passport_url=creds.get("passport_url", ""),
+        redirect_uri=creds.get("redirect_uri", ""),
     )
     return LansengerSyncClient.from_config(config)
 
