@@ -36,6 +36,7 @@ lansenger config set api_gateway_url https://apigw.lx.qianxin.com/open/apigw   #
 
 ```bash
 lansenger config set passport_url https://passport.lx.qianxin.com   # 私有部署需修改
+lansenger config set redirect_uri http://localhost:8765             # OAuth2 回调地址（默认值）
 ```
 
 **回调接收（需要解析/验签回调 Webhook 时填写）**：
