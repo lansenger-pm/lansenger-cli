@@ -124,10 +124,10 @@ lansenger message send-text group123 "Annonce" --group --mention-all
 # @mention spécifique dans un groupe
 lansenger message send-text group123 "Veuillez vérifier" --group --mention staff001
 
-# Diffusion via le canal bot
+# Diffusion via le canal robot
 lansenger message send-bot-message text '{"content":"Avis"}' --chat-id user001 --chat-id user002
 
-# Canal message de groupe (user_token facultatif, affiché comme bot sans)
+# Canal message de groupe (user_token facultatif, affiché comme robot sans)
 lansenger message send-group-message group123 text '{"content":"Message de groupe"}'
 
 # Envoyer en tant qu'utilisateur humain (nécessite user_token)
@@ -155,7 +155,7 @@ lansenger group info group123
 # Voir les membres du groupe
 lansenger group members group123
 
-# Voir la liste des groupes (bot peut lister ses groupes)
+# Voir la liste des groupes (robot peut lister ses groupes)
 lansenger group list
 
 # Voir la liste des groupes en tant qu'utilisateur (nécessite user_token)
@@ -218,7 +218,7 @@ lansenger chat list --type 1 --keyword ZhangSan --user-token YOUR_USER_TOKEN
 # Messages privés
 lansenger chat messages --staff-id staff001 --user-token YOUR_USER_TOKEN
 
-# Messages de groupe (bot peut récupérer)
+# Messages de groupe (robot peut récupérer)
 lansenger chat messages --group-id group123
 
 # Messages de groupe en tant qu'utilisateur (nécessite user_token)
@@ -301,7 +301,7 @@ lansenger callback verify-signature TIMESTAMP NONCE SIGNATURE ENCODING_KEY --dat
 # Télécharger un fichier plateforme principale
 lansenger media upload /path/to/file.pdf --media-type 3
 
-# Télécharger un média application/bot
+# Télécharger un média application/robot
 lansenger media upload-app /path/to/file.pdf --media-type file
 
 # Télécharger un média vers un fichier local
@@ -348,7 +348,7 @@ Supporte bash, zsh, fish et autres shells majeurs.
 Le CLI prend en charge plusieurs profils, chacun correspondant à un appID, avec des identifiants isolés :
 
 ```bash
-# Configurer la première application (bot personnel)
+# Configurer la première application (robot personnel)
 lansenger config set app_id xxx1 --profile my-bot
 lansenger config set app_secret xxx1 --profile my-bot
 

@@ -2,7 +2,7 @@
 
 # Lansenger CLI
 
-Lansenger 命令列工具 — 在終端機直接呼叫藍信開放平台 API，傳送訊息、管理群組、查詢人員/部門、操作行事曆與待辦等。
+Lansenger 命令列工具 — 在終端機直接呼叫藍信開放平台 API，發送訊息、管理群組、查詢人員/部門、操作行事曆與待辦等。
 
 ## 安裝
 
@@ -76,7 +76,7 @@ lansenger health check
 | 命令組 | 說明 | 子命令 |
 |--------|------|--------|
 | `config` | 管理憑證設定 | `set`, `show`, `clear`, `list-profiles` |
-| `message` | 傳送與管理訊息 | `send-text`, `send-markdown`, `send-file`, `send-image-url`, `send-link-card`, `send-app-articles`, `send-app-card`, `send-oacard`, `send-bot-message`, `send-group-message`, `send-account-message`, `send-user-message`, `update-dynamic-card`, `revoke`, `query-groups` |
+| `message` | 發送與管理訊息 | `send-text`, `send-markdown`, `send-file`, `send-image-url`, `send-link-card`, `send-app-articles`, `send-app-card`, `send-oacard`, `send-bot-message`, `send-group-message`, `send-account-message`, `send-user-message`, `update-dynamic-card`, `revoke`, `query-groups` |
 | `group` | 管理群組 | `create`, `info`, `members`, `list`, `check`, `update`, `update-members` |
 | `staff` | 查詢人員資訊 | `basic-info`, `detail`, `ancestors`, `id-mapping`, `org-extra-fields`, `search`, `org-info` |
 | `department` | 查詢部門資訊 | `detail`, `children`, `staffs` |
@@ -91,52 +91,52 @@ lansenger health check
 
 ## 常用範例
 
-### 訊息傳送
+### 訊息發送
 
 ```bash
-# 傳送純文字訊息
+# 發送純文字訊息
 lansenger message send-text chat123 "Hello World"
 
-# 傳送 Markdown 訊息
+# 發送 Markdown 訊息
 lansenger message send-markdown chat123 "**粗體** 文字"
 
-# 傳送檔案
+# 發送檔案
 lansenger message send-file chat123 /path/to/file.pdf
 
-# 傳送網路圖片
+# 發送網路圖片
 lansenger message send-image-url chat123 https://example.com/photo.jpg
 
-# 傳送連結卡片
+# 發送連結卡片
 lansenger message send-link-card chat123 "公告標題" https://example.com --desc "點擊檢視詳情"
 
-# 傳送應用卡片
+# 發送應用卡片
 lansenger message send-app-card chat123 "卡片標題" --content "正文內容" --card-link https://example.com
 
-# 傳送多條圖文（appArticles）
+# 發送多條圖文（appArticles）
 lansenger message send-app-articles chat123 '{"title":"文章1","url":"https://a.com"}' '{"title":"文章2","url":"https://b.com"}'
 
-# 傳送 OA 審批卡片
+# 發送 OA 審批卡片
 lansenger message send-oacard chat123 "審批標題" --head "審批通知" --field '{"key":"申請人","value":"張三"}'
 
-# 群組內傳送並 @all
+# 群組內發送並 @all
 lansenger message send-text group123 "全員通知" --group --mention-all
 
 # 群組內 @指定人
 lansenger message send-text group123 "請檢視" --group --mention staff001
 
-# 機械人通道傳送訊息
+# 機械人通道發送訊息
 lansenger message send-bot-message text '{"content":"通知內容"}' --chat-id user001 --chat-id user002
 
-# 群組訊息通道傳送（user_token 可選，無則顯示為 bot）
+# 群組訊息通道發送（user_token 可選，無則顯示為 bot）
 lansenger message send-group-message group123 text '{"content":"群組訊息"}'
 
-# 以人類使用者身份傳送（需要 user_token）
+# 以人類使用者身份發送（需要 user_token）
 lansenger message send-group-message group123 text '{"content":"群組訊息"}' --user-token YOUR_USER_TOKEN --sender-id staff001
 
-# 應用帳號通道傳送
+# 應用帳號通道發送
 lansenger message send-account-message text '{"content":"帳號訊息"}' --chat-id user001 --account-id acct001
 
-# 使用者通道傳送（需要 user_token）
+# 使用者通道發送（需要 user_token）
 lansenger message send-user-message user001 text '{"content":"私聊訊息"}' --user-token YOUR_USER_TOKEN
 
 # 撤回訊息
