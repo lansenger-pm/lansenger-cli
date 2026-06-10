@@ -56,6 +56,7 @@ def refresh_user_token(
             result.expires_in,
             300,  # margin
             result.refresh_expires_in or 0,  # refresh_expires_in
+            staff_id=result.staff_id or "",
         )
     output_result(result, fields=[
         "user_token", "expires_in", "refresh_token", "staff_id",
@@ -204,6 +205,7 @@ def local_callback(
                 exchange_result.user_token, rt,
                 exchange_result.expires_in, 300,
                 exchange_result.refresh_expires_in or 0,
+                staff_id=exchange_result.staff_id or "",
             )
         output_result(exchange_result, fields=[
             "user_token", "expires_in", "refresh_token",
