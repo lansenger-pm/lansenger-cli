@@ -9,6 +9,7 @@ app = typer.Typer(help="Health check and connection verification")
 
 @app.command("check")
 def health_check():
+    """Check Lansenger API connection health"""
     client = get_client()
     result = client.health_check()
     if is_json_output():

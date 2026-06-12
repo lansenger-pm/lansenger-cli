@@ -19,6 +19,7 @@ def send_text(
     user_token: str = typer.Option("", "--user-token", help="User token for private channel"),
     sender_id: str = typer.Option("", "--sender-id", help="Sender staff ID for group message"),
 ):
+    """Send text message"""
     client = get_client()
     result = client.send_text(
         chat_id=chat_id,
@@ -45,6 +46,7 @@ def send_markdown(
     user_token: str = typer.Option("", "--user-token", help="User token for private channel"),
     sender_id: str = typer.Option("", "--sender-id", help="Sender staff ID for group message"),
 ):
+    """Send markdown message"""
     client = get_client()
     result = client.send_markdown(
         chat_id=chat_id, content=content,
@@ -68,6 +70,7 @@ def send_file(
     user_token: str = typer.Option("", "--user-token", help="User token for private channel"),
     sender_id: str = typer.Option("", "--sender-id", help="Sender staff ID for group message"),
 ):
+    """Send file message"""
     client = get_client()
     result = client.send_file(
         chat_id=chat_id,
@@ -91,6 +94,7 @@ def send_image_url(
     user_token: str = typer.Option("", "--user-token", help="User token for private channel"),
     sender_id: str = typer.Option("", "--sender-id", help="Sender staff ID for group message"),
 ):
+    """Send image URL message"""
     client = get_client()
     result = client.send_image_url(
         chat_id=chat_id, image_url=image_url, caption=content,
@@ -114,6 +118,7 @@ def send_link_card(
     user_token: str = typer.Option("", "--user-token", help="User token for private channel"),
     sender_id: str = typer.Option("", "--sender-id", help="Sender staff ID for group message"),
 ):
+    """Send link card message"""
     client = get_client()
     result = client.send_link_card(
         chat_id=chat_id, title=title, link=link,
@@ -133,6 +138,7 @@ def send_app_articles(
     user_token: str = typer.Option("", "--user-token", help="User token for private channel"),
     sender_id: str = typer.Option("", "--sender-id", help="Sender staff ID for group message"),
 ):
+    """Send app articles message"""
     import json
     parsed = [json.loads(a) for a in articles]
     client = get_client()
@@ -165,6 +171,7 @@ def send_app_card(
     user_token: str = typer.Option("", "--user-token", help="User token for private channel"),
     sender_id: str = typer.Option("", "--sender-id", help="Sender staff ID for group message"),
 ):
+    """Send app card message"""
     client = get_client()
     head_status_info = None
     if head_status_description or head_status_colour:
@@ -201,6 +208,7 @@ def update_dynamic_card(
     head_status_colour: str = typer.Option("", "--status-colour", help="New status DOT colour (hex)"),
     links: Optional[List[str]] = typer.Option(None, "--link", "-L", help="Updated link as JSON title=url"),
 ):
+    """Update dynamic card message"""
     client = get_client()
     head_status_info = None
     if head_status_description or head_status_colour:
@@ -227,6 +235,7 @@ def revoke_message(
     chat_type: str = typer.Option("bot", "--chat-type", help="staff, group, notification, account, or bot"),
     sender_id: str = typer.Option("", "--sender-id", help="Sender staff ID (required for staff/group)"),
 ):
+    """Revoke/recall a sent message"""
     client = get_client()
     result = client.revoke_message(message_ids=message_ids, chat_type=chat_type, sender_id=sender_id)
     output_result(result, fields=["message_id", "operation"], title="Revoke Message Result")
@@ -242,6 +251,7 @@ def send_bot_message(
     entry_id: str = typer.Option("", "--entry-id", help="App entry selector"),
     is_group: bool = typer.Option(False, "--group", "-g", help="Send to groups instead of users"),
 ):
+    """Send bot message"""
     import json
     client = get_client()
     parsed_data = json.loads(msg_data)
@@ -266,6 +276,7 @@ def send_group_message(
     outlines: str = typer.Option("", "--outlines", help="Group notification digest"),
     entry_id: str = typer.Option("", "--entry-id", help="App entry selector"),
 ):
+    """Send group message"""
     import json
     client = get_client()
     parsed_data = json.loads(msg_data)
@@ -283,6 +294,7 @@ def query_groups(
     page_offset: int = typer.Option(1, "--page", "-p", help="Page offset"),
     page_size: int = typer.Option(100, "--size", "-s", help="Page size"),
 ):
+    """Query groups for message sending"""
     client = get_client()
     result = client.query_groups(page_offset=page_offset, page_size=page_size)
     if result.success:
@@ -309,6 +321,7 @@ def send_oacard(
     user_token: str = typer.Option("", "--user-token", help="User token for private channel"),
     sender_id: str = typer.Option("", "--sender-id", help="Sender staff ID for group message"),
 ):
+    """Send OA card message"""
     client = get_client()
     parsed_fields = None
     if fields:
@@ -339,6 +352,7 @@ def send_account_message(
     attach: str = typer.Option("", "--attach", help="Attach info"),
     user_token: str = typer.Option("", "--user-token", help="User token"),
 ):
+    """Send account message"""
     import json
     client = get_client()
     parsed_data = json.loads(msg_data)
@@ -360,6 +374,7 @@ def send_user_message(
     common: Optional[str] = typer.Option(None, "--common", help="Common data as JSON dict"),
     uuid: str = typer.Option("", "--uuid", help="Deduplication UUID"),
 ):
+    """Send user message"""
     import json
     client = get_client()
     parsed_data = json.loads(msg_data)
@@ -377,6 +392,7 @@ def send_reminder(
     reminder_types: Optional[List[int]] = typer.Option(None, "--type", "-t", help="Reminder types: 1=popup, 2=SMS, 3=phone call"),
     user_id_list: Optional[List[str]] = typer.Option(None, "--user", "-u", help="User IDs (staff openIds) to remind"),
 ):
+    """Send reminder message"""
     client = get_client()
     result = client.send_reminder(
         msg_id=msg_id,

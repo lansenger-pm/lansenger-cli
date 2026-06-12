@@ -11,6 +11,7 @@ def fetch_department_detail(
     user_token: str = typer.Option("", "--user-token", help="User token"),
     tag_id: str = typer.Option("", "--tag-id", help="Tag ID"),
 ):
+    """Fetch department detail information"""
     client = get_client()
     result = client.fetch_department_detail(
         department_id=department_id, user_token=user_token, tag_id=tag_id,
@@ -26,6 +27,7 @@ def fetch_department_children(
     department_id: str = typer.Argument(help="Department ID"),
     user_token: str = typer.Option("", "--user-token", help="User token"),
 ):
+    """Fetch child departments"""
     client = get_client()
     result = client.fetch_department_children(department_id=department_id, user_token=user_token)
     if result.success and result.departments:
@@ -44,6 +46,7 @@ def fetch_department_staffs(
     page: int = typer.Option(1, "--page", "-p", help="Page number"),
     page_size: int = typer.Option(100, "--size", "-s", help="Page size"),
 ):
+    """Fetch staff members in a department"""
     client = get_client()
     result = client.fetch_department_staffs(
         department_id=department_id, user_token=user_token,

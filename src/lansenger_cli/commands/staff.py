@@ -11,6 +11,7 @@ def fetch_staff_basic_info(
     staff_id: str = typer.Argument(help="Staff ID"),
     user_token: str = typer.Option("", "--user-token", help="User token"),
 ):
+    """Fetch staff basic information"""
     client = get_client()
     result = client.fetch_staff_basic_info(staff_id=staff_id, user_token=user_token)
     output_result(result, fields=[
@@ -24,6 +25,7 @@ def fetch_staff_detail(
     staff_id: str = typer.Argument(help="Staff ID"),
     user_token: str = typer.Option("", "--user-token", help="User token"),
 ):
+    """Fetch staff detailed information"""
     client = get_client()
     result = client.fetch_staff_detail(staff_id=staff_id, user_token=user_token)
     output_result(result, fields=[
@@ -37,6 +39,7 @@ def fetch_department_ancestors(
     staff_id: str = typer.Argument(help="Staff ID"),
     user_token: str = typer.Option("", "--user-token", help="User token"),
 ):
+    """Fetch department ancestors for a staff member"""
     client = get_client()
     result = client.fetch_department_ancestors(staff_id=staff_id, user_token=user_token)
     if result.success and result.ancestor_groups:
@@ -52,6 +55,7 @@ def fetch_staff_id_mapping(
     id_value: str = typer.Argument(help="ID value to map"),
     user_token: str = typer.Option("", "--user-token", help="User token"),
 ):
+    """Map external IDs (phone/email/login/external_id) to staffId"""
     client = get_client()
     result = client.fetch_staff_id_mapping(
         org_id=org_id, id_type=id_type, id_value=id_value, user_token=user_token,
@@ -66,6 +70,7 @@ def fetch_org_extra_field_ids(
     page: int = typer.Option(1, "--page", "-p", help="Page number"),
     page_size: int = typer.Option(1000, "--size", "-s", help="Page size"),
 ):
+    """Fetch organization custom extra field IDs"""
     client = get_client()
     result = client.fetch_org_extra_field_ids(
         org_id=org_id, user_token=user_token, page=page, page_size=page_size,
@@ -73,16 +78,17 @@ def fetch_org_extra_field_ids(
     output_result(result, fields=["has_more", "total"], title="Org Extra Fields")
 
 
-@app.command("search")
+@app.command("search", help="Search staff by name/phone/email (requires --user-token OR --user-id)")
 def search_staff(
-    keyword: str = typer.Argument(help="Search keyword"),
-    user_token: str = typer.Option("", "--user-token", help="User token"),
-    user_id: str = typer.Option("", "--user-id", help="User ID context"),
+    keyword: str = typer.Argument(help="Search keyword (name/phone/email)"),
+    user_token: str = typer.Option("", "--user-token", help="User token (one of --user-token or --user-id is required)"),
+    user_id: str = typer.Option("", "--user-id", help="User ID context (one of --user-token or --user-id is required)"),
     recursive: bool = typer.Option(True, "--recursive/--no-recursive", "-R", help="Recursive search"),
     sector_ids: Optional[List[str]] = typer.Option(None, "--sector", "-S", help="Sector IDs"),
     page: Optional[int] = typer.Option(None, "--page", "-p", help="Page number"),
     page_size: Optional[int] = typer.Option(None, "--size", "-s", help="Page size"),
 ):
+    """Search staff by name/phone/email (requires --user-token OR --user-id). Returns: staffId, name, email, mobile, avatar"""
     client = get_client()
     result = client.search_staff(
         keyword=keyword, user_token=user_token, user_id=user_id,
@@ -97,6 +103,7 @@ def fetch_org_info(
     org_id: str = typer.Argument(help="Organization ID"),
     user_token: str = typer.Option("", "--user-token", help="User token"),
 ):
+    """Fetch organization information"""
     client = get_client()
     result = client.fetch_org_info(org_id=org_id, user_token=user_token)
     output_result(result, fields=["org_id", "org_name", "icon_url"], title="Org Info")

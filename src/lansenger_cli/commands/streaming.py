@@ -11,6 +11,7 @@ def create_stream_message(
     receiver_type: str = typer.Argument(help="Receiver type: staff or group"),
     stream_id: str = typer.Argument(help="Stream ID (unique per session)"),
 ):
+    """Create a streaming message for progressive output"""
     client = get_client()
     result = client.create_stream_message(
         receiver_id=receiver_id, receiver_type=receiver_type, stream_id=stream_id,
@@ -22,6 +23,7 @@ def create_stream_message(
 def fetch_stream_message(
     msg_id: str = typer.Argument(help="Message ID of the stream message"),
 ):
+    """Fetch streaming message content"""
     client = get_client()
     result = client.fetch_stream_message(msg_id=msg_id)
     output_result(result, fields=["message_id"], title="Fetch Stream Message Result")

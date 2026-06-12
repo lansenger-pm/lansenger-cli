@@ -20,6 +20,7 @@ def create_todo_task(
     sender_id: str = typer.Option("", "--sender-id", help="Sender staff ID"),
     user_token: str = typer.Option("", "--user-token", help="User token"),
 ):
+    """Create a todo task"""
     client = get_client()
     ids = executor_ids.split(",")
     result = client.create_todo_task(
@@ -41,6 +42,7 @@ def update_todo_task(
     desc: str = typer.Option("", "--desc", "-d", help="New description"),
     user_token: str = typer.Option("", "--user-token", help="User token"),
 ):
+    """Update a todo task"""
     client = get_client()
     result = client.update_todo_task(
         todotask_id=todotask_id, title=title, link=link,
@@ -58,6 +60,7 @@ def update_todo_task_status(
     staff_id: str = typer.Option("", "--staff-id", help="Staff ID"),
     user_token: str = typer.Option("", "--user-token", help="User token"),
 ):
+    """Update todo task status"""
     client = get_client()
     result = client.update_todo_task_status(
         todotask_id=todotask_id, status=status, org_id=org_id,
@@ -73,6 +76,7 @@ def delete_todo_task(
     staff_id: str = typer.Option("", "--staff-id", help="Staff ID"),
     user_token: str = typer.Option("", "--user-token", help="User token"),
 ):
+    """Delete a todo task"""
     client = get_client()
     result = client.delete_todo_task(
         todotask_id=todotask_id, org_id=org_id,
@@ -89,6 +93,7 @@ def fetch_todo_task_list(
     staff_id: str = typer.Option("", "--staff-id", help="Staff ID"),
     status_list: Optional[str] = typer.Option(None, "--status", help="Status list (comma-separated)"),
 ):
+    """List todo tasks"""
     client = get_client()
     app_ids_list = app_ids.split(",") if app_ids else None
     status_list_parsed = status_list.split(",") if status_list else None
@@ -107,6 +112,7 @@ def fetch_todo_task_by_source_id(
     staff_id: str = typer.Option("", "--staff-id", help="Staff ID"),
     user_token: str = typer.Option("", "--user-token", help="User token"),
 ):
+    """Fetch todo task by source ID"""
     client = get_client()
     result = client.fetch_todo_task_by_source_id(
         source_id=source_id, org_id=org_id,
@@ -125,6 +131,7 @@ def fetch_todo_task_by_id(
     staff_id: str = typer.Option("", "--staff-id", help="Staff ID"),
     user_token: str = typer.Option("", "--user-token", help="User token"),
 ):
+    """Fetch todo task by ID"""
     client = get_client()
     result = client.fetch_todo_task_by_id(
         todotask_id=todotask_id, org_id=org_id,
@@ -144,6 +151,7 @@ def fetch_todo_task_status_counts(
     status_list: Optional[str] = typer.Option(None, "--status", help="Status list (comma-separated)"),
     user_token: str = typer.Option("", "--user-token", help="User token"),
 ):
+    """Fetch todo task status counts"""
     client = get_client()
     status_parsed = status_list.split(",") if status_list else None
     result = client.fetch_todo_task_status_counts(
@@ -161,6 +169,7 @@ def update_executor_status(
     todotask_id: str = typer.Option("", "--task-id", help="Todo task ID"),
     user_token: str = typer.Option("", "--user-token", help="User token"),
 ):
+    """Update executor status"""
     client = get_client()
     parsed = json.loads(executor_status_list)
     result = client.update_executor_status(
@@ -177,6 +186,7 @@ def add_executors(
     todotask_id: str = typer.Option("", "--task-id", help="Todo task ID"),
     user_token: str = typer.Option("", "--user-token", help="User token"),
 ):
+    """Add executors to a todo task"""
     client = get_client()
     ids = executor_ids.split(",")
     result = client.add_executors(
@@ -193,6 +203,7 @@ def delete_executors(
     todotask_id: str = typer.Option("", "--task-id", help="Todo task ID"),
     user_token: str = typer.Option("", "--user-token", help="User token"),
 ):
+    """Delete executors from a todo task"""
     client = get_client()
     ids = executor_ids.split(",")
     result = client.delete_executors(
@@ -210,6 +221,7 @@ def fetch_executor_list(
     status_list: Optional[str] = typer.Option(None, "--status", help="Status list (comma-separated)"),
     user_token: str = typer.Option("", "--user-token", help="User token"),
 ):
+    """Fetch executor list"""
     client = get_client()
     status_parsed = status_list.split(",") if status_list else None
     result = client.fetch_executor_list(

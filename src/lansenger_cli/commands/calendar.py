@@ -12,6 +12,7 @@ def fetch_primary_calendar(
     user_token: str = typer.Option("", "--user-token", help="User token"),
     user_id: str = typer.Option("", "--user-id", help="User ID"),
 ):
+    """Fetch primary calendar"""
     client = get_client()
     result = client.fetch_primary_calendar(user_token=user_token, user_id=user_id)
     output_result(result, fields=[
@@ -38,6 +39,7 @@ def create_schedule(
     user_token: str = typer.Option("", "--user-token", help="User token"),
     user_id: str = typer.Option("", "--user-id", help="User ID"),
 ):
+    """Create a schedule in calendar"""
     client = get_client()
     attendees_list = json.loads(attendees)
     start_time_dict = {"time": start_time, "date": date, "timeZone": time_zone}
@@ -64,6 +66,7 @@ def fetch_schedule(
     user_token: str = typer.Option("", "--user-token", help="User token"),
     user_id: str = typer.Option("", "--user-id", help="User ID"),
 ):
+    """Fetch schedule details"""
     client = get_client()
     result = client.fetch_schedule(
         calendar_id=calendar_id, schedule_id=schedule_id,
@@ -82,6 +85,7 @@ def delete_schedule(
     user_token: str = typer.Option("", "--user-token", help="User token"),
     user_id: str = typer.Option("", "--user-id", help="User ID"),
 ):
+    """Delete a schedule"""
     client = get_client()
     result = client.delete_schedule(
         calendar_id=calendar_id, schedule_id=schedule_id,
@@ -98,6 +102,7 @@ def fetch_schedule_list(
     user_token: str = typer.Option("", "--user-token", help="User token"),
     user_id: str = typer.Option("", "--user-id", help="User ID"),
 ):
+    """List schedules in a calendar"""
     client = get_client()
     result = client.fetch_schedule_list(
         calendar_id=calendar_id, start_time=start_time, end_time=end_time,
@@ -120,6 +125,7 @@ def fetch_schedule_attendees(
     page: int = typer.Option(1, "--page", "-p", help="Page number"),
     page_size: int = typer.Option(500, "--size", "-s", help="Page size"),
 ):
+    """Fetch schedule attendees"""
     client = get_client()
     result = client.fetch_schedule_attendees(
         calendar_id=calendar_id, schedule_id=schedule_id,
@@ -138,6 +144,7 @@ def add_schedule_attendees(
     user_token: str = typer.Option("", "--user-token", help="User token"),
     user_id: str = typer.Option("", "--user-id", help="User ID"),
 ):
+    """Add attendees to a schedule"""
     client = get_client()
     attendees_list = json.loads(attendees)
     result = client.add_schedule_attendees(
@@ -157,6 +164,7 @@ def delete_schedule_attendees(
     user_token: str = typer.Option("", "--user-token", help="User token"),
     user_id: str = typer.Option("", "--user-id", help="User ID"),
 ):
+    """Delete attendees from a schedule"""
     client = get_client()
     attendees_list = json.loads(attendees)
     result = client.delete_schedule_attendees(
@@ -186,6 +194,7 @@ def update_schedule(
     user_token: str = typer.Option("", "--user-token", help="User token"),
     user_id: str = typer.Option("", "--user-id", help="User ID"),
 ):
+    """Update schedule details"""
     client = get_client()
     start_time_dict = json.loads(start_time) if start_time else None
     end_time_dict = json.loads(end_time) if end_time else None
@@ -216,6 +225,7 @@ def update_schedule_attendee_meta(
     user_token: str = typer.Option("", "--user-token", help="User token"),
     user_id: str = typer.Option("", "--user-id", help="User ID"),
 ):
+    """Update attendee meta information"""
     client = get_client()
     remind_times_list = json.loads(remind_times) if remind_times else None
     result = client.update_schedule_attendee_meta(

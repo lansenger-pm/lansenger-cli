@@ -6,6 +6,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [0.10.12] - 2026-06-12
+
+### Changed
+
+- **help docs**: All 81 subcommands across 13 modules now have descriptive docstrings, making `--help` output informative for both humans and AI agents.
+- **staff search**: `--user-token` and `--user-id` help text now correctly states "one of the two is required" (previously both were shown as required).
+
+### Fixed
+
+- **help rendering**: Command-level help strings migrated from `@app.command(help=...)` to function docstrings for better compatibility with Typer.
+
+---
+
 ## [0.10.11] - 2026-06-10
 
 ### Changed

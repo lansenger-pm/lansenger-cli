@@ -17,6 +17,7 @@ def create_group(
     department_id_list: Optional[List[str]] = typer.Option(None, "--dept", "-D", help="Department IDs to add"),
     user_token: str = typer.Option("", "--user-token", help="User token"),
 ):
+    """Create a new group"""
     client = get_client()
     result = client.create_group(
         name=name, org_id=org_id, owner_id=owner_id,
@@ -32,6 +33,7 @@ def fetch_group_info(
     group_id: str = typer.Argument(help="Group ID"),
     user_token: str = typer.Option("", "--user-token", help="User token"),
 ):
+    """Fetch group information"""
     client = get_client()
     result = client.fetch_group_info(group_id=group_id, user_token=user_token)
     output_result(result, fields=[
@@ -47,6 +49,7 @@ def fetch_group_members(
     page_offset: int = typer.Option(0, "--page", "-p", help="Page offset"),
     page_size: int = typer.Option(100, "--size", "-s", help="Page size"),
 ):
+    """Fetch group members"""
     client = get_client()
     result = client.fetch_group_members(
         group_id=group_id, user_token=user_token,
@@ -68,6 +71,7 @@ def fetch_group_list(
     page_offset: int = typer.Option(0, "--page", "-p", help="Page offset"),
     page_size: int = typer.Option(100, "--size", "-s", help="Page size"),
 ):
+    """Fetch user's group list"""
     client = get_client()
     result = client.fetch_group_list(user_token=user_token, page_offset=page_offset, page_size=page_size)
     output_result(result, fields=["total_group_ids"], title="Group List")
@@ -79,6 +83,7 @@ def check_is_in_group(
     user_token: str = typer.Option("", "--user-token", help="User token"),
     staff_id: str = typer.Option("", "--staff-id", help="Staff ID to check"),
 ):
+    """Check if a staff member is in a group"""
     client = get_client()
     result = client.check_is_in_group(group_id=group_id, user_token=user_token, staff_id=staff_id)
     output_result(result, fields=["is_in_group"], title="Is In Group")
@@ -103,6 +108,7 @@ def update_group_info(
     send_msg_status: Optional[bool] = typer.Option(None, "--mute", help="Group mute on/off"),
     user_token: str = typer.Option("", "--user-token", help="User token"),
 ):
+    """Update group information"""
     client = get_client()
     result = client.update_group_info(
         group_id=group_id, name=name, description=description,
@@ -125,6 +131,7 @@ def update_group_members(
     add_dept: Optional[List[str]] = typer.Option(None, "--add-dept", "-D", help="Department IDs to add"),
     user_token: str = typer.Option("", "--user-token", help="User token"),
 ):
+    """Add/remove group members"""
     client = get_client()
     result = client.update_group_members(
         group_id=group_id, add_user_list=add_user,
@@ -139,6 +146,7 @@ def dismiss_group(
     group_id: str = typer.Argument(help="Group ID to dismiss/delete"),
     user_token: str = typer.Option("", "--user-token", help="User token"),
 ):
+    """Dismiss/delete a group"""
     client = get_client()
     result = client.dismiss_group(group_id=group_id, user_token=user_token)
     output_result(result, title="Dismiss Group Result")

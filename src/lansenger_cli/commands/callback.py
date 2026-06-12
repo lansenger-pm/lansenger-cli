@@ -45,6 +45,7 @@ def parse_callback_payload(
     signature: str = typer.Option("", "--signature", help="Signature to verify"),
     profile: str = typer.Option("", "--profile", "-P", help="Credential profile (overrides global --profile)"),
 ):
+    """Parse callback payload (decrypt and verify)"""
     from lansenger_sdk import parse_callback_payload
     p = profile or get_active_profile()
     resolved_key = _resolve_encoding_key(encoding_key, p)
@@ -77,6 +78,7 @@ def decrypt_callback_payload(
     known_app_id: str = typer.Option("", "--known-app-id", help="Known appId to help split orgId/appId in decrypted result"),
     profile: str = typer.Option("", "--profile", "-P", help="Credential profile (overrides global --profile)"),
 ):
+    """Decrypt callback payload"""
     from lansenger_sdk import decrypt_callback_payload
     p = profile or get_active_profile()
     resolved_key = _resolve_encoding_key(encoding_key, p)
@@ -104,6 +106,7 @@ def verify_callback_signature(
     callback_token: str = typer.Option("", "--callback-token", help="Token from developer center callback config (reads from credential store if empty; falls back to encoding_key)"),
     profile: str = typer.Option("", "--profile", "-P", help="Credential profile (overrides global --profile)"),
 ):
+    """Verify callback signature"""
     from lansenger_sdk import verify_callback_signature as _verify
     p = profile or get_active_profile()
     resolved_key = _resolve_encoding_key(encoding_key, p)
@@ -120,6 +123,7 @@ def verify_callback_signature(
 
 @app.command("event-types")
 def get_callback_event_types():
+    """Get callback event types"""
     from lansenger_sdk import get_callback_event_types
     types = get_callback_event_types()
     if is_json_output():

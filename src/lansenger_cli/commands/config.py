@@ -28,6 +28,7 @@ def config_set(
     value: str = typer.Argument(help="Config value"),
     profile: str = typer.Option("", "--profile", "-P", help="Profile name (overrides global --profile)"),
 ):
+    """Set configuration value"""
     p = profile or get_active_profile()
     if key not in VALID_KEYS:
         rprint(f"[red]Error:[/red] Invalid key '{key}'. Valid keys: {', '.join(VALID_KEYS)}")
@@ -51,6 +52,7 @@ def config_set(
 def config_show(
     profile: str = typer.Option("", "--profile", "-P", help="Profile name (overrides global --profile)"),
 ):
+    """Show current configuration"""
     p = profile or get_active_profile()
     store = CredentialStore(profile=p)
     if is_json_output():
@@ -75,6 +77,7 @@ def config_clear(
     profile: str = typer.Option("", "--profile", "-P", help="Profile name (overrides global --profile)"),
     all_profiles: bool = typer.Option(False, "--all", help="Delete entire state file"),
 ):
+    """Clear configuration"""
     if all_profiles:
         store = CredentialStore()
         store.clear()
@@ -88,6 +91,7 @@ def config_clear(
 
 @app.command("list-profiles")
 def config_list_profiles():
+    """List all configuration profiles"""
     store = CredentialStore()
     profiles = store.list_profiles()
     active = store.get_active_profile()

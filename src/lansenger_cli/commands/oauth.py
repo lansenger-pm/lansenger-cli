@@ -18,6 +18,7 @@ def build_authorize_url(
     scope: str = typer.Option("basic_userinfor", "--scope", "-s", help="OAuth2 scope"),
     state: str = typer.Option("", "--state", help="State parameter for CSRF protection"),
 ):
+    """Build OAuth2 authorization URL"""
     client = get_client()
     url = client.build_authorize_url(redirect_uri=redirect_uri, scope=scope, state=state or None)
     if is_json_output():
@@ -31,6 +32,7 @@ def exchange_code(
     code: str = typer.Argument(help="Authorization code from callback"),
     redirect_uri: str = typer.Option("", "--redirect-uri", help="Redirect URI used in authorize"),
 ):
+    """Exchange authorization code for user token"""
     client = get_client()
     result = client.exchange_code(code=code, redirect_uri=redirect_uri)
     output_result(result, fields=[
@@ -44,6 +46,7 @@ def refresh_user_token(
     refresh_token: str = typer.Argument(help="Refresh token"),
     scope: str = typer.Option("", "--scope", "-s", help="Scope"),
 ):
+    """Refresh user token using refresh token"""
     client = get_client()
     result = client.refresh_user_token(refresh_token=refresh_token, scope=scope)
     if result.success and result.user_token:
@@ -67,6 +70,7 @@ def refresh_user_token(
 def fetch_user_info(
     user_token: str = typer.Argument(help="User token"),
 ):
+    """Fetch user information using user token"""
     client = get_client()
     result = client.fetch_user_info(user_token=user_token)
     output_result(result, fields=[
@@ -79,6 +83,7 @@ def fetch_user_info(
 def parse_authorize_callback(
     query_string: str = typer.Argument(help="Query string from callback URL"),
 ):
+    """Parse OAuth2 callback query string"""
     from lansenger_sdk import LansengerSyncClient
     params = LansengerSyncClient.parse_authorize_callback(query_string)
     if is_json_output():
@@ -92,6 +97,7 @@ def validate_callback_state(
     callback_state: str = typer.Argument(help="State from callback"),
     expected_state: str = typer.Argument(help="Expected state you set"),
 ):
+    """Validate OAuth2 callback state"""
     from lansenger_sdk import LansengerSyncClient
     valid = LansengerSyncClient.validate_callback_state(callback_state, expected_state)
     if is_json_output():

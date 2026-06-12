@@ -16,6 +16,7 @@ def fetch_chat_list(
     end_time: int = typer.Option(0, "--end", help="End time in microseconds"),
     user_token: str = typer.Option("", "--user-token", help="User token"),
 ):
+    """Fetch chat list"""
     client = get_client()
     result = client.fetch_chat_list(
         chat_type=chat_type, keyword=keyword,
@@ -54,6 +55,7 @@ def fetch_chat_messages(
     progress: bool = typer.Option(False, "--progress", help="Show pagination progress (pages/messages fetched)"),
     user_token: str = typer.Option("", "--user-token", help="User token"),
 ):
+    """Fetch chat message history"""
     client = get_client()
     if not staff_id and not group_id:
         rprint("[red]Error:[/red] At least one of --staff-id or --group-id is required.")
