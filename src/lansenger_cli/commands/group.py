@@ -59,7 +59,7 @@ def fetch_group_members(
         output_result(result, fields=["total_members"], title="Group Members")
         if result.members:
             output_list(result.members, columns=["Staff ID", "Name", "Role"], row_mapper=lambda m: [
-                getattr(m, "staff_id", ""), getattr(m, "name", ""), getattr(m, "role", "")
+                m.get("staffId", ""), m.get("name", ""), m.get("role", "")
             ])
     else:
         output_result(result)
