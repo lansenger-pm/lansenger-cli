@@ -17,9 +17,11 @@ def build_authorize_url(
     redirect_uri: str = typer.Argument(help="Redirect URI after auth"),
     scope: str = typer.Option("basic_userinfor", "--scope", "-s", help="OAuth2 scope"),
     state: str = typer.Option("", "--state", help="State parameter for CSRF protection"),
+    profile: str = typer.Option("", "--profile", "-P", help="Credential profile (overrides global --profile)"),
 ):
     """Build OAuth2 authorization URL"""
-    client = get_client()
+    p = profile or get_active_profile()
+    client = get_client(profile=p)
     url = client.build_authorize_url(redirect_uri=redirect_uri, scope=scope, state=state or None)
     if is_json_output():
         rprint(json.dumps({"authorize_url": url}, ensure_ascii=False))
@@ -31,9 +33,11 @@ def build_authorize_url(
 def exchange_code(
     code: str = typer.Argument(help="Authorization code from callback"),
     redirect_uri: str = typer.Option("", "--redirect-uri", help="Redirect URI used in authorize"),
+    profile: str = typer.Option("", "--profile", "-P", help="Credential profile (overrides global --profile)"),
 ):
     """Exchange authorization code for user token"""
-    client = get_client()
+    p = profile or get_active_profile()
+    client = get_client(profile=p)
     result = client.exchange_code(code=code, redirect_uri=redirect_uri)
     output_result(result, fields=[
         "user_token", "expires_in", "refresh_token",
@@ -45,12 +49,14 @@ def exchange_code(
 def refresh_user_token(
     refresh_token: str = typer.Argument(help="Refresh token"),
     scope: str = typer.Option("", "--scope", "-s", help="Scope"),
+    profile: str = typer.Option("", "--profile", "-P", help="Credential profile (overrides global --profile)"),
 ):
     """Refresh user token using refresh token"""
-    client = get_client()
+    p = profile or get_active_profile()
+    client = get_client(profile=p)
     result = client.refresh_user_token(refresh_token=refresh_token, scope=scope)
     if result.success and result.user_token:
-        store = get_store()
+        store = get_store(profile=p)
         existing = store.load_user_token()
         old_rt = existing.get("refresh_token", "")
         store.save_user_token(
@@ -69,9 +75,11 @@ def refresh_user_token(
 @app.command("user-info")
 def fetch_user_info(
     user_token: str = typer.Argument(help="User token"),
+    profile: str = typer.Option("", "--profile", "-P", help="Credential profile (overrides global --profile)"),
 ):
     """Fetch user information using user token"""
-    client = get_client()
+    p = profile or get_active_profile()
+    client = get_client(profile=p)
     result = client.fetch_user_info(user_token=user_token)
     output_result(result, fields=[
         "staff_id", "name", "org_id", "org_name",
@@ -142,6 +150,7 @@ def local_callback(
     auto_exchange: bool = typer.Option(True, "--exchange/--no-exchange", "-E", help="Auto-exchange code for userToken"),
     timeout: int = typer.Option(120, "--timeout", "-t", help="Max wait seconds for callback"),
     redirect_uri: str = typer.Option("", "--redirect-uri", help="Override redirect_uri (default: http://localhost:<port>)"),
+    profile: str = typer.Option("", "--profile", "-P", help="Credential profile (overrides global --profile)"),
 ):
     """Start a local HTTP server to capture OAuth2 callback and auto-exchange the code.
 
@@ -160,7 +169,8 @@ def local_callback(
     if not redirect_uri:
         redirect_uri = f"http://localhost:{port}"
 
-    client = get_client()
+    p = profile or get_active_profile()
+    client = get_client(profile=p)
     auth_url = client.build_authorize_url(redirect_uri=redirect_uri, scope=scope, state=state or None)
 
     if not is_json_output():
@@ -204,7 +214,7 @@ def local_callback(
     if auto_exchange:
         exchange_result = client.exchange_code(code=code, redirect_uri=redirect_uri)
         if exchange_result.success and exchange_result.user_token:
-            store = get_store()
+            store = get_store(profile=p)
             existing = store.load_user_token()
             rt = exchange_result.refresh_token or existing.get("refresh_token", "")
             store.save_user_token(
