@@ -108,3 +108,21 @@ def config_list_profiles():
         p_creds = p_store.load_credentials()
         has = p_store.has_credentials()
         rprint(f"  {p}{marker}  {'[green]✓[/green]' if has else '[red]✗[/red]'}  app_id={p_creds.get('app_id', '(empty)')}  gateway={p_creds.get('api_gateway_url', '(empty)')}")
+
+
+@app.command("delete-profile")
+def config_delete_profile(
+    profile: str = typer.Argument(help="Profile name to delete"),
+):
+    """Delete a profile and all its credentials"""
+    store = CredentialStore()
+    was_active = store.get_active_profile() == profile
+    if not store.delete_profile_by_name(profile):
+        rprint(f"[red]Error:[/red] Profile '{profile}' does not exist.")
+        raise typer.Exit(1)
+    if is_json_output():
+        rprint({"deleted": profile, "active": store.get_active_profile()})
+        return
+    rprint(f"[green]Deleted[/green] profile '{profile}'.")
+    if was_active:
+        rprint(f"[dim]Active profile switched to 'default'.[/dim]")

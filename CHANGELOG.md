@@ -6,6 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [0.10.13] - 2026-06-15
+
+### Added
+
+- **config**: `delete-profile` command to permanently remove a credential profile and all its data. If the deleted profile is the active one, automatically switches to `"default"`.
+
+### Changed
+
+- **deps**: Bump minimum `lansenger-sdk` requirement to >=1.6.12 for `delete_profile_by_name()` support.
+
 ## [0.10.12] - 2026-06-12
 
 ### Changed

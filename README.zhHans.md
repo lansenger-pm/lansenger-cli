@@ -75,7 +75,7 @@ lansenger health check
 
 | 命令组 | 说明 | 子命令 |
 |--------|------|--------|
-| `config` | 管理凭证配置 | `set`, `show`, `clear`, `list-profiles` |
+| `config` | 管理凭证配置 | `set`, `show`, `clear`, `delete-profile`, `list-profiles` |
 | `message` | 发送与管理消息 | `send-text`, `send-markdown`, `send-file`, `send-image-url`, `send-link-card`, `send-app-articles`, `send-app-card`, `send-oacard`, `send-bot-message`, `send-group-message`, `send-account-message`, `send-user-message`, `update-dynamic-card`, `revoke`, `query-groups` |
 | `group` | 管理群组 | `create`, `info`, `members`, `list`, `check`, `update`, `update-members` |
 | `staff` | 查询人员信息 | `basic-info`, `detail`, `ancestors`, `id-mapping`, `org-extra-fields`, `search`, `org-info` |
@@ -364,6 +364,9 @@ lansenger callback parse-payload DATA --profile my-app
 
 # 查看所有已配置 profile
 lansenger config list-profiles
+
+# 删除指定 profile（如为当前 active 则自动切换到 default）
+lansenger config delete-profile my-bot
 
 # 查看某个 profile 详情
 lansenger config show --profile my-app

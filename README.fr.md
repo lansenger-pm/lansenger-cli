@@ -75,7 +75,7 @@ lansenger health check
 
 | Groupe | Description | Sous-commandes |
 |--------|------|--------|
-| `config` | Gérer les identifiants | `set`, `show`, `clear`, `list-profiles` |
+| `config` | Gérer les identifiants | `set`, `show`, `clear`, `delete-profile`, `list-profiles` |
 | `message` | Envoyer et gérer les messages | `send-text`, `send-markdown`, `send-file`, `send-image-url`, `send-link-card`, `send-app-articles`, `send-app-card`, `send-oacard`, `send-bot-message`, `send-group-message`, `send-account-message`, `send-user-message`, `update-dynamic-card`, `revoke`, `query-groups` |
 | `group` | Gérer les groupes | `create`, `info`, `members`, `list`, `check`, `update`, `update-members` |
 | `staff` | Interroger les infos du personnel | `basic-info`, `detail`, `ancestors`, `id-mapping`, `org-extra-fields`, `search`, `org-info` |
@@ -364,6 +364,9 @@ lansenger callback parse-payload DATA --profile my-app
 
 # Lister tous les profils
 lansenger config list-profiles
+
+# Supprimer un profil (bascule automatiquement vers default si actif)
+lansenger config delete-profile my-bot
 
 # Voir les détails d'un profil
 lansenger config show --profile my-app
