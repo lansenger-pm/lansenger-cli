@@ -110,7 +110,7 @@ def fetch_schedule_list(
     )
     if result.success and result.schedule_list:
         output_list(result.schedule_list, columns=["Schedule ID", "Summary"], row_mapper=lambda s: [
-            getattr(s, "schedule_id", ""), getattr(s, "summary", ""),
+            s.get("scheduleId", ""), s.get("summary", ""),
         ])
     else:
         output_result(result, title="Schedule List")
