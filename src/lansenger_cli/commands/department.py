@@ -33,7 +33,7 @@ def fetch_department_children(
     if result.success and result.departments:
         output_list(result.departments, columns=["ID", "Name", "Parent ID", "Has Children"], row_mapper=lambda d: [
             d.get("id", ""), d.get("name", ""),
-            d.get("parentId", ""), d.get("hasChildren", ""),
+            (d.get("ancestorDepartments") or [{}])[0].get("id", ""), d.get("hasChildren", ""),
         ])
     else:
         output_result(result, title="Department Children")
@@ -54,9 +54,9 @@ def fetch_department_staffs(
     )
     if result.success and result.staffs:
         output_result(result, fields=["has_more", "total"], title="Department Staffs")
-        output_list(result.staffs, columns=["Staff ID", "Name", "Gender"], row_mapper=lambda s: [
-            s.get("staffId", ""), s.get("name", ""),
-            s.get("gender", ""),
+        output_list(result.staffs, columns=["Staff ID", "Name", "Org Name"], row_mapper=lambda s: [
+            s.get("id", ""), s.get("name", ""),
+            s.get("orgName", ""),
         ])
     else:
         output_result(result)
