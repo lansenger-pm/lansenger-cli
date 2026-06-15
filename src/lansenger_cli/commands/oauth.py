@@ -6,7 +6,7 @@ from urllib.parse import urlparse, parse_qs
 from rich import print as rprint
 from rich.console import Console
 
-from lansenger_cli.utils import get_client, get_store, output_result, is_json_output
+from lansenger_cli.utils import get_client, get_store, output_result, is_json_output, get_active_profile
 
 console = Console()
 app = typer.Typer(help="OAuth2 user authentication operations")
