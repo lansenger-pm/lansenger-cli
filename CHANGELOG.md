@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [0.10.14] - 2026-06-16
+
+### Fixed
+
+- **calendar**: `list-schedules` — use `s.get("scheduleId")` instead of `getattr(s, "schedule_id")` for dict items.
+- **group**: `members` — use `m.get("staffId")` instead of `getattr(m, "staff_id")`.
+- **department**: `children` — fix `Parent ID` (`ancestorDepartments[0].id`), `Has Children` (`hasChildren`).
+- **department**: `staffs` — fix `Staff ID` (`id` not `staffId`), replace nonexistent `Gender` with `Org Name` (`orgName`).
+
 ## [0.10.13] - 2026-06-15
 
 ### Added
