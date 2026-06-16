@@ -403,7 +403,7 @@ lansenger config show --profile my-app
 | `chat list/messages` | N | **Y** | **Y** | 仅组织级应用 |
 | `group *`（群组管理 V2） | N | N | **Y** | 需要机器人已在群内 |
 | `media upload` | **Y** | **Y** | **Y** | 通用上传 |
-| `media upload-app` | N | **Y** | **Y** | 仅自建应用（非 ISV） |
+| `media upload-app` | **Y** | **Y** | **Y** | 仅自建应用（非 ISV） |
 | `media download/path` | **Y** | **Y** | **Y** | 通用下载 |
 | `oauth *` | N | **Y** | **Y** | 仅组织级应用 |
 | `streaming *` | N | **Y** | **Y** | 仅组织级应用 |

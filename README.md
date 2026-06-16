@@ -403,7 +403,7 @@ The Lansenger platform has three identity types with different API access:
 | `chat list/messages` | N | **Y** | **Y** | Org-level apps only |
 | `group *` (group management V2) | N | N | **Y** | Requires bot to be in group |
 | `media upload` | **Y** | **Y** | **Y** | General upload |
-| `media upload-app` | N | **Y** | **Y** | Self-built apps only (not ISV) |
+| `media upload-app` | **Y** | **Y** | **Y** | Self-built apps only (not ISV) |
 | `media download/path` | **Y** | **Y** | **Y** | General download |
 | `oauth *` | N | **Y** | **Y** | Org-level apps only |
 | `streaming *` | N | **Y** | **Y** | Org-level apps only |

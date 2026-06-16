@@ -403,7 +403,7 @@ La plateforme Lansenger propose trois types d'identité avec différents accès 
 | `chat list/messages` | N | **Y** | **Y** | Applications niveau organisation uniquement |
 | `group *` (gestion de groupes V2) | N | N | **Y** | Nécessite que le robot soit dans le groupe |
 | `media upload` | **Y** | **Y** | **Y** | Téléchargement général |
-| `media upload-app` | N | **Y** | **Y** | Apps auto-hébergées uniquement (pas ISV) |
+| `media upload-app` | **Y** | **Y** | **Y** | Apps auto-hébergées uniquement (pas ISV) |
 | `media download/path` | **Y** | **Y** | **Y** | Téléchargement général |
 | `oauth *` | N | **Y** | **Y** | Applications niveau organisation uniquement |
 | `streaming *` | N | **Y** | **Y** | Applications niveau organisation uniquement |
