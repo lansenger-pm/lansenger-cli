@@ -382,6 +382,72 @@ lansenger config show --profile my-app
 - `config show` 對所有密鑰類欄位脫敏顯示（`***`），僅 `api_gateway_url` 和 `passport_url` 明文展示
 - 支援環境變數 `LANSENGER_APP_ID` / `LANSENGER_APP_SECRET` / `LANSENGER_ENCODING_KEY` / `LANSENGER_CALLBACK_TOKEN`，適合 CI/CD 場景
 
+## 身份與權限
+
+### 身份能力矩陣
+
+藍信平台有三種身份類型，各自擁有不同的 API 存取權限：
+
+| 命令域 | 個人機械人 | 組織應用（自建） | 組織應用 + 機械人 | 說明 |
+|--------|:---:|:---:|:---:|------|
+| `message send-text/markdown/file/...`（機械人私聊） | **Y** | N | **Y** | 只有機械人可以傳送機械人私聊 |
+| `message send-text --group`（群聊） | N* | N | **Y** | 個人機械人 API 支援，但尚無入群功能 |
+| `message send-group-message` | N* | N | **Y** | 同上 |
+| `message send-account-message`（公眾號） | N | **Y** | **Y** | 需要公眾號能力 |
+| `message send-user-message`（使用者對使用者） | N | **Y** | **Y** | 需要 userToken + OAuth2 |
+| `message revoke` | **Y** | **Y** | **Y** | 撤回自己傳送的訊息 |
+| `staff *`（通訊錄唯讀） | N | **Y** | **Y** | `search` 額外需要 userToken |
+| `department *` | N | **Y** | **Y** | 僅組織級應用 |
+| `calendar *` | N | **Y** | **Y** | 有 userToken = 使用者身份；無 = 機械人身份 |
+| `todo *` | N | **Y** | **Y** | 僅組織級應用 |
+| `chat list/messages` | N | **Y** | **Y** | 僅組織級應用 |
+| `group *`（群組管理 V2） | N | N | **Y** | 需要機械人已在群內 |
+| `media upload` | **Y** | **Y** | **Y** | 通用上載 |
+| `media upload-app` | N | **Y** | **Y** | 僅自建應用（非 ISV） |
+| `media download/path` | **Y** | **Y** | **Y** | 通用下載 |
+| `oauth *` | N | **Y** | **Y** | 僅組織級應用 |
+| `streaming *` | N | **Y** | **Y** | 僅組織級應用 |
+| `callback *`（事件解析） | N/A | N/A | N/A | 純資料操作，無需身份 |
+
+> \* **N\*** = API 能力存在，但入群功能尚未就緒。
+
+> **個人機械人**只能收發訊息和上載/下載檔案。不能存取通訊錄、群組、行事曆或 OAuth2。
+>
+> **組織應用 vs 組織應用 + 機械人**：使用相同的 appID/appSecret。唯一區別在於訊息通道——只有機械人可以傳送機械人私聊和群訊息（因為只有機械人可以加入群組）。所有其他 API（通訊錄、行事曆、待辦、會話、OAuth2、串流訊息）兩者完全一致。目前僅自建應用支援機械人能力。
+
+### 開發者中心權限
+
+除了身份類型外，具體 API 呼叫還依賴藍信開發者中心中的權限開關。組織可能限制開發者存取，需要管理員協助。
+
+**基礎權限（預設開啟）：**
+
+| 權限 | 說明 |
+|------|------|
+| 取得使用者基本資訊 | 取得人員基本資訊，用於系統/應用登入 |
+| 傳送通知訊息 | 取得組織訊息通道，向人員/群組傳送訊息 |
+
+**進階權限（預設關閉，需手動開啟）：**
+
+| 權限 | 說明 | 涉及的 Skill |
+|------|------|-------------|
+| 通訊錄唯讀 | 通訊錄讀取權限 | `lansenger-staff`、`lansenger-department` |
+| 通訊錄編輯 | 通訊錄編輯權限 | `lansenger-staff`（建立/更新/刪除） |
+| 敏感資訊 - 手機號 | 取得使用者手機號 | `lansenger-staff`（詳情、ID 對映） |
+| 敏感資訊 - 電子郵件 | 取得使用者電子郵件 | `lansenger-staff`（詳情、ID 對映） |
+| 敏感資訊 - 身份證號 | 取得使用者身份證號 | `lansenger-staff` |
+| 敏感資訊 - 工號 | 取得使用者工號 | `lansenger-staff` |
+| 唯一屬性對映 staff ID | 將手機號/電子郵件/工號對映為 staff ID | `lansenger-staff`（ID 對映） |
+| 應用編輯 | 建立和更新應用 | 開發者中心管理 |
+| 群組唯讀 | 群組讀取權限 | `lansenger-group`（查詢資訊/成員） |
+| 群組編輯 | 群組編輯權限 | `lansenger-group`（建立/更新/解散/成員） |
+| 行事曆唯讀 | 行事曆和排程讀取權限 | `lansenger-calendar`（查詢） |
+| 行事曆編輯 | 行事曆和排程編輯權限 | `lansenger-calendar`（建立/更新/刪除） |
+| 上載媒體 | 上載媒體檔案權限 | `lansenger-media`（upload、upload-app） |
+| 工作台模板讀取 | 工作台模板讀取權限 | — |
+| 工作台模板寫入 | 工作台模板寫入權限 | — |
+
+遇到權限錯誤時，請先確認身份類型是否支援該操作，再提示使用者在開發者中心開啟對應的進階權限（如無法存取請聯繫組織管理員）。
+
 ## CLI 相容性
 
 本 CLI 與 TypeScript 版、Go 版命令語法完全一致：

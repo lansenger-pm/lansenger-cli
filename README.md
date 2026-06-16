@@ -382,6 +382,72 @@ lansenger config show --profile my-app
 - `config show` masks all secret fields (`***`), only `api_gateway_url` and `passport_url` shown in plaintext
 - Environment variables `LANSENGER_APP_ID` / `LANSENGER_APP_SECRET` / `LANSENGER_ENCODING_KEY` / `LANSENGER_CALLBACK_TOKEN` supported for CI/CD
 
+## Identity & Permissions
+
+### Identity Capability Matrix
+
+The Lansenger platform has three identity types with different API access:
+
+| Command Domain | Personal Bot | Org App (Self-built) | Org App + Bot | Notes |
+|--------|:---:|:---:|:---:|------|
+| `message send-text/markdown/file/...` (bot DM) | **Y** | N | **Y** | Only bots can send bot DMs |
+| `message send-text --group` (group chat) | N* | N | **Y** | Personal bot API supports it but no join-group feature yet |
+| `message send-group-message` | N* | N | **Y** | Same as above |
+| `message send-account-message` (public account) | N | **Y** | **Y** | Requires public account capability |
+| `message send-user-message` (user-to-user) | N | **Y** | **Y** | Requires userToken + OAuth2 |
+| `message revoke` | **Y** | **Y** | **Y** | Revoke own messages |
+| `staff *` (contacts read-only) | N | **Y** | **Y** | `search` additionally requires userToken |
+| `department *` | N | **Y** | **Y** | Org-level apps only |
+| `calendar *` | N | **Y** | **Y** | With userToken = user identity; without = bot identity |
+| `todo *` | N | **Y** | **Y** | Org-level apps only |
+| `chat list/messages` | N | **Y** | **Y** | Org-level apps only |
+| `group *` (group management V2) | N | N | **Y** | Requires bot to be in group |
+| `media upload` | **Y** | **Y** | **Y** | General upload |
+| `media upload-app` | N | **Y** | **Y** | Self-built apps only (not ISV) |
+| `media download/path` | **Y** | **Y** | **Y** | General download |
+| `oauth *` | N | **Y** | **Y** | Org-level apps only |
+| `streaming *` | N | **Y** | **Y** | Org-level apps only |
+| `callback *` (event parsing) | N/A | N/A | N/A | Pure data operation, no identity required |
+
+> \* **N\*** = API capability exists, but join-group feature not yet available.
+
+> **Personal Bot** can only send/receive messages and upload/download files. Cannot access contacts, groups, calendars, or OAuth2.
+>
+> **Org App vs Org App + Bot**: Same appID/appSecret. The only difference is messaging channels — only bots can send bot DMs and group messages (because only bots can join groups). All other APIs (contacts, calendar, todo, chat, OAuth2, streaming) work identically for both. Currently only self-built apps support bot capability.
+
+### Developer Center Permissions
+
+Beyond identity type, specific API calls also depend on permission toggles in the Lansenger Developer Center. The organization may restrict developer access, requiring admin assistance.
+
+**Basic Permissions (enabled by default):**
+
+| Permission | Description |
+|------|------|
+| Get basic user info | Get personnel basic info for system/app login |
+| Send notification messages | Get org message channels to send messages to people/groups |
+
+**Advanced Permissions (disabled by default, must be manually enabled):**
+
+| Permission | Description | Impacted Skill |
+|------|------|-------------|
+| Contacts read-only | Read access to contacts | `lansenger-staff`, `lansenger-department` |
+| Contacts edit | Edit access to contacts | `lansenger-staff` (create/update/delete) |
+| Sensitive info - Phone | Access user phone numbers | `lansenger-staff` (detail, id-mapping) |
+| Sensitive info - Email | Access user emails | `lansenger-staff` (detail, id-mapping) |
+| Sensitive info - ID number | Access user ID numbers | `lansenger-staff` |
+| Sensitive info - Employee ID | Access user employee IDs | `lansenger-staff` |
+| Map unique attribute to staff ID | Map phone/email/employee ID to staff ID | `lansenger-staff` (id-mapping) |
+| App edit | Create and update apps | Developer Center management |
+| Groups read-only | Read access to groups | `lansenger-group` (query info/members) |
+| Groups edit | Edit access to groups | `lansenger-group` (create/update/dismiss/members) |
+| Calendar read-only | Read access to calendar & schedules | `lansenger-calendar` (query) |
+| Calendar edit | Edit access to calendar & schedules | `lansenger-calendar` (create/update/delete) |
+| Upload media | Upload media file permission | `lansenger-media` (upload, upload-app) |
+| Workbench template read | Read access to workbench templates | — |
+| Workbench template write | Write access to workbench templates | — |
+
+When encountering permission errors, first verify the identity type supports the operation, then prompt the user to enable the corresponding advanced permission in the Developer Center (contact org admin if unable to access).
+
 ## CLI Compatibility
 
 This CLI shares the same command syntax as the TypeScript and Go versions:

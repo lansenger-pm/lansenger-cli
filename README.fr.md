@@ -382,6 +382,72 @@ lansenger config show --profile my-app
 - `config show` masque tous les champs secrets (`***`), seuls `api_gateway_url` et `passport_url` sont affichés en clair
 - Variables d'environnement `LANSENGER_APP_ID` / `LANSENGER_APP_SECRET` / `LANSENGER_ENCODING_KEY` / `LANSENGER_CALLBACK_TOKEN` supportées pour CI/CD
 
+## Identité & Permissions
+
+### Matrice des capacités par identité
+
+La plateforme Lansenger propose trois types d'identité avec différents accès API :
+
+| Domaine de commande | Robot personnel | App Org (auto-hébergée) | App Org + Robot | Notes |
+|--------|:---:|:---:|:---:|------|
+| `message send-text/markdown/file/...` (DM robot) | **Y** | N | **Y** | Seuls les robots peuvent envoyer des DM robot |
+| `message send-text --group` (chat de groupe) | N* | N | **Y** | L'API robot personnel le supporte mais la fonction rejoindre un groupe n'est pas encore disponible |
+| `message send-group-message` | N* | N | **Y** | Identique à ci-dessus |
+| `message send-account-message` (compte public) | N | **Y** | **Y** | Nécessite la capacité compte public |
+| `message send-user-message` (utilisateur à utilisateur) | N | **Y** | **Y** | Nécessite userToken + OAuth2 |
+| `message revoke` | **Y** | **Y** | **Y** | Révoquer ses propres messages |
+| `staff *` (contacts lecture seule) | N | **Y** | **Y** | `search` nécessite en plus userToken |
+| `department *` | N | **Y** | **Y** | Applications niveau organisation uniquement |
+| `calendar *` | N | **Y** | **Y** | Avec userToken = identité utilisateur ; sans = identité robot |
+| `todo *` | N | **Y** | **Y** | Applications niveau organisation uniquement |
+| `chat list/messages` | N | **Y** | **Y** | Applications niveau organisation uniquement |
+| `group *` (gestion de groupes V2) | N | N | **Y** | Nécessite que le robot soit dans le groupe |
+| `media upload` | **Y** | **Y** | **Y** | Téléchargement général |
+| `media upload-app` | N | **Y** | **Y** | Apps auto-hébergées uniquement (pas ISV) |
+| `media download/path` | **Y** | **Y** | **Y** | Téléchargement général |
+| `oauth *` | N | **Y** | **Y** | Applications niveau organisation uniquement |
+| `streaming *` | N | **Y** | **Y** | Applications niveau organisation uniquement |
+| `callback *` (analyse d'événements) | N/A | N/A | N/A | Opération pure de données, aucune identité requise |
+
+> \* **N\*** = La capacité API existe, mais la fonction rejoindre un groupe n'est pas encore disponible.
+
+> **Robot personnel** ne peut qu'envoyer/recevoir des messages et télécharger des fichiers. Ne peut pas accéder aux contacts, groupes, calendriers ou OAuth2.
+>
+> **App Org vs App Org + Robot** : Même appID/appSecret. La seule différence réside dans les canaux de messagerie — seuls les robots peuvent envoyer des DM robot et des messages de groupe (car seuls les robots peuvent rejoindre des groupes). Toutes les autres API (contacts, calendrier, tâches, conversations, OAuth2, streaming) fonctionnent de manière identique pour les deux. Actuellement, seules les apps auto-hébergées supportent la capacité robot.
+
+### Permissions du Centre Développeur
+
+Au-delà du type d'identité, les appels API spécifiques dépendent également des bascules de permission dans le Centre Développeur Lansenger. L'organisation peut restreindre l'accès développeur, nécessitant l'assistance d'un administrateur.
+
+**Permissions de base (activées par défaut) :**
+
+| Permission | Description |
+|------|------|
+| Obtenir les infos utilisateur de base | Obtenir les informations de base du personnel pour la connexion système/app |
+| Envoyer des messages de notification | Obtenir les canaux de messagerie de l'organisation pour envoyer des messages aux personnes/groupes |
+
+**Permissions avancées (désactivées par défaut, doivent être activées manuellement) :**
+
+| Permission | Description | Skill impacté |
+|------|------|-------------|
+| Contacts lecture seule | Accès en lecture aux contacts | `lansenger-staff`, `lansenger-department` |
+| Contacts édition | Accès en édition aux contacts | `lansenger-staff` (créer/mettre à jour/supprimer) |
+| Infos sensibles - Téléphone | Accéder aux numéros de téléphone | `lansenger-staff` (détail, id-mapping) |
+| Infos sensibles - Email | Accéder aux emails | `lansenger-staff` (détail, id-mapping) |
+| Infos sensibles - N° d'identité | Accéder aux numéros d'identité | `lansenger-staff` |
+| Infos sensibles - ID employé | Accéder aux IDs employé | `lansenger-staff` |
+| Mapper attribut unique vers staff ID | Mapper téléphone/email/ID employé vers staff ID | `lansenger-staff` (id-mapping) |
+| Édition d'app | Créer et mettre à jour des apps | Gestion du Centre Développeur |
+| Groupes lecture seule | Accès en lecture aux groupes | `lansenger-group` (infos/membres) |
+| Groupes édition | Accès en édition aux groupes | `lansenger-group` (créer/mettre à jour/dissoudre/membres) |
+| Calendrier lecture seule | Accès en lecture au calendrier | `lansenger-calendar` (requête) |
+| Calendrier édition | Accès en édition au calendrier | `lansenger-calendar` (créer/mettre à jour/supprimer) |
+| Télécharger média | Permission de télécharger des fichiers média | `lansenger-media` (upload, upload-app) |
+| Lecture modèles workbench | Accès en lecture aux modèles workbench | — |
+| Écriture modèles workbench | Accès en écriture aux modèles workbench | — |
+
+En cas d'erreurs de permission, vérifiez d'abord que le type d'identité supporte l'opération, puis invitez l'utilisateur à activer la permission avancée correspondante dans le Centre Développeur (contactez l'admin de l'organisation si l'accès est impossible).
+
 ## Compatibilité CLI
 
 Ce CLI partage la même syntaxe de commande que les versions TypeScript et Go :
