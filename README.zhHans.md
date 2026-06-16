@@ -75,7 +75,7 @@ lansenger health check
 
 | 命令组 | 说明 | 子命令 |
 |--------|------|--------|
-| `config` | 管理凭证配置 | `set`, `show`, `clear`, `delete-profile`, `list-profiles` |
+| `config` | 管理凭证配置 | `set`, `show`, `clear`, `delete-profile`, `list-profiles`, `list-users` |
 | `message` | 发送与管理消息 | `send-text`, `send-markdown`, `send-file`, `send-image-url`, `send-link-card`, `send-app-articles`, `send-app-card`, `send-oacard`, `send-bot-message`, `send-group-message`, `send-account-message`, `send-user-message`, `update-dynamic-card`, `revoke`, `query-groups` |
 | `group` | 管理群组 | `create`, `info`, `members`, `list`, `check`, `update`, `update-members` |
 | `staff` | 查询人员信息 | `basic-info`, `detail`, `ancestors`, `id-mapping`, `org-extra-fields`, `search`, `org-info` |
@@ -323,10 +323,14 @@ lansenger streaming fetch MSG_ID
 | 选项 | 说明 |
 |------|------|
 | `--json` / `-j` | 输出原始 JSON 格式而非 rich 表格 |
+| `--as <staff_id>` | 从凭证存储中自动加载并自动刷新指定 staff_id 的 user token |
 
 ```bash
 # JSON 格式输出（便于脚本处理）
 lansenger -j staff basic-info staff001
+
+# 以指定用户身份执行命令（自动从凭证存储加载 user token）
+lansenger --as staff001 chat messages --group-id group123
 ```
 
 ## Shell 自动补全

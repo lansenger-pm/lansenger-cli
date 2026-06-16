@@ -1,7 +1,8 @@
 import os
+import time
 import dataclasses
 
-from lansenger_sdk import LansengerSyncClient, CredentialStore, LansengerConfig
+from lansenger_sdk import LansengerSyncClient, CredentialStore, LansengerConfig, LansengerAuthError
 from rich import print as rprint
 from rich.console import Console
 from rich.table import Table
@@ -9,6 +10,7 @@ from rich.table import Table
 console = Console()
 _json_output = False
 _active_profile = "default"
+_as_staff_id = ""
 
 
 def set_json_output(value: bool):
@@ -35,11 +37,84 @@ def get_active_profile() -> str:
     return _active_profile
 
 
+def set_as_staff_id(value: str):
+    global _as_staff_id
+    _as_staff_id = value
+
+
+def get_as_staff_id() -> str:
+    return _as_staff_id
+
+
+class _AutoUserTokenProxy:
+    """Proxy that auto-injects userToken from CredentialStore for --as mode.
+
+    Intercepts method calls on the client and replaces empty user_token
+    kwargs with the stored & auto-refreshed token for the given staff_id.
+
+    Only activates when the caller passes user_token="" — explicit
+    --user-token values are never overridden.
+    """
+
+    def __init__(self, raw_client, store, staff_id):
+        self._client = raw_client
+        self._store = store
+        self._staff_id = staff_id
+
+    def __getattr__(self, name):
+        attr = getattr(self._client, name)
+        if not callable(attr):
+            return attr
+
+        def wrapper(*args, **kwargs):
+            if "user_token" in kwargs and not kwargs.get("user_token"):
+                kwargs["user_token"] = _load_and_refresh_user_token(
+                    self._store, self._staff_id
+                )
+            return attr(*args, **kwargs)
+
+        return wrapper
+
+
+def _load_and_refresh_user_token(store: CredentialStore, staff_id: str) -> str:
+    """Load userToken from store for staff_id, auto-refreshing if expired."""
+    cached = store.load_user_token(staff_id=staff_id)
+    user_token = cached.get("user_token", "")
+    refresh_token = cached.get("refresh_token", "")
+    expiry = cached.get("user_token_expiry", 0)
+
+    if user_token and expiry > time.time():
+        return user_token
+
+    if not refresh_token:
+        raise LansengerAuthError(
+            f"No userToken available for staff_id={staff_id} and no refreshToken for auto-refresh. "
+            "Run OAuth2 authorize flow: build_authorize_url → exchange_code."
+        )
+
+    # Use a raw client (no proxy) to avoid infinite recursion
+    client = _create_raw_client()
+    result = client.refresh_user_token(refresh_token=refresh_token)
+    if not result.success:
+        raise LansengerAuthError(f"userToken refresh failed for staff_id={staff_id}: {result.error}")
+
+    store.save_user_token(
+        result.user_token,
+        result.refresh_token or refresh_token,
+        result.expires_in,
+        300,
+        result.refresh_expires_in or 0,
+        staff_id=result.staff_id or staff_id,
+    )
+    return result.user_token
+
+
 def get_store() -> CredentialStore:
     return CredentialStore(profile=_active_profile)
 
 
-def get_client() -> LansengerSyncClient:
+def _create_raw_client() -> LansengerSyncClient:
+    """Create a base LansengerSyncClient without proxy wrapping."""
     store = CredentialStore(profile=_active_profile)
     creds = store.load_credentials()
     if not creds.get("app_id") or not creds.get("app_secret"):
@@ -56,6 +131,21 @@ def get_client() -> LansengerSyncClient:
         redirect_uri=creds.get("redirect_uri", ""),
     )
     return LansengerSyncClient.from_config(config)
+
+
+def get_client():
+    """Get a LansengerSyncClient, wrapped in proxy when --as is set.
+
+    When --as <staff_id> is active, returns an _AutoUserTokenProxy that
+    auto-injects the stored & auto-refreshed userToken for that staff_id
+    into any method call where user_token="" is passed (i.e., the caller
+    did not provide an explicit --user-token).
+    """
+    raw = _create_raw_client()
+    if _as_staff_id:
+        store = CredentialStore(profile=_active_profile)
+        return _AutoUserTokenProxy(raw, store, _as_staff_id)
+    return raw
 
 
 def _result_to_dict(result):

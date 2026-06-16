@@ -126,3 +126,45 @@ def config_delete_profile(
     rprint(f"[green]Deleted[/green] profile '{profile}'.")
     if was_active:
         rprint(f"[dim]Active profile switched to 'default'.[/dim]")
+
+
+@app.command("list-users")
+def config_list_users(
+    profile: str = typer.Option("", "--profile", "-P", help="Profile name (overrides global --profile)"),
+    show_tokens: bool = typer.Option(False, "--show-tokens", "-T", help="Show user tokens (security warning)"),
+):
+    """List all users with stored user tokens in the current profile"""
+    p = profile or get_active_profile()
+    store = CredentialStore(profile=p)
+    users = store.list_user_tokens()
+    if is_json_output():
+        if show_tokens:
+            tokens = {}
+            for staff_id in users:
+                token_data = store.load_user_token(staff_id)
+                tokens[staff_id] = {
+                    "user_token": token_data.get("user_token", ""),
+                    "refresh_token": token_data.get("refresh_token", ""),
+                    "expires_in": token_data.get("expires_in", 0),
+                    "refresh_expires_in": token_data.get("refresh_expires_in", 0),
+                }
+            rprint({"profile": p, "users": users, "tokens": tokens})
+        else:
+            rprint({"profile": p, "users": users})
+        return
+    if not users:
+        rprint(f"[yellow]No users found in profile '{p}'.[/yellow]")
+        return
+    rprint(f"[bold]Users in profile '{p}':[/bold]")
+    for i, staff_id in enumerate(users, 1):
+        if show_tokens:
+            token_data = store.load_user_token(staff_id)
+            rprint(f"  {i}. {staff_id}")
+            rprint(f"     user_token:          [dim]{token_data.get('user_token', '(empty)')}[/dim]")
+            rprint(f"     refresh_token:       [dim]{token_data.get('refresh_token', '(empty)')}[/dim]")
+            rprint(f"     expires_in:          {token_data.get('expires_in', 0)}")
+            rprint(f"     refresh_expires_in:  {token_data.get('refresh_expires_in', 0)}")
+        else:
+            rprint(f"  {i}. {staff_id}")
+    if not show_tokens:
+        rprint("[dim]Hint: Use --show-tokens to view user tokens[/dim]")

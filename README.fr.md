@@ -75,7 +75,7 @@ lansenger health check
 
 | Groupe | Description | Sous-commandes |
 |--------|------|--------|
-| `config` | Gérer les identifiants | `set`, `show`, `clear`, `delete-profile`, `list-profiles` |
+| `config` | Gérer les identifiants | `set`, `show`, `clear`, `delete-profile`, `list-profiles`, `list-users` |
 | `message` | Envoyer et gérer les messages | `send-text`, `send-markdown`, `send-file`, `send-image-url`, `send-link-card`, `send-app-articles`, `send-app-card`, `send-oacard`, `send-bot-message`, `send-group-message`, `send-account-message`, `send-user-message`, `update-dynamic-card`, `revoke`, `query-groups` |
 | `group` | Gérer les groupes | `create`, `info`, `members`, `list`, `check`, `update`, `update-members` |
 | `staff` | Interroger les infos du personnel | `basic-info`, `detail`, `ancestors`, `id-mapping`, `org-extra-fields`, `search`, `org-info` |
@@ -323,10 +323,14 @@ lansenger streaming fetch MSG_ID
 | Option | Description |
 |------|------|
 | `--json` / `-j` | Sortie JSON brute au lieu de tableaux formatés |
+| `--as <staff_id>` | Charge et rafraîchit automatiquement le jeton utilisateur pour le staff_id spécifié depuis le stockage des identifiants |
 
 ```bash
 # Sortie JSON (utile pour les scripts)
 lansenger -j staff basic-info staff001
+
+# Exécuter une commande en tant qu'utilisateur spécifique (charge automatiquement le jeton utilisateur)
+lansenger --as staff001 chat messages --group-id group123
 ```
 
 ## Auto-complétion shell

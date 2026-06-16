@@ -75,7 +75,7 @@ lansenger health check
 
 | Group | Description | Subcommands |
 |--------|------|--------|
-| `config` | Manage credentials | `set`, `show`, `clear`, `delete-profile`, `list-profiles` |
+| `config` | Manage credentials | `set`, `show`, `clear`, `delete-profile`, `list-profiles`, `list-users` |
 | `message` | Send & manage messages | `send-text`, `send-markdown`, `send-file`, `send-image-url`, `send-link-card`, `send-app-articles`, `send-app-card`, `send-oacard`, `send-bot-message`, `send-group-message`, `send-account-message`, `send-user-message`, `update-dynamic-card`, `revoke`, `query-groups` |
 | `group` | Manage groups | `create`, `info`, `members`, `list`, `check`, `update`, `update-members` |
 | `staff` | Query staff info | `basic-info`, `detail`, `ancestors`, `id-mapping`, `org-extra-fields`, `search`, `org-info` |
@@ -323,10 +323,14 @@ lansenger streaming fetch MSG_ID
 | Option | Description |
 |------|------|
 | `--json` / `-j` | Output raw JSON instead of formatted tables |
+| `--as <staff_id>` | Auto-load & auto-refresh user token for the given staff_id from credential store |
 
 ```bash
 # JSON output (useful for scripting)
 lansenger -j staff basic-info staff001
+
+# Run a command as a specific user (auto-loads user token from credential store)
+lansenger --as staff001 chat messages --group-id group123
 ```
 
 ## Shell Completion

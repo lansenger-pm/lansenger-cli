@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [0.10.15] - 2026-06-16
+
+### Added
+
+- **config**: `list-users` command to list all users with stored user tokens in the current profile.
+- **config**: `list-users --show-tokens` flag to display complete token information (user_token, refresh_token, expires_in, refresh_expires_in) for each stored user.
+- **cli**: `--as <staff_id>` global flag (short for "act as") that auto-loads and auto-refreshes user tokens from the CredentialStore. Works transparently via proxy — no command files were modified.
+
 ## [0.10.14] - 2026-06-16
 
 ### Fixed
