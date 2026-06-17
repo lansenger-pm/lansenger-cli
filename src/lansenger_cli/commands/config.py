@@ -145,8 +145,8 @@ def config_list_users(
                 tokens[staff_id] = {
                     "user_token": token_data.get("user_token", ""),
                     "refresh_token": token_data.get("refresh_token", ""),
-                    "expires_in": token_data.get("expires_in", 0),
-                    "refresh_expires_in": token_data.get("refresh_expires_in", 0),
+                    "expires_in": token_data.get("user_token_expiry", 0),
+                    "refresh_expires_in": token_data.get("refresh_token_expiry", 0),
                 }
             rprint({"profile": p, "users": users, "tokens": tokens})
         else:
@@ -162,8 +162,8 @@ def config_list_users(
             rprint(f"  {i}. {staff_id}")
             rprint(f"     user_token:          [dim]{token_data.get('user_token', '(empty)')}[/dim]")
             rprint(f"     refresh_token:       [dim]{token_data.get('refresh_token', '(empty)')}[/dim]")
-            rprint(f"     expires_in:          {token_data.get('expires_in', 0)}")
-            rprint(f"     refresh_expires_in:  {token_data.get('refresh_expires_in', 0)}")
+            rprint(f"     expires_in:          {token_data.get('user_token_expiry', 0)}")
+            rprint(f"     refresh_expires_in:  {token_data.get('refresh_token_expiry', 0)}")
         else:
             rprint(f"  {i}. {staff_id}")
     if not show_tokens:
