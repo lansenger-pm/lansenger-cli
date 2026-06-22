@@ -406,8 +406,8 @@ The Lansenger platform has three identity types with different API access:
 | Command Domain | Personal Bot | Org App (Self-built) | Org App + Bot | Notes |
 |--------|:---:|:---:|:---:|------|
 | `message send-text/markdown/file/...` (bot DM) | **Y** | N | **Y** | Only bots can send bot DMs |
-| `message send-text --group` (group chat) | N* | N | **Y** | Personal bot API supports it but no join-group feature yet |
-| `message send-group-message` | N* | N | **Y** | Same as above |
+| `message send-text --group` (group chat) | **Y** | N | **Y** | Personal bot now supports group messaging |
+| `message send-group-message` | **Y** | N | **Y** | Same as above |
 | `message send-account-message` (public account) | N | **Y** | **Y** | Requires public account capability |
 | `message send-user-message` (user-to-user) | N | **Y** | **Y** | Requires userToken + OAuth2 |
 | `message revoke` | **Y** | **Y** | **Y** | Revoke own messages |
@@ -424,7 +424,6 @@ The Lansenger platform has three identity types with different API access:
 | `streaming *` | N | **Y** | **Y** | Org-level apps only |
 | `callback *` (event parsing) | N/A | N/A | N/A | Pure data operation, no identity required |
 
-> \* **N\*** = API capability exists, but join-group feature not yet available.
 
 > **Personal Bot** can only send/receive messages and upload/download files. Cannot access contacts, groups, calendars, or OAuth2.
 >

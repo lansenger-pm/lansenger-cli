@@ -406,8 +406,8 @@ lansenger config show --profile my-app
 | 命令域 | 个人机器人 | 组织应用（自建） | 组织应用 + 机器人 | 说明 |
 |--------|:---:|:---:|:---:|------|
 | `message send-text/markdown/file/...`（机器人私聊） | **Y** | N | **Y** | 只有机器人可以发送机器人私聊 |
-| `message send-text --group`（群聊） | N* | N | **Y** | 个人机器人 API 支持，但尚无入群功能 |
-| `message send-group-message` | N* | N | **Y** | 同上 |
+| `message send-text --group`（群聊） | **Y** | N | **Y** | 个人机器人现已支持群聊 |
+| `message send-group-message` | **Y** | N | **Y** | 同上 |
 | `message send-account-message`（公众号） | N | **Y** | **Y** | 需要公众号能力 |
 | `message send-user-message`（用户对用户） | N | **Y** | **Y** | 需要 userToken + OAuth2 |
 | `message revoke` | **Y** | **Y** | **Y** | 撤回自己发送的消息 |
@@ -424,9 +424,9 @@ lansenger config show --profile my-app
 | `streaming *` | N | **Y** | **Y** | 仅组织级应用 |
 | `callback *`（事件解析） | N/A | N/A | N/A | 纯数据操作，无需身份 |
 
-> \* **N\*** = API 能力存在，但入群功能尚未就绪。
+> \* **N\*** = API 能力存在。
 
-> **个人机器人**只能收发消息和上传/下载文件。不能访问通讯录、群组、日历或 OAuth2。
+> **个人机器人**只能收发消息和上传/下载文件。不能访问通讯录、日历或 OAuth2。
 >
 > **组织应用 vs 组织应用 + 机器人**：使用相同的 appID/appSecret。唯一区别在于消息通道——只有机器人可以发送机器人私聊和群消息（因为只有机器人可以加入群组）。所有其他 API（通讯录、日历、待办、会话、OAuth2、流式消息）两者完全一致。目前仅自建应用支持机器人能力。
 

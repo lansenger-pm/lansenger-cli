@@ -406,8 +406,8 @@ lansenger config show --profile my-app
 | 命令域 | 個人機械人 | 組織應用（自建） | 組織應用 + 機械人 | 說明 |
 |--------|:---:|:---:|:---:|------|
 | `message send-text/markdown/file/...`（機械人私聊） | **Y** | N | **Y** | 只有機械人可以傳送機械人私聊 |
-| `message send-text --group`（群聊） | N* | N | **Y** | 個人機械人 API 支援，但尚無入群功能 |
-| `message send-group-message` | N* | N | **Y** | 同上 |
+| `message send-text --group`（群聊） | **Y** | N | **Y** | 個人機械人現已支援群聊 |
+| `message send-group-message` | **Y** | N | **Y** | 同上 |
 | `message send-account-message`（公眾號） | N | **Y** | **Y** | 需要公眾號能力 |
 | `message send-user-message`（使用者對使用者） | N | **Y** | **Y** | 需要 userToken + OAuth2 |
 | `message revoke` | **Y** | **Y** | **Y** | 撤回自己傳送的訊息 |
@@ -424,9 +424,8 @@ lansenger config show --profile my-app
 | `streaming *` | N | **Y** | **Y** | 僅組織級應用 |
 | `callback *`（事件解析） | N/A | N/A | N/A | 純資料操作，無需身份 |
 
-> \* **N\*** = API 能力存在，但入群功能尚未就緒。
 
-> **個人機械人**只能收發訊息和上載/下載檔案。不能存取通訊錄、群組、行事曆或 OAuth2。
+> **個人機械人**只能收發訊息和上載/下載檔案。不能存取通訊錄、行事曆或 OAuth2。
 >
 > **組織應用 vs 組織應用 + 機械人**：使用相同的 appID/appSecret。唯一區別在於訊息通道——只有機械人可以傳送機械人私聊和群訊息（因為只有機械人可以加入群組）。所有其他 API（通訊錄、行事曆、待辦、會話、OAuth2、串流訊息）兩者完全一致。目前僅自建應用支援機械人能力。
 
