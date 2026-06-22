@@ -6,6 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [0.10.17] - 2026-06-17
+
+### Added
+
+- **message**: `send-text`, `send-markdown`, `send-group-message` commands now support `--mention-bot` and `--ref-msg-id` options.
+
+### Fixed
+
+- **message**: `query-groups` command default page offset changed from 1 to 0 to match V2 API specification.
+
 ## [0.10.16] - 2026-06-17
 
 ### Fixed

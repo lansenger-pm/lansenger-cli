@@ -16,8 +16,10 @@ def send_text(
     is_group: bool = typer.Option(False, "--group", "-g", help="Send as group message"),
     reminder_all: bool = typer.Option(False, "--mention-all", help="@all in group"),
     reminder_user_ids: Optional[List[str]] = typer.Option(None, "--mention", "-m", help="User IDs to @mention"),
+    reminder_bot_ids: Optional[List[str]] = typer.Option(None, "--mention-bot", help="Bot IDs to @mention"),
     user_token: str = typer.Option("", "--user-token", help="User token for private channel"),
     sender_id: str = typer.Option("", "--sender-id", help="Sender staff ID for group message"),
+    ref_msg_id: str = typer.Option("", "--ref-msg-id", help="Reference message openId for reply"),
 ):
     """Send text message"""
     client = get_client()
@@ -30,8 +32,10 @@ def send_text(
         is_group=is_group,
         reminder_all=reminder_all,
         reminder_user_ids=reminder_user_ids,
+        reminder_bot_ids=reminder_bot_ids,
         user_token=user_token,
         sender_id=sender_id,
+        ref_msg_id=ref_msg_id,
     )
     output_result(result, fields=["message_id", "msg_type", "operation"], title="Send Text Result")
 
@@ -42,9 +46,11 @@ def send_markdown(
     content: str = typer.Argument(help="Markdown content"),
     reminder_all: bool = typer.Option(False, "--mention-all", help="@all in group"),
     reminder_user_ids: Optional[List[str]] = typer.Option(None, "--mention", "-m", help="User IDs to @mention"),
+    reminder_bot_ids: Optional[List[str]] = typer.Option(None, "--mention-bot", help="Bot IDs to @mention"),
     is_group: bool = typer.Option(False, "--group", "-g", help="Send as group message"),
     user_token: str = typer.Option("", "--user-token", help="User token for private channel"),
     sender_id: str = typer.Option("", "--sender-id", help="Sender staff ID for group message"),
+    ref_msg_id: str = typer.Option("", "--ref-msg-id", help="Reference message openId for reply"),
 ):
     """Send markdown message"""
     client = get_client()
@@ -52,9 +58,11 @@ def send_markdown(
         chat_id=chat_id, content=content,
         reminder_all=reminder_all,
         reminder_user_ids=reminder_user_ids,
+        reminder_bot_ids=reminder_bot_ids,
         is_group=is_group,
         user_token=user_token,
         sender_id=sender_id,
+        ref_msg_id=ref_msg_id,
     )
     output_result(result, fields=["message_id", "msg_type", "operation"], title="Send Markdown Result")
 
@@ -273,8 +281,10 @@ def send_group_message(
     sender_id: str = typer.Option("", "--sender-id", help="Sender staff ID"),
     reminder_all: bool = typer.Option(False, "--mention-all", help="@all (text/formatText only)"),
     reminder_user_ids: Optional[List[str]] = typer.Option(None, "--mention", "-m", help="User IDs to @mention (text/formatText only)"),
+    reminder_bot_ids: Optional[List[str]] = typer.Option(None, "--mention-bot", help="Bot IDs to @mention (text/formatText only)"),
     outlines: str = typer.Option("", "--outlines", help="Group notification digest"),
     entry_id: str = typer.Option("", "--entry-id", help="App entry selector"),
+    ref_msg_id: str = typer.Option("", "--ref-msg-id", help="Reference message openId for reply"),
 ):
     """Send group message"""
     import json
@@ -284,14 +294,16 @@ def send_group_message(
         group_id=group_id, msg_type=msg_type, msg_data=parsed_data,
         user_token=user_token, sender_id=sender_id,
         reminder_all=reminder_all, reminder_user_ids=reminder_user_ids,
+        reminder_bot_ids=reminder_bot_ids,
         outlines=outlines, entry_id=entry_id,
+        ref_msg_id=ref_msg_id,
     )
     output_result(result, fields=["message_id"], title="Group Message Result")
 
 
 @app.command("query-groups")
 def query_groups(
-    page_offset: int = typer.Option(1, "--page", "-p", help="Page offset"),
+    page_offset: int = typer.Option(0, "--page", "-p", help="Page offset (starts from 0)"),
     page_size: int = typer.Option(100, "--size", "-s", help="Page size"),
 ):
     """Query groups for message sending"""
