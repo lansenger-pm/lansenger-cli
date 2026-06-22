@@ -124,14 +124,26 @@ lansenger message send-text group123 "全员通知" --group --mention-all
 # 群内 @指定人
 lansenger message send-text group123 "请查看" --group --mention staff001 --mention staff002
 
+# @提及群中的特定机器人
+lansenger message send-text group123 "Bot check" --group --mention-bot bot001 --mention-bot bot002
+
+# 回复消息（消息引用）
+lansenger message send-text group123 "Got it" --group --ref-msg-id 524288-xxx
+
 # 机器人通道发送消息
 lansenger message send-bot-message text '{"content":"通知内容"}' --chat-id user001 --chat-id user002
+
+# 机器人通道回复（消息引用）
+lansenger message send-bot-message text '{"content":"Reply"}' --chat-id user001 --ref-msg-id 524288-xxx
 
 # 群消息通道发送（user_token 可选，无则显示为 bot）
 lansenger message send-group-message group123 text '{"content":"群消息"}'
 
 # 以人类用户身份发送（需要 user_token）
 lansenger message send-group-message group123 text '{"content":"群消息"}' --user-token YOUR_USER_TOKEN --sender-id staff001
+
+# 回复群消息
+lansenger message send-group-message group123 text '{"content":"reply"}' --ref-msg-id 524288-xxx
 
 # 应用账号通道发送
 lansenger message send-account-message text '{"content":"账号消息"}' --chat-id user001 --account-id acct001
@@ -141,6 +153,9 @@ lansenger message send-user-message user001 text '{"content":"私聊消息"}' --
 
 # 撤回消息
 lansenger message revoke msg001 msg002
+
+# 查询群 ID 列表
+lansenger message query-groups --page 0 --size 100
 ```
 
 ### 群组管理
