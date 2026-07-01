@@ -2,7 +2,7 @@ import typer
 
 from importlib.metadata import version as pkg_version
 from lansenger_cli.utils import get_store, output_result, is_json_output, console
-from lansenger_cli.utils import set_json_output, set_active_profile, get_active_profile, set_as_staff_id
+from lansenger_cli.utils import set_json_output, set_active_profile, get_active_profile, set_as_staff_id, set_app_token, set_user_token
 from lansenger_cli.commands import (
     config as config_cmd,
     message as message_cmd,
@@ -17,6 +17,8 @@ from lansenger_cli.commands import (
     streaming as streaming_cmd,
     health as health_cmd,
     chat as chat_cmd,
+    bot_command as bot_command_cmd,
+    personal_app as personal_app_cmd,
 )
 
 app = typer.Typer(
@@ -39,6 +41,8 @@ app.add_typer(media_cmd.app, name="media")
 app.add_typer(streaming_cmd.app, name="streaming")
 app.add_typer(chat_cmd.app, name="chat")
 app.add_typer(health_cmd.app, name="health")
+app.add_typer(bot_command_cmd.app, name="bot-command")
+app.add_typer(personal_app_cmd.app, name="personal-app")
 
 
 @app.callback(invoke_without_command=True)
@@ -47,11 +51,15 @@ def global_options(
     json: bool = typer.Option(False, "--json", "-j", help="Output raw JSON instead of formatted tables"),
     profile: str = typer.Option("default", "--profile", "-P", help="Credential profile to use"),
     as_user: str = typer.Option("", "--as", help="Act as a specific user (staff_id). Auto-loads & refreshes stored userToken."),
+    app_token: str = typer.Option("", "--app-token", help="App access token (external mode — no auto-refresh)"),
+    user_token: str = typer.Option("", "--user-token", help="User access token (external mode — no auto-refresh)"),
     version: bool = typer.Option(False, "--version", "-v", help="Show CLI and SDK versions"),
 ):
     set_json_output(json)
     set_active_profile(profile)
     set_as_staff_id(as_user)
+    set_app_token(app_token)
+    set_user_token(user_token)
     if version:
         cli_ver = pkg_version("lansenger-cli")
         sdk_ver = pkg_version("lansenger-sdk")

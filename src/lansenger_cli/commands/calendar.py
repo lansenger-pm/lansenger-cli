@@ -237,3 +237,30 @@ def update_schedule_attendee_meta(
         user_token=user_token, user_id=user_id,
     )
     output_result(result, title="Update Attendee Meta Result")
+
+
+@app.command("update-attendees")
+def update_schedule_attendees(
+    calendar_id: str = typer.Argument(help="Calendar ID"),
+    schedule_id: str = typer.Argument(help="Schedule ID"),
+    add_attendees: str = typer.Option("", "--add", "-A", help="Staff IDs to add as JSON list: '[\"id1\",\"id2\"]'"),
+    delete_attendees: str = typer.Option("", "--remove", "-X", help="Staff IDs to remove as JSON list"),
+    reminder_type: str = typer.Option("", "--reminder", help="Reminder type: yes or no"),
+    operation_type: str = typer.Option("", "--op", help="Operation: modify_current, modify_current_after, modify_all"),
+    current_time: int = typer.Option(0, "--current-time", help="Required when op != modify_all"),
+    user_token: str = typer.Option("", "--user-token", help="User token"),
+    user_id: str = typer.Option("", "--user-id", help="User ID"),
+):
+    """Batch add and/or delete schedule attendees (4.23.19)"""
+    client = get_client()
+    add_list = json.loads(add_attendees) if add_attendees else None
+    del_list = json.loads(delete_attendees) if delete_attendees else None
+    result = client.update_schedule_attendees(
+        calendar_id=calendar_id, schedule_id=schedule_id,
+        add_attendees=add_list, delete_attendees=del_list,
+        reminder_type=reminder_type or None,
+        operation_type=operation_type or None,
+        current_time=current_time or None,
+        user_token=user_token, user_id=user_id,
+    )
+    output_result(result, fields=["schedule_ids", "failed_attendees"], title="Update Attendees Result")

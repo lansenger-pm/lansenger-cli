@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [0.10.18] - 2026-07-01
+
+### Added
+
+- **bot-command**: New command group (create/query/delete) for managing bot slash commands (4.37).
+- **personal-app**: New command group (create/update/info/delete/list) for managing personal apps/bots (4.38).
+- **calendar**: `update-attendees` command for batch add/delete schedule attendees (4.23.19).
+
 ## [0.10.17] - 2026-06-17
 
 ### Added
