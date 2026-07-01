@@ -11,6 +11,8 @@ console = Console()
 _json_output = False
 _active_profile = "default"
 _as_staff_id = ""
+_app_token = ""
+_user_token = ""
 
 
 def set_json_output(value: bool):
@@ -44,6 +46,24 @@ def set_as_staff_id(value: str):
 
 def get_as_staff_id() -> str:
     return _as_staff_id
+
+
+def set_app_token(value: str):
+    global _app_token
+    _app_token = value
+
+
+def get_app_token() -> str:
+    return _app_token
+
+
+def set_user_token(value: str):
+    global _user_token
+    _user_token = value
+
+
+def get_user_token() -> str:
+    return _user_token
 
 
 class _AutoUserTokenProxy:
@@ -114,14 +134,35 @@ def get_store() -> CredentialStore:
 
 
 def _create_raw_client() -> LansengerSyncClient:
-    """Create a base LansengerSyncClient without proxy wrapping."""
+    """Create a base LansengerSyncClient without proxy wrapping.
+
+    Supports two modes:
+    - External mode (--app-token provided): creates client with the
+      provided token only. No credential file or env vars needed.
+      Token refresh is disabled — the caller manages token lifecycle.
+    - Normal mode: reads credentials from store file or env vars.
+    """
+    # External mode: just app_token + user_token, no credential file needed
+    if _app_token:
+        config = LansengerConfig(
+            app_id="",
+            app_secret="",
+            api_gateway_url=os.environ.get(
+                "LANSENGER_API_GATEWAY_URL",
+                "https://open.e.lanxin.cn/open/apigw",
+            ),
+            app_token=_app_token,
+            user_token=_user_token,
+        )
+        return LansengerSyncClient.from_config(config)
+
     store = CredentialStore(profile=_active_profile)
     creds = store.load_credentials()
     if not creds.get("app_id") or not creds.get("app_secret"):
         env_config = LansengerConfig.from_env()
         if env_config.is_configured():
             return LansengerSyncClient.from_config(env_config)
-        rprint(f"[red]Error:[/red] No credentials configured for profile '{_active_profile}'. Run [bold]lansenger config set[/bold] first, or set LANSENGER_APP_ID / LANSENGER_APP_SECRET env vars.")
+        rprint(f"[red]Error:[/red] No credentials configured for profile '{_active_profile}'. Run [bold]lansenger config set[/bold] first, or set LANSENGER_APP_ID / LANSENGER_APP_SECRET env vars, or use [bold]--app-token[/bold] for external token mode.")
         raise SystemExit(1)
     config = LansengerConfig(
         app_id=creds["app_id"],
@@ -129,6 +170,7 @@ def _create_raw_client() -> LansengerSyncClient:
         api_gateway_url=creds.get("api_gateway_url", "https://open.e.lanxin.cn/open/apigw"),
         passport_url=creds.get("passport_url", ""),
         redirect_uri=creds.get("redirect_uri", ""),
+        app_token=_app_token,
     )
     return LansengerSyncClient.from_config(config)
 

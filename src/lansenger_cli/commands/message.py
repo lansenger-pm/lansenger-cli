@@ -412,3 +412,71 @@ def send_reminder(
         user_id_list=user_id_list or [],
     )
     output_result(result, fields=["operation"], title="Send Reminder Result")
+
+
+@app.command("approve-card")
+def approve_card(
+    body_title: str = typer.Argument(help="Card body title (required)"),
+    body_content: str = typer.Argument(help="Card body markdown content (required)"),
+    chat_id: str = typer.Option("", "--chat-id", "-C", help="Chat ID (user/group)"),
+    head_title: str = typer.Option("", "--head-title", help="Card header title"),
+    head_icon_link: str = typer.Option("", "--head-icon-link", help="Header icon URL"),
+    head_status_describe: str = typer.Option("", "--head-status", help="Card status description"),
+    head_status_colour: str = typer.Option("", "--head-status-colour", help="Status colour (e.g. green)"),
+    fields: Optional[str] = typer.Option(None, "--fields", help="Body fields as JSON array, e.g. '[{\"key\":\"k\",\"value\":\"v\"}]'"),
+    card_link: str = typer.Option("", "--card-link", help="Overall card click link"),
+    card_link_pc: str = typer.Option("", "--card-link-pc", help="PC click link"),
+    card_link_pad: str = typer.Option("", "--card-link-pad", help="Pad click link"),
+    buttons: Optional[str] = typer.Option(None, "--buttons", help="Buttons as JSON array, e.g. '[{\"text\":\"Approve\",\"buttonTheme\":1,\"callbackInfo\":\"ok\"}]'"),
+    expire_time: int = typer.Option(0, "--expire-time", help="Card expiry in seconds (max 30 days, 0=default 7d)"),
+    reminder_all: bool = typer.Option(False, "--mention-all", help="@all in group"),
+    reminder_user_ids: Optional[List[str]] = typer.Option(None, "--mention", "-m", help="User IDs to @mention"),
+    reminder_bot_ids: Optional[List[str]] = typer.Option(None, "--mention-bot", help="Bot IDs to @mention"),
+    is_group: bool = typer.Option(False, "--group", "-g", help="Send as group message"),
+    user_token: str = typer.Option("", "--user-token", help="User token for private channel"),
+    sender_id: str = typer.Option("", "--sender-id", help="Sender staff ID for group message"),
+):
+    """Send approveCard (审批卡片) message"""
+    import json
+    client = get_client()
+    parsed_fields = None
+    if fields:
+        parsed_fields = json.loads(fields)
+    parsed_buttons = None
+    if buttons:
+        parsed_buttons = json.loads(buttons)
+    result = client.send_approve_card(
+        chat_id=chat_id, body_title=body_title, body_content=body_content,
+        head_title=head_title, head_icon_link=head_icon_link,
+        head_status_describe=head_status_describe,
+        head_status_colour=head_status_colour,
+        fields=parsed_fields, buttons=parsed_buttons,
+        card_link=card_link, card_link_for_pc=card_link_pc,
+        card_link_for_pad=card_link_pad, expire_time=expire_time,
+        reminder_all=reminder_all, reminder_user_ids=reminder_user_ids,
+        reminder_bot_ids=reminder_bot_ids,
+        is_group=is_group, user_token=user_token, sender_id=sender_id,
+    )
+    output_result(result, fields=["message_id", "operation"], title="Send ApproveCard Result")
+
+
+@app.command("update-approve-card")
+def update_approve_card(
+    msg_id: str = typer.Argument(help="Message ID to update"),
+    head_status_describe: str = typer.Option("", "--head-status", help="Updated status description"),
+    head_status_colour: str = typer.Option("", "--head-status-colour", help="Updated status colour"),
+    buttons: Optional[str] = typer.Option(None, "--buttons", help="Updated buttons as JSON array"),
+):
+    """Update an approveCard's status in-place"""
+    import json
+    client = get_client()
+    parsed_buttons = None
+    if buttons:
+        parsed_buttons = json.loads(buttons)
+    result = client.update_approve_card(
+        msg_id=msg_id,
+        head_status_describe=head_status_describe,
+        head_status_colour=head_status_colour,
+        buttons=parsed_buttons,
+    )
+    output_result(result, fields=["operation"], title="Update ApproveCard Result")
