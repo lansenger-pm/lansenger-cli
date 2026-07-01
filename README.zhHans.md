@@ -80,8 +80,10 @@ lansenger health check
 | `group` | 管理群组 | `create`, `info`, `members`, `list`, `check`, `update`, `update-members` |
 | `staff` | 查询人员信息 | `basic-info`, `detail`, `ancestors`, `id-mapping`, `org-extra-fields`, `search`, `org-info` |
 | `department` | 查询部门信息 | `detail`, `children`, `staffs` |
-| `calendar` | 日程操作 | `primary`, `create-schedule`, `fetch-schedule`, `delete-schedule`, `list-schedules`, `attendees`, `add-attendees`, `delete-attendees` |
+| `calendar` | 日程操作 | `primary`, `create-schedule`, `fetch-schedule`, `delete-schedule`, `list-schedules`, `attendees`, `add-attendees`, `delete-attendees`, `update-attendees`, `update-schedule`, `attendee-meta` |
 | `todo` | 待办任务管理 | `create`, `update`, `update-status`, `delete`, `list`, `fetch-by-source`, `fetch-by-id`, `status-counts`, `executor-status`, `add-executors`, `delete-executors`, `executor-list` |
+| `bot-command` | 机器人命令 | `create`, `query`, `delete` |
+| `personal-app` | 个人应用 | `create`, `update`, `info`, `delete`, `list` |
 | `oauth` | OAuth2 用户认证 | `authorize-url`, `exchange-code`, `refresh-token`, `user-info`, `parse-callback`, `validate-state` |
 | `callback` | 回调事件解析 | `parse-payload`, `decrypt-payload`, `verify-signature`, `event-types` |
 | `media` | 媒体文件操作 | `upload`, `upload-app`, `download`, `download-to-file` |

@@ -80,8 +80,10 @@ lansenger health check
 | `group` | Manage groups | `create`, `info`, `members`, `list`, `check`, `update`, `update-members` |
 | `staff` | Query staff info | `basic-info`, `detail`, `ancestors`, `id-mapping`, `org-extra-fields`, `search`, `org-info` |
 | `department` | Query department info | `detail`, `children`, `staffs` |
-| `calendar` | Calendar & schedule | `primary`, `create-schedule`, `fetch-schedule`, `delete-schedule`, `list-schedules`, `attendees`, `add-attendees`, `delete-attendees` |
+| `calendar` | Calendar & schedule | `primary`, `create-schedule`, `fetch-schedule`, `delete-schedule`, `list-schedules`, `attendees`, `add-attendees`, `delete-attendees`, `update-attendees`, `update-schedule`, `attendee-meta` |
 | `todo` | Todo task management | `create`, `update`, `update-status`, `delete`, `list`, `fetch-by-source`, `fetch-by-id`, `status-counts`, `executor-status`, `add-executors`, `delete-executors`, `executor-list` |
+| `bot-command` | Bot slash commands | `create`, `query`, `delete` |
+| `personal-app` | Personal apps/bots | `create`, `update`, `info`, `delete`, `list` |
 | `oauth` | OAuth2 user auth | `authorize-url`, `exchange-code`, `refresh-token`, `user-info`, `parse-callback`, `validate-state` |
 | `callback` | Callback event parsing | `parse-payload`, `decrypt-payload`, `verify-signature`, `event-types` |
 | `media` | Media file operations | `upload`, `upload-app`, `download`, `download-to-file` |

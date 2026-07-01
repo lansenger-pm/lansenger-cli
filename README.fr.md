@@ -80,8 +80,10 @@ lansenger health check
 | `group` | Gérer les groupes | `create`, `info`, `members`, `list`, `check`, `update`, `update-members` |
 | `staff` | Interroger les infos du personnel | `basic-info`, `detail`, `ancestors`, `id-mapping`, `org-extra-fields`, `search`, `org-info` |
 | `department` | Interroger les départements | `detail`, `children`, `staffs` |
-| `calendar` | Calendrier et planification | `primary`, `create-schedule`, `fetch-schedule`, `delete-schedule`, `list-schedules`, `attendees`, `add-attendees`, `delete-attendees` |
+| `calendar` | Calendrier et planification | `primary`, `create-schedule`, `fetch-schedule`, `delete-schedule`, `list-schedules`, `attendees`, `add-attendees`, `delete-attendees`, `update-attendees`, `update-schedule`, `attendee-meta` |
 | `todo` | Gestion des tâches | `create`, `update`, `update-status`, `delete`, `list`, `fetch-by-source`, `fetch-by-id`, `status-counts`, `executor-status`, `add-executors`, `delete-executors`, `executor-list` |
+| `bot-command` | Commandes de bot | `create`, `query`, `delete` |
+| `personal-app` | Applications personnelles | `create`, `update`, `info`, `delete`, `list` |
 | `oauth` | Authentification OAuth2 | `authorize-url`, `exchange-code`, `refresh-token`, `user-info`, `parse-callback`, `validate-state` |
 | `callback` | Analyse des événements callback | `parse-payload`, `decrypt-payload`, `verify-signature`, `event-types` |
 | `media` | Opérations sur les fichiers média | `upload`, `upload-app`, `download`, `download-to-file` |
