@@ -8,7 +8,7 @@ app = typer.Typer(help="Manage bot slash commands (4.37)")
 @app.command("create")
 def create_bot_commands(
     scope_type: int = typer.Argument(help="Scope: 1=single group single member, 2=single group admin, 3=single chat, 4=all group admins, 5=all groups, 6=all private chats, 7=global"),
-    commands: str = typer.Argument(help="Commands as JSON array: '[{\"command\":\"/add\",\"description\":\"desc\",\"icon\":\"xxx\"}]'"),
+    commands: str = typer.Argument(help="Commands as JSON array: '[{\"command\":\"add\",\"description\":\"desc\",\"icon\":\"xxx\"}]'"),
     chat_id: str = typer.Option("", "--chat-id", help="Group/staff openId (for scope 1/2/3)"),
     chat_type: str = typer.Option("", "--chat-type", help="group or staff (for scope 1/2/3)"),
     staff_id: str = typer.Option("", "--staff-id", help="Staff openId (for scope 1)"),
