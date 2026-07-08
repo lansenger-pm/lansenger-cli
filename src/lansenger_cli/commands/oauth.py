@@ -1,5 +1,6 @@
 import typer
 import json
+import subprocess
 import time
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.parse import urlparse, parse_qs
@@ -10,6 +11,22 @@ from lansenger_cli.utils import get_client, get_store, output_result, is_json_ou
 
 console = Console()
 app = typer.Typer(help="OAuth2 user authentication operations")
+
+
+def _copy_to_clipboard(text: str) -> bool:
+    """Copy text to system clipboard. Returns True on success."""
+    try:
+        import platform
+        system = platform.system()
+        if system == "Darwin":
+            subprocess.run("pbcopy", input=text, text=True, capture_output=True, check=True)
+        elif system == "Windows":
+            subprocess.run("clip", input=text, text=True, capture_output=True, check=True)
+        else:
+            subprocess.run(["wl-copy"], input=text, text=True, capture_output=True, check=True)
+        return True
+    except (subprocess.SubprocessError, FileNotFoundError):
+        return False
 
 
 @app.command("authorize-url")
@@ -24,7 +41,10 @@ def build_authorize_url(
     if is_json_output():
         rprint(json.dumps({"authorize_url": url}, ensure_ascii=False))
         return
+
     rprint(f"[green]Authorize URL:[/green] {url}")
+    if _copy_to_clipboard(url):
+        rprint("[dim]  (copied to clipboard)[/dim]")
 
 
 @app.command("exchange-code")
