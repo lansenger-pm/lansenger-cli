@@ -31,13 +31,13 @@ Sauvegardez les identifiants via `config set` (stockés par profil dans `~/.lans
 ```bash
 lansenger config set app_id YOUR_APP_ID
 lansenger config set app_secret YOUR_APP_SECRET
-lansenger config set api_gateway_url https://apigw.lx.qianxin.com/open/apigw
+lansenger config set api_gateway_url https://your-gateway.example.com
 ```
 
 **Authentification OAuth2 (remplissez si vous avez besoin d'un userToken)** :
 
 ```bash
-lansenger config set passport_url https://passport.lx.qianxin.com
+lansenger config set passport_url https://your-passport.example.com  # requis
 lansenger config set redirect_uri http://localhost:8765   # URI de redirection OAuth2 (défaut)
 ```
 

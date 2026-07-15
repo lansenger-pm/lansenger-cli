@@ -2,7 +2,7 @@ import typer
 
 from importlib.metadata import version as pkg_version
 from lansenger_cli.utils import get_store, output_result, is_json_output, console
-from lansenger_cli.utils import set_json_output, set_active_profile, get_active_profile, set_as_staff_id, set_app_token, set_user_token
+from lansenger_cli.utils import set_json_output, set_active_profile, get_active_profile, set_as_staff_id, set_app_token, set_user_token, set_verbose
 from lansenger_cli.commands import (
     config as config_cmd,
     message as message_cmd,
@@ -54,12 +54,15 @@ def global_options(
     app_token: str = typer.Option("", "--app-token", help="App access token (external mode — no auto-refresh)"),
     user_token: str = typer.Option("", "--user-token", help="User access token (external mode — no auto-refresh)"),
     version: bool = typer.Option(False, "--version", "-v", help="Show CLI and SDK versions"),
+    verbose: bool = typer.Option(False, "--verbose", help="Enable debug logging"),
 ):
     set_json_output(json)
     set_active_profile(profile)
     set_as_staff_id(as_user)
     set_app_token(app_token)
     set_user_token(user_token)
+    if verbose:
+        set_verbose(True)
     if version:
         cli_ver = pkg_version("lansenger-cli")
         sdk_ver = pkg_version("lansenger-sdk")

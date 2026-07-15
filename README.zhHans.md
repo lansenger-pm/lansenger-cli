@@ -31,13 +31,13 @@ pip install -e .
 ```bash
 lansenger config set app_id YOUR_APP_ID
 lansenger config set app_secret YOUR_APP_SECRET
-lansenger config set api_gateway_url https://apigw.lx.qianxin.com/open/apigw   # 私有部署需修改
+lansenger config set api_gateway_url https://your-gateway.example.com
 ```
 
 **OAuth2 用户认证（需要获取 userToken 时填写）**：
 
 ```bash
-lansenger config set passport_url https://passport.lx.qianxin.com   # 私有部署需修改
+lansenger config set passport_url https://your-passport.example.com   # 必须配置
 lansenger config set redirect_uri http://localhost:8765             # OAuth2 回调地址（默认值）
 ```
 

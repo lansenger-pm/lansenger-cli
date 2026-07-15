@@ -31,14 +31,14 @@ Save credentials via `config set` (stored by profile in `~/.lansenger/sdk_state.
 ```bash
 lansenger config set app_id YOUR_APP_ID
 lansenger config set app_secret YOUR_APP_SECRET
-lansenger config set api_gateway_url https://apigw.lx.qianxin.com/open/apigw
+lansenger config set api_gateway_url https://your-gateway.example.com
 ```
 
 **OAuth2 user auth (fill in when you need userToken)**:
 
 ```bash
-lansenger config set passport_url https://passport.lx.qianxin.com
-lansenger config set redirect_uri http://localhost:8765   # OAuth2 redirect URI (default)
+lansenger config set passport_url https://your-passport.example.com  # required
+lansenger config set redirect_uri http://localhost:8765   # OAuth2 redirect URI
 ```
 
 **Callback receiver (fill in when you need to parse/verify webhook callbacks)**:

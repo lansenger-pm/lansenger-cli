@@ -112,7 +112,7 @@ wheels = [
 
 [[package]]
 name = "lansenger-cli"
-version = "0.10.17"
+version = "0.10.19"
 source = { editable = "." }
 dependencies = [
     { name = "lansenger-sdk" },

@@ -1,6 +1,7 @@
 import os
 import time
 import dataclasses
+import logging
 
 from lansenger_sdk import LansengerSyncClient, CredentialStore, LansengerConfig, LansengerAuthError
 from rich import print as rprint
@@ -13,6 +14,31 @@ _active_profile = "default"
 _as_staff_id = ""
 _app_token = ""
 _user_token = ""
+_verbose = False
+
+_formatter = logging.Formatter("%(asctime)s [%(name)s] %(levelname)s: %(message)s", datefmt="%H:%M:%S")
+_handler = logging.StreamHandler()
+_handler.setFormatter(_formatter)
+
+
+def set_verbose(value: bool):
+    global _verbose
+    _verbose = value
+    if value:
+        root = logging.getLogger("lansenger_sdk")
+        root.setLevel(logging.DEBUG)
+        if _handler not in root.handlers:
+            root.addHandler(_handler)
+        root.propagate = False
+    else:
+        root = logging.getLogger("lansenger_sdk")
+        root.setLevel(logging.WARNING)
+        if _handler in root.handlers:
+            root.removeHandler(_handler)
+
+
+def is_verbose() -> bool:
+    return _verbose
 
 
 def set_json_output(value: bool):
@@ -148,8 +174,7 @@ def _create_raw_client() -> LansengerSyncClient:
             app_id="",
             app_secret="",
             api_gateway_url=os.environ.get(
-                "LANSENGER_API_GATEWAY_URL",
-                "https://open.e.lanxin.cn/open/apigw",
+                "LANSENGER_API_GATEWAY_URL", ""
             ),
             app_token=_app_token,
             user_token=_user_token,
@@ -167,7 +192,7 @@ def _create_raw_client() -> LansengerSyncClient:
     config = LansengerConfig(
         app_id=creds["app_id"],
         app_secret=creds["app_secret"],
-        api_gateway_url=creds.get("api_gateway_url", "https://open.e.lanxin.cn/open/apigw"),
+        api_gateway_url=creds.get("api_gateway_url", ""),
         passport_url=creds.get("passport_url", ""),
         redirect_uri=creds.get("redirect_uri", ""),
         app_token=_app_token,
