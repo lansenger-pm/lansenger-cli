@@ -93,13 +93,14 @@ def get_user_token() -> str:
 
 
 class _AutoUserTokenProxy:
-    """Proxy that auto-injects userToken from CredentialStore for --as mode.
+    """Proxy that auto-injects userToken and user_id from CredentialStore for --as mode.
 
     Intercepts method calls on the client and replaces empty user_token
     kwargs with the stored & auto-refreshed token for the given staff_id.
+    Also auto-fills user_id from staff_id when user_id is empty.
 
-    Only activates when the caller passes user_token="" — explicit
-    --user-token values are never overridden.
+    Only activates when the caller passes user_token="" / user_id="" — explicit
+    values are never overridden.
     """
 
     def __init__(self, raw_client, store, staff_id):
@@ -117,6 +118,8 @@ class _AutoUserTokenProxy:
                 kwargs["user_token"] = _load_and_refresh_user_token(
                     self._store, self._staff_id
                 )
+            if "user_id" in kwargs and not kwargs.get("user_id"):
+                kwargs["user_id"] = self._staff_id
             return attr(*args, **kwargs)
 
         return wrapper
