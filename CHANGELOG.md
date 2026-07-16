@@ -6,6 +6,28 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [0.10.21] - 2026-07-16
+
+### Added
+
+- **cli**: `--as` mode now auto-injects `user_id` from staff_id (alongside existing `user_token` auto-fill), enabling calendar `create-schedule` without explicit `--user-id`.
+
+## [0.10.20] - 2026-07-16
+
+### Added
+
+- **cli**: `--verbose` global flag to enable debug logging in `lansenger_sdk`. Logs to stderr with timestamp prefix.
+
+### Changed
+
+- **docs**: All READMEs updated — real URLs replaced with `your-gateway.example.com` / `your-passport.example.com` placeholders. `api_gateway_url` and `passport_url` now clearly marked as required.
+
+## [0.10.19] - 2026-07-15
+
+### Changed
+
+- **docs**: `passport_url` marked as required in all language READMEs. Removed references to "public cloud default" for `api_gateway_url`.
+
 ## [0.10.18] - 2026-07-01
 
 ### Added
