@@ -6,6 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [0.10.22] - 2026-07-16
+
+### Added
+
+- **linting**: `ruff` linter config in `pyproject.toml` (F/E/W/B rules).
+- **tests**: CLI command-level tests for `config` (4 tests) and `health` (2 tests) using Typer CliRunner.
+
+### Fixed
+
+- **lint**: Renamed ambiguous variable `l` to `link` in `message.py`.
+
 ## [0.10.21] - 2026-07-16
 
 ### Added
