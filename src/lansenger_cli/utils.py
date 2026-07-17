@@ -125,6 +125,32 @@ class _AutoUserTokenProxy:
         return wrapper
 
 
+class _ExternalUserTokenProxy:
+    """Proxy that auto-injects the global user_token in external mode.
+
+    Intercepts method calls on the client and replaces empty user_token
+    kwargs with the globally-provided --user-token value. Only activates
+    when the caller passes user_token="" — explicit values are never
+    overridden.
+    """
+
+    def __init__(self, raw_client, user_token):
+        self._client = raw_client
+        self._user_token = user_token
+
+    def __getattr__(self, name):
+        attr = getattr(self._client, name)
+        if not callable(attr):
+            return attr
+
+        def wrapper(*args, **kwargs):
+            if "user_token" in kwargs and not kwargs.get("user_token"):
+                kwargs["user_token"] = self._user_token
+            return attr(*args, **kwargs)
+
+        return wrapper
+
+
 def _load_and_refresh_user_token(store: CredentialStore, staff_id: str) -> str:
     """Load userToken from store for staff_id, auto-refreshing if expired."""
     cached = store.load_user_token(staff_id=staff_id)
@@ -210,11 +236,17 @@ def get_client():
     auto-injects the stored & auto-refreshed userToken for that staff_id
     into any method call where user_token="" is passed (i.e., the caller
     did not provide an explicit --user-token).
+
+    In external mode (--app-token + --user-token), returns an
+    _ExternalUserTokenProxy that auto-injects the global user_token
+    into method calls where user_token="" is passed.
     """
     raw = _create_raw_client()
     if _as_staff_id:
         store = CredentialStore(profile=_active_profile)
         return _AutoUserTokenProxy(raw, store, _as_staff_id)
+    if _user_token:
+        return _ExternalUserTokenProxy(raw, _user_token)
     return raw
 
 

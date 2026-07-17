@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [0.10.23] - 2026-07-17
+
+### Added
+
+- **cli**: `_ExternalUserTokenProxy` for external mode — auto-injects global `--user-token` into method calls where `user_token=""` is passed.
+- **cli**: External mode support in `get_client()` — when `--app-token` + `--user-token` are provided, returns an `_ExternalUserTokenProxy`.
+
 ## [0.10.22] - 2026-07-16
 
 ### Added
