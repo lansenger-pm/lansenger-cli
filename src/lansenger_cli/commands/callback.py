@@ -92,7 +92,7 @@ def decrypt_callback_payload(
     rprint(f"[bold]orgId:[/bold] {result.get('orgId', '')}")
     rprint(f"[bold]appId:[/bold] {result.get('appId', '')}")
     rprint(f"[bold]events length:[/bold] {result.get('length', 0)}")
-    rprint(f"[bold]events:[/bold]")
+    rprint("[bold]events:[/bold]")
     rprint(json.dumps(result.get("events", []), indent=2, ensure_ascii=False))
 
 

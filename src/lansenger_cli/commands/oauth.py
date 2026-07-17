@@ -239,5 +239,5 @@ def local_callback(
         if is_json_output():
             rprint(json.dumps({"code": code, "state": received_state}, ensure_ascii=False))
         else:
-            rprint(f"\n[cyan]Use this code to exchange manually:[/cyan]")
+            rprint("\n[cyan]Use this code to exchange manually:[/cyan]")
             rprint(f"  lansenger oauth exchange-code {code} --redirect-uri {redirect_uri}")

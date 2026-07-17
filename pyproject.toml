@@ -44,3 +44,21 @@ Issues = "https://github.com/lansenger-pm/lansenger-cli/issues"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.15.22",
+]
+
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+select = ["F", "E", "W", "B"]
+ignore = [
+    "E501",
+    "F401",
+    "F821",
+    "F841",
+    "B008", # Typer Option/Argument defaults are standard Typer pattern
+]

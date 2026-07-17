@@ -125,7 +125,7 @@ def config_delete_profile(
         return
     rprint(f"[green]Deleted[/green] profile '{profile}'.")
     if was_active:
-        rprint(f"[dim]Active profile switched to 'default'.[/dim]")
+        rprint("[dim]Active profile switched to 'default'.[/dim]")
 
 
 @app.command("list-users")

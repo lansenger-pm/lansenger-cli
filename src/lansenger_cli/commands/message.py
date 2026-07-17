@@ -194,7 +194,7 @@ def send_app_card(
     parsed_links = None
     if links:
         import json
-        parsed_links = [json.loads(l) for l in links]
+        parsed_links = [json.loads(link) for link in links]
     result = client.send_app_card(
         chat_id=chat_id, body_title=body_title,
         head_title=head_title, body_sub_title=body_sub_title,
@@ -227,7 +227,7 @@ def update_dynamic_card(
     parsed_links = None
     if links:
         import json
-        parsed_links = [json.loads(l) for l in links]
+        parsed_links = [json.loads(link) for link in links]
     result = client.update_dynamic_card(
         msg_id=msg_id,
         head_status_info=head_status_info,

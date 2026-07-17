@@ -12,11 +12,9 @@
 
 ## 质量漏洞
 
-1. **无 CI/CD** — 测试只在本地运行，Go 测试坏了都没发现
-2. **无类型检查** — `LansengerAuthError` 遗漏 import 未被静态检测发现
-3. **无 linting** — 代码风格不统一
-4. **CLI 无集成测试** — 只测了 utils/token 等基础功能，不测命令链路
-5. **发版后未验证** — 发布后没有运行 smoke test
+1. **无 CI/CD** — 测试只在本地运行
+2. **CLI 测试覆盖不足** — 已改善（Python CLI 4→9 tests, TS CLI 3→38 tests）
+3. **发版后未验证** — 发布后没有运行 smoke test
 
 ## 每次发版前必须执行
 
@@ -34,6 +32,13 @@ cd lansenger-cli-ts       && npm run build                   # TS CLI
 cd lansenger-sdk-go       && go build ./...                  # Go SDK + CLI
 cd lansenger-sdk-python   && uv build                        # Python SDK
 cd lansenger-cli          && uv build                        # Python CLI
+
+# 3. Lint 检查
+cd lansenger-sdk-python   && uv run ruff check src/          # Python SDK
+cd lansenger-cli          && uv run ruff check src/          # Python CLI
+cd lansenger-sdk-go       && golangci-lint run               # Go SDK
+cd lansenger-sdk-ts       && npx tsc --noEmit                # TS SDK type-check
+cd lansenger-cli-ts       && npx tsc --noEmit                # TS CLI type-check
 ```
 
 ## 推荐改进（按优先级）
