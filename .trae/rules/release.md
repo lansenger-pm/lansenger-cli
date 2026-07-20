@@ -56,12 +56,26 @@ vX.Y.Z"
 
 ## 5. 发布
 
+### 5.1 Git Tag
+
+为每个 repo 创建版本标签：
+
+```bash
+cd lansenger-sdk-python && git tag vX.Y.Z && git push origin vX.Y.Z
+cd lansenger-cli          && git tag vX.Y.Z && git push origin vX.Y.Z
+cd lansenger-sdk-go      && git tag vX.Y.Z && git push origin vX.Y.Z
+cd lansenger-sdk-ts      && git tag vX.Y.Z && git push origin vX.Y.Z
+cd lansenger-cli-ts      && git tag vX.Y.Z && git push origin vX.Y.Z
+```
+
+### 5.2 发布到包管理器
+
 | 平台 | 命令 |
 |---|---|
 | PyPI (SDK) | `cd lansenger-sdk-python && uv build && uv publish dist/lansenger_sdk-X.Y.Z-*` |
 | PyPI (CLI) | `cd lansenger-cli && uv build && uv publish dist/lansenger_cli-X.Y.Z-*` |
-| npm (SDK) | `cd lansenger-sdk-ts && npm publish` |
-| npm (CLI) | `cd lansenger-cli-ts && npm publish` |
+| npm (SDK) | `cd lansenger-sdk-ts && npm run build && npm publish` |
+| npm (CLI) | `cd lansenger-cli-ts && npm run build && npm publish` |
 | Go | 无需发布到中央仓库，commit + tag 即可 |
 
 ## 6. 文档类 repo
@@ -79,4 +93,6 @@ git add -A && git commit -m "docs: 变更说明"
 - [ ] 所有 5 语言 README 内容一致，无遗留真实 URL
 - [ ] 单元测试全部通过
 - [ ] `uv build` / `npm run build` / `go build` 成功
+- [ ] Git tag 已创建并推送到远端
 - [ ] 发布后验证 PyPI/npm 页面显示正确版本
+- [ ] 运行 `lansenger health check` smoke test 验证基础连接
