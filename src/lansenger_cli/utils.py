@@ -1,5 +1,6 @@
 import os
 import time
+import json
 import dataclasses
 import logging
 
@@ -299,3 +300,29 @@ def output_list(items: list, columns: list[str], title: str = "", row_mapper=Non
             row = [str(getattr(item, col, "")) for col in columns]
         table.add_row(*row)
     console.print(table)
+
+
+def parse_field_or_json(raw: str) -> dict:
+    """Parse a --field/--link/--fields value as JSON, falling back to key=value.
+
+    PowerShell-friendly: avoids quoting issues when passing JSON on the
+    command line.  Accepts either a JSON object string or a simple
+    ``name=value`` / ``key=value`` pair.
+
+    Raises ``typer.BadParameter`` when neither format parses.
+    """
+    import typer
+    try:
+        return json.loads(raw)
+    except (json.JSONDecodeError, ValueError):
+        pass
+    if "=" in raw:
+        name, _, value = raw.partition("=")
+        name = name.strip()
+        value = value.strip()
+        if name:
+            return {"name": name, "value": value}
+    raise typer.BadParameter(
+        f"Invalid field format: {raw!r}. "
+        "Use JSON (e.g. '{\"name\":\"K\",\"value\":\"V\"}') or name=value"
+    )

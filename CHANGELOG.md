@@ -6,6 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [0.10.24] - 2026-07-29
+
+### Added
+
+- **cli**: `parse_field_or_json()` utility — parses `--field`/`--link`/`--fields` values as JSON with automatic `name=value` fallback, fixing PowerShell quoting issues.
+- **cli**: `__main__.py` entry point — supports `python -m lansenger_cli` invocation.
+
+### Fixed
+
+- **cli**: `send-app-card`, `update-dynamic-card`, `send-oacard`, `approve-card` now accept `name=value` format for field/link parameters in addition to JSON.
+
 ## [0.10.23] - 2026-07-17
 
 ### Added

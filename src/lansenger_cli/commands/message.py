@@ -1,7 +1,7 @@
 import typer
 from typing import Optional, List
 
-from lansenger_cli.utils import get_client, output_result, output_list
+from lansenger_cli.utils import get_client, output_result, output_list, parse_field_or_json
 
 app = typer.Typer(help="Send and manage messages")
 
@@ -189,12 +189,10 @@ def send_app_card(
         }
     parsed_fields = None
     if fields:
-        import json
-        parsed_fields = [json.loads(f) for f in fields]
+        parsed_fields = [parse_field_or_json(f) for f in fields]
     parsed_links = None
     if links:
-        import json
-        parsed_links = [json.loads(link) for link in links]
+        parsed_links = [parse_field_or_json(link) for link in links]
     result = client.send_app_card(
         chat_id=chat_id, body_title=body_title,
         head_title=head_title, body_sub_title=body_sub_title,
@@ -226,8 +224,7 @@ def update_dynamic_card(
         }
     parsed_links = None
     if links:
-        import json
-        parsed_links = [json.loads(link) for link in links]
+        parsed_links = [parse_field_or_json(link) for link in links]
     result = client.update_dynamic_card(
         msg_id=msg_id,
         head_status_info=head_status_info,
@@ -337,8 +334,7 @@ def send_oacard(
     client = get_client()
     parsed_fields = None
     if fields:
-        import json
-        parsed_fields = [json.loads(f) for f in fields]
+        parsed_fields = [parse_field_or_json(f) for f in fields]
     parsed_action = None
     if card_action:
         import json
@@ -441,7 +437,7 @@ def approve_card(
     client = get_client()
     parsed_fields = None
     if fields:
-        parsed_fields = json.loads(fields)
+        parsed_fields = [parse_field_or_json(f) for f in fields]
     parsed_buttons = None
     if buttons:
         parsed_buttons = json.loads(buttons)
