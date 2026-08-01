@@ -36,6 +36,24 @@ def upload_app_media(
     output_result(result, fields=["message_id"], title="Upload App Media Result (4.5.4)")
 
 
+@app.command("upload-app-v2")
+def upload_app_media_v2(
+    file_path: str = typer.Argument(help="Local file path to upload"),
+    media_type: str = typer.Option("file", "--media-type", "-t", help="file, video, image, audio (4.5.5 app/bot V2)"),
+    user_token: str = typer.Option("", "--user-token", help="User token (required for V2)"),
+    width: int = typer.Option(0, "--width", help="Width for video/image"),
+    height: int = typer.Option(0, "--height", help="Height for video/image"),
+    duration: int = typer.Option(0, "--duration", help="Duration in seconds for video/audio"),
+):
+    """Upload media file (4.5.5 app/bot V2, requires user token)"""
+    client = get_client()
+    result = client.upload_app_media_v2(
+        file_path=file_path, media_type=media_type, user_token=user_token,
+        width=width or None, height=height or None, duration=duration or None,
+    )
+    output_result(result, fields=["message_id"], title="Upload App Media Result (4.5.5 V2)")
+
+
 @app.command("download")
 def download_media(
     media_id: str = typer.Argument(help="Media ID to download"),
@@ -67,6 +85,29 @@ def download_media_to_file(
         rprint(json.dumps({"saved_path": saved_path}, ensure_ascii=False))
         return
     rprint(f"[green]Saved to:[/green] {saved_path}")
+
+
+@app.command("download-share")
+def download_media_by_share_id(
+    share_id: str = typer.Argument(help="Share ID to download"),
+    target_path: str = typer.Option("", "--output", "-o", help="Target file path"),
+    user_token: str = typer.Option("", "--user-token", help="User token"),
+):
+    """Download media by share ID (4.5.6)"""
+    client = get_client()
+    result = client.download_media_by_share_id(share_id=share_id, user_token=user_token)
+    if is_json_output():
+        rprint(json.dumps({"success": result.success, "size": len(result.data) if result.data else 0, "error": result.error if not result.success else ""}, ensure_ascii=False))
+        return
+    if result.success:
+        if target_path:
+            with open(target_path, "wb") as f:
+                f.write(result.data)
+            rprint(f"[green]Saved to:[/green] {target_path} ({len(result.data)} bytes)")
+        else:
+            rprint(f"[green]Downloaded media[/green] (size: {len(result.data)} bytes)")
+    else:
+        output_result(result)
 
 
 @app.command("path")

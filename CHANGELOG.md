@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [0.11.0] - 2026-07-29
+
+### Added
+
+- **media**: `upload-app-v2` command — 4.5.5 V2 app media upload with required `--user-token`.
+- **media**: `download-share` command — 4.5.6 download media by share ID with optional `--output` and `--user-token`.
+
 ## [0.10.24] - 2026-07-29
 
 ### Added
