@@ -341,6 +341,8 @@ lansenger streaming fetch MSG_ID
 |------|------|
 | `--json` / `-j` | Sortie JSON brute au lieu de tableaux formatés |
 | `--as <staff_id>` | Charge et rafraîchit automatiquement le jeton utilisateur pour le staff_id spécifié depuis le stockage des identifiants |
+| `--app-token <token>` | Mode externe : fournir le jeton d'application directement, contournant le stockage des identifiants |
+| `--user-token <token>` | Fournir le jeton utilisateur directement en mode externe (injecté automatiquement dans les commandes) |
 
 ```bash
 # Sortie JSON (utile pour les scripts)
@@ -348,7 +350,29 @@ lansenger -j staff basic-info staff001
 
 # Exécuter une commande en tant qu'utilisateur spécifique (charge automatiquement le jeton utilisateur)
 lansenger --as staff001 chat messages --group-id group123
+
+# Mode externe — fournir les jetons directement, pas de fichier d'identifiants nécessaire
+lansenger --app-token YOUR_APP_TOKEN --user-token YOUR_USER_TOKEN message send-text chat123 "Hello"
+
+# Mode externe avec URL de passerelle API
+LANSENGER_API_GATEWAY_URL=https://your-gateway.example.com lansenger --app-token YOUR_APP_TOKEN --user-token YOUR_USER_TOKEN staff basic-info staff001
 ```
+
+### Mode externe
+
+Le mode externe vous permet de fournir `app_token` et `user_token` directement via des options de ligne de commande, contournant complètement le stockage des identifiants et le flux OAuth2. Cela est utile pour :
+
+- Pipelines CI/CD où les jetons sont gérés externement
+- Intégration avec votre propre système d'authentification
+- Jetons à courte durée de vie que vous rafraîchissez vous-même
+- Tests avec des jetons temporaires
+
+En mode externe :
+- `--app-token` est requis pour entrer en mode externe
+- `--user-token` est facultatif mais recommandé pour les API nécessitant une identité utilisateur
+- Le `user_token` fourni est automatiquement injecté dans toutes les commandes qui l'acceptent
+- Les opérations de stockage des identifiants (`config`) ne sont pas disponibles
+- Aucun rafraîchissement de jeton n'est effectué — vous êtes responsable de maintenir les jetons valides
 
 ## Auto-complétion shell
 

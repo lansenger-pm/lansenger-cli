@@ -2,7 +2,7 @@ import typer
 import json
 from typing import Optional, List
 
-from lansenger_cli.utils import get_client, output_result, output_list
+from lansenger_cli.utils import get_client, output_result, confirm_high_risk, output_list
 
 app = typer.Typer(help="Manage todo tasks")
 
@@ -75,8 +75,13 @@ def delete_todo_task(
     org_id: str = typer.Argument(help="Organization ID"),
     staff_id: str = typer.Option("", "--staff-id", help="Staff ID"),
     user_token: str = typer.Option("", "--user-token", help="User token"),
+    yes: bool = typer.Option(False, "--yes", "-y", help="Confirm todo deletion before executing"),
+    dry_run: bool = typer.Option(False, "--dry-run", help="Validate inputs without deleting"),
 ):
     """Delete a todo task"""
+    confirm_high_risk("delete", f"todo {todotask_id}", yes=yes, dry_run=dry_run)
+    if dry_run:
+        return
     client = get_client()
     result = client.delete_todo_task(
         todotask_id=todotask_id, org_id=org_id,
@@ -202,10 +207,15 @@ def delete_executors(
     org_id: str = typer.Argument(help="Organization ID"),
     todotask_id: str = typer.Option("", "--task-id", help="Todo task ID"),
     user_token: str = typer.Option("", "--user-token", help="User token"),
+    yes: bool = typer.Option(False, "--yes", "-y", help="Confirm executor removal before executing"),
+    dry_run: bool = typer.Option(False, "--dry-run", help="Validate inputs without deleting executors"),
 ):
     """Delete executors from a todo task"""
-    client = get_client()
     ids = executor_ids.split(",")
+    confirm_high_risk("delete", f"executors {ids} from todo {todotask_id or org_id}", yes=yes, dry_run=dry_run)
+    if dry_run:
+        return
+    client = get_client()
     result = client.delete_executors(
         executor_ids=ids, org_id=org_id,
         todotask_id=todotask_id, user_token=user_token,

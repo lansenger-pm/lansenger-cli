@@ -1,7 +1,7 @@
 import typer
 from typing import Optional, List
 
-from lansenger_cli.utils import get_client, output_result, output_list, parse_field_or_json
+from lansenger_cli.utils import get_client, output_result, output_list, parse_field_or_json, confirm_high_risk
 
 app = typer.Typer(help="Send and manage messages")
 
@@ -239,8 +239,13 @@ def revoke_message(
     message_ids: List[str] = typer.Argument(help="Message IDs to revoke"),
     chat_type: str = typer.Option("bot", "--chat-type", help="staff, group, notification, account, or bot"),
     sender_id: str = typer.Option("", "--sender-id", help="Sender staff ID (required for staff/group)"),
+    yes: bool = typer.Option(False, "--yes", "-y", help="Confirm high-risk revoke before executing"),
+    dry_run: bool = typer.Option(False, "--dry-run", help="Validate inputs without revoking"),
 ):
     """Revoke/recall a sent message"""
+    confirm_high_risk("revoke", f"messages {message_ids}", yes=yes, dry_run=dry_run)
+    if dry_run:
+        return
     client = get_client()
     result = client.revoke_message(message_ids=message_ids, chat_type=chat_type, sender_id=sender_id)
     output_result(result, fields=["message_id", "operation"], title="Revoke Message Result")

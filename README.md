@@ -341,6 +341,8 @@ lansenger streaming fetch MSG_ID
 |------|------|
 | `--json` / `-j` | Output raw JSON instead of formatted tables |
 | `--as <staff_id>` | Auto-load & auto-refresh user token for the given staff_id from credential store |
+| `--app-token <token>` | Use external mode: provide app token directly, bypassing credential store |
+| `--user-token <token>` | Provide user token directly in external mode (auto-injected into commands) |
 
 ```bash
 # JSON output (useful for scripting)
@@ -348,7 +350,29 @@ lansenger -j staff basic-info staff001
 
 # Run a command as a specific user (auto-loads user token from credential store)
 lansenger --as staff001 chat messages --group-id group123
+
+# External mode — provide tokens directly, no credential file needed
+lansenger --app-token YOUR_APP_TOKEN --user-token YOUR_USER_TOKEN message send-text chat123 "Hello"
+
+# External mode with API gateway URL
+LANSENGER_API_GATEWAY_URL=https://your-gateway.example.com lansenger --app-token YOUR_APP_TOKEN --user-token YOUR_USER_TOKEN staff basic-info staff001
 ```
+
+### External Mode
+
+External mode allows you to provide `app_token` and `user_token` directly via command line flags, bypassing the credential store and OAuth2 flow entirely. This is useful for:
+
+- CI/CD pipelines where tokens are managed externally
+- Integration with your own authentication system
+- Short-lived tokens that you refresh yourself
+- Testing with temporary tokens
+
+When using external mode:
+- `--app-token` is required to enter external mode
+- `--user-token` is optional but recommended for APIs that require user identity
+- The provided `user_token` is automatically injected into all commands that accept it
+- Credential store operations (`config` commands) are not available
+- Token refresh is not performed — you are responsible for keeping tokens valid
 
 ## Shell Completion
 

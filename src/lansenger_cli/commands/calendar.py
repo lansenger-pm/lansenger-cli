@@ -2,7 +2,7 @@ import typer
 import json
 from typing import List
 
-from lansenger_cli.utils import get_client, output_result, output_list
+from lansenger_cli.utils import get_client, output_result, confirm_high_risk, output_list
 
 app = typer.Typer(help="Calendar and schedule operations")
 
@@ -84,8 +84,13 @@ def delete_schedule(
     schedule_id: str = typer.Argument(help="Schedule ID"),
     user_token: str = typer.Option("", "--user-token", help="User token"),
     user_id: str = typer.Option("", "--user-id", help="User ID"),
+    yes: bool = typer.Option(False, "--yes", "-y", help="Confirm schedule deletion before executing"),
+    dry_run: bool = typer.Option(False, "--dry-run", help="Validate inputs without deleting"),
 ):
     """Delete a schedule"""
+    confirm_high_risk("delete", f"schedule {schedule_id}", yes=yes, dry_run=dry_run)
+    if dry_run:
+        return
     client = get_client()
     result = client.delete_schedule(
         calendar_id=calendar_id, schedule_id=schedule_id,
@@ -163,10 +168,15 @@ def delete_schedule_attendees(
     reminder_type: str = typer.Option("", "--reminder", help="Reminder type: yes or no"),
     user_token: str = typer.Option("", "--user-token", help="User token"),
     user_id: str = typer.Option("", "--user-id", help="User ID"),
+    yes: bool = typer.Option(False, "--yes", "-y", help="Confirm attendee removal before executing"),
+    dry_run: bool = typer.Option(False, "--dry-run", help="Validate inputs without deleting attendees"),
 ):
     """Delete attendees from a schedule"""
-    client = get_client()
     attendees_list = json.loads(attendees)
+    confirm_high_risk("delete", f"attendees {attendees_list} from schedule {schedule_id}", yes=yes, dry_run=dry_run)
+    if dry_run:
+        return
+    client = get_client()
     result = client.delete_schedule_attendees(
         calendar_id=calendar_id, schedule_id=schedule_id,
         attendees=attendees_list, reminder_type=reminder_type,

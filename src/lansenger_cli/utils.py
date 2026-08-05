@@ -10,6 +10,11 @@ from rich.console import Console
 from rich.table import Table
 
 console = Console()
+
+# Exit codes — stable contract for agents/scripts.
+EXIT_OK = 0
+EXIT_ERROR = 1              # generic / parameter / API failure
+EXIT_CONFIRM_REQUIRED = 10  # high-risk write without --yes
 _json_output = False
 _active_profile = "default"
 _as_staff_id = ""
@@ -259,14 +264,64 @@ def _result_to_dict(result):
     return str(result)
 
 
+def confirm_high_risk(action: str, resource: str, *, yes: bool, dry_run: bool):
+    """Gate high-risk write operations.
+
+    Prints a structured confirmation request and exits with
+    ``EXIT_CONFIRM_REQUIRED`` (10) when ``--yes`` is not supplied, so an agent
+    must surface the risk to the user before retrying with ``--yes``.
+
+    ``--dry-run`` validates inputs without performing the call: it prints the
+    planned action and exits 0 immediately after confirmation (caller should
+    return right after this function when dry_run is True).
+    """
+    import sys
+    risk_label = f"{action} {resource}".strip()
+    if dry_run:
+        payload = {
+            "ok": True,
+            "dry_run": True,
+            "would_perform": risk_label,
+            "message": f"Dry run: would {risk_label}. No action taken.",
+        }
+        if is_json_output():
+            print(json.dumps(payload, ensure_ascii=False, indent=2))
+        else:
+            rprint(f"[yellow]DRY RUN[/yellow] — would {risk_label} (no action taken).")
+        return
+
+    if yes:
+        return
+
+    payload = {
+        "ok": False,
+        "error": {
+            "type": "confirmation_required",
+            "message": f"High-risk operation requires confirmation: {risk_label}.",
+            "hint": "add --yes to confirm and proceed.",
+            "risk": {"level": "high-risk-write", "action": risk_label},
+        },
+    }
+    if is_json_output():
+        print(json.dumps(payload, ensure_ascii=False, indent=2), file=sys.stderr)
+    else:
+        rprint(f"[red]Confirmation required[/red] — {risk_label}")
+        rprint("[dim]Re-run with [bold]--yes[/bold] to confirm and proceed.[/dim]")
+    raise SystemExit(EXIT_CONFIRM_REQUIRED)
+
+
 def output_result(result, fields: list[str] | None = None, title: str = ""):
     if is_json_output():
         import json
         print(json.dumps(_result_to_dict(result), ensure_ascii=False, indent=2))
+        if not result.success:
+            raise SystemExit(EXIT_ERROR)
         return
     if not result.success:
-        rprint(f"[red]Error:[/red] {result.error}")
-        raise SystemExit(1)
+        retryable = bool(getattr(result, "retryable", False))
+        hint = " — retry may succeed" if retryable else ""
+        rprint(f"[red]Error:[/red] {result.error}{hint}")
+        raise SystemExit(EXIT_ERROR)
     if fields:
         table = Table(title=title, show_header=True, header_style="bold cyan", show_lines=True)
         table.add_column("Field", style="bold")
@@ -281,7 +336,6 @@ def output_result(result, fields: list[str] | None = None, title: str = ""):
         console.print(table)
     else:
         rprint(_result_to_dict(result))
-
 
 def output_list(items: list, columns: list[str], title: str = "", row_mapper=None):
     if is_json_output():

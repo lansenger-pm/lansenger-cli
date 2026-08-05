@@ -1,7 +1,7 @@
 import typer
 from typing import Optional, List
 
-from lansenger_cli.utils import get_client, output_result, output_list
+from lansenger_cli.utils import get_client, output_result, output_list, confirm_high_risk
 
 app = typer.Typer(help="Manage groups")
 
@@ -130,8 +130,14 @@ def update_group_members(
     del_user: Optional[List[str]] = typer.Option(None, "--remove", "-X", help="Staff IDs to remove"),
     add_dept: Optional[List[str]] = typer.Option(None, "--add-dept", "-D", help="Department IDs to add"),
     user_token: str = typer.Option("", "--user-token", help="User token"),
+    yes: bool = typer.Option(False, "--yes", "-y", help="Confirm member removal before executing"),
+    dry_run: bool = typer.Option(False, "--dry-run", help="Validate inputs without changing members"),
 ):
     """Add/remove group members"""
+    if del_user:
+        confirm_high_risk("remove", f"members {del_user} from group {group_id}", yes=yes, dry_run=dry_run)
+        if dry_run:
+            return
     client = get_client()
     result = client.update_group_members(
         group_id=group_id, add_user_list=add_user,
@@ -145,8 +151,13 @@ def update_group_members(
 def dismiss_group(
     group_id: str = typer.Argument(help="Group ID to dismiss/delete"),
     user_token: str = typer.Option("", "--user-token", help="User token"),
+    yes: bool = typer.Option(False, "--yes", "-y", help="Confirm group dismissal before executing"),
+    dry_run: bool = typer.Option(False, "--dry-run", help="Validate inputs without dismissing"),
 ):
     """Dismiss/delete a group"""
+    confirm_high_risk("dismiss", f"group {group_id}", yes=yes, dry_run=dry_run)
+    if dry_run:
+        return
     client = get_client()
     result = client.dismiss_group(group_id=group_id, user_token=user_token)
     output_result(result, title="Dismiss Group Result")

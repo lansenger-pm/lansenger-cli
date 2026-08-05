@@ -341,6 +341,8 @@ lansenger streaming fetch MSG_ID
 |------|------|
 | `--json` / `-j` | 输出原始 JSON 格式而非 rich 表格 |
 | `--as <staff_id>` | 从凭证存储中自动加载并自动刷新指定 staff_id 的 user token |
+| `--app-token <token>` | 使用 external 模式：直接传入 app token，不使用凭证存储 |
+| `--user-token <token>` | 在 external 模式下直接传入 user token（自动注入到命令中） |
 
 ```bash
 # JSON 格式输出（便于脚本处理）
@@ -348,7 +350,29 @@ lansenger -j staff basic-info staff001
 
 # 以指定用户身份执行命令（自动从凭证存储加载 user token）
 lansenger --as staff001 chat messages --group-id group123
+
+# External 模式 — 直接传入 token，无需凭证文件
+lansenger --app-token YOUR_APP_TOKEN --user-token YOUR_USER_TOKEN message send-text chat123 "Hello"
+
+# External 模式配合 API 网关 URL
+LANSENGER_API_GATEWAY_URL=https://your-gateway.example.com lansenger --app-token YOUR_APP_TOKEN --user-token YOUR_USER_TOKEN staff basic-info staff001
 ```
+
+### External 模式
+
+External 模式允许你通过命令行参数直接传入 `app_token` 和 `user_token`，完全绕过凭证存储和 OAuth2 流程。适用于：
+
+- CI/CD 流水线，token 由外部系统管理
+- 与你自己的认证系统集成
+- 自行刷新的短期 token
+- 使用临时 token 进行测试
+
+使用 external 模式时：
+- `--app-token` 是进入 external 模式的必需参数
+- `--user-token` 可选，但对于需要用户身份的 API 推荐传入
+- 传入的 `user_token` 会自动注入到所有支持的命令中
+- 凭证存储操作（`config` 命令）不可用
+- 不会自动刷新 token — 你需要自行保持 token 有效
 
 ## Shell 自动补全
 
