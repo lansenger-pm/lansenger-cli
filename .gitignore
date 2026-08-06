@@ -8,3 +8,8 @@ build/
 package/
 skills-*.tgz
 docs/
+# Agent/IDE local files
+.trae/
+.claude/
+.cursor/
+.codex/
