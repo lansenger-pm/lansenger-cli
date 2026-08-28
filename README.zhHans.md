@@ -32,6 +32,7 @@ pip install -e .
 lansenger config set app_id YOUR_APP_ID
 lansenger config set app_secret YOUR_APP_SECRET
 lansenger config set api_gateway_url https://your-gateway.example.com
+lansenger config set identity_type personal-bot   # 可选：凭证身份类型 — personal-bot（个人机器人）/ org-app（组织应用）/ org-bot（组织机器人）
 ```
 
 **OAuth2 用户认证（需要获取 userToken 时填写）**：

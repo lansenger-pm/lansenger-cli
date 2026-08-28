@@ -4,7 +4,7 @@ import json
 import dataclasses
 import logging
 
-from lansenger_sdk import LansengerSyncClient, CredentialStore, LansengerConfig, LansengerAuthError
+from lansenger_sdk import LansengerSyncClient, CredentialStore, LansengerConfig, LansengerAuthError, LansengerConfigError
 from rich import print as rprint
 from rich.console import Console
 from rich.table import Table
@@ -212,17 +212,20 @@ def _create_raw_client() -> LansengerSyncClient:
                 "LANSENGER_API_GATEWAY_URL", ""
             ),
             app_token=_app_token,
-            user_token=_user_token,
+            user_token=_user_token or os.environ.get("LANSENGER_USER_TOKEN", "").strip(),
         )
         return LansengerSyncClient.from_config(config)
 
     store = CredentialStore(profile=_active_profile)
     creds = store.load_credentials()
     if not creds.get("app_id") or not creds.get("app_secret"):
-        env_config = LansengerConfig.from_env()
-        if env_config.is_configured():
+        try:
+            env_config = LansengerConfig.from_env()
+        except LansengerConfigError:
+            env_config = None
+        if env_config is not None and (env_config.is_configured() or env_config.is_external_mode()):
             return LansengerSyncClient.from_config(env_config)
-        rprint(f"[red]Error:[/red] No credentials configured for profile '{_active_profile}'. Run [bold]lansenger config set[/bold] first, or set LANSENGER_APP_ID / LANSENGER_APP_SECRET env vars, or use [bold]--app-token[/bold] for external token mode.")
+        rprint(f"[red]Error:[/red] No credentials configured for profile '{_active_profile}'. Run [bold]lansenger config set[/bold] first, or set LANSENGER_APP_ID / LANSENGER_APP_SECRET env vars, or set LANSENGER_APP_TOKEN for external token mode, or use [bold]--app-token[/bold].")
         raise SystemExit(1)
     config = LansengerConfig(
         app_id=creds["app_id"],
@@ -251,8 +254,9 @@ def get_client():
     if _as_staff_id:
         store = CredentialStore(profile=_active_profile)
         return _AutoUserTokenProxy(raw, store, _as_staff_id)
-    if _user_token:
-        return _ExternalUserTokenProxy(raw, _user_token)
+    user_token = _user_token or os.environ.get("LANSENGER_USER_TOKEN", "").strip()
+    if user_token:
+        return _ExternalUserTokenProxy(raw, user_token)
     return raw
 
 

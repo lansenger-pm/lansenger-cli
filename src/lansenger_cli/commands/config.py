@@ -1,13 +1,13 @@
 import typer
 from rich import print as rprint
 
-from lansenger_sdk import CredentialStore
+from lansenger_sdk import CredentialStore, VALID_IDENTITY_TYPES
 
 from lansenger_cli.utils import get_store, get_active_profile, output_result, is_json_output
 
 app = typer.Typer(help="Manage CLI configuration (credentials, tokens)")
 
-VALID_KEYS = ["app_id", "app_secret", "api_gateway_url", "passport_url", "redirect_uri", "encoding_key", "callback_token"]
+VALID_KEYS = ["app_id", "app_secret", "api_gateway_url", "passport_url", "redirect_uri", "encoding_key", "callback_token", "identity_type"]
 
 _SENSITIVE_KEYS = {"app_secret", "encoding_key", "callback_token"}
 
@@ -33,6 +33,15 @@ def config_set(
     if key not in VALID_KEYS:
         rprint(f"[red]Error:[/red] Invalid key '{key}'. Valid keys: {', '.join(VALID_KEYS)}")
         raise typer.Exit(1)
+    if key == "identity_type":
+        value = value.strip()
+        if value and value not in VALID_IDENTITY_TYPES:
+            rprint(f"[red]Error:[/red] Invalid identity_type '{value}'. Valid values: {', '.join(VALID_IDENTITY_TYPES)}")
+            raise typer.Exit(1)
+        store = CredentialStore(profile=p)
+        store.save_identity_type(value)
+        rprint(f"[green]Set[/green] identity_type = {value or '(cleared)'} [dim](profile: {p})[/dim]")
+        return
     store = CredentialStore(profile=p)
     creds = store.load_credentials()
     creds[key] = value
@@ -68,7 +77,7 @@ def config_show(
     rprint(f"Full config available: {full}")
     rprint(f"Store path: {store.path}")
     for k, v in creds.items():
-        display = v if k in ("api_gateway_url", "passport_url") else ("***" if v else "(empty)")
+        display = v if k in ("api_gateway_url", "passport_url", "identity_type") else ("***" if v else "(empty)")
         rprint(f"  {k}: {display}")
 
 
@@ -107,7 +116,7 @@ def config_list_profiles():
         p_store = CredentialStore(profile=p)
         p_creds = p_store.load_credentials()
         has = p_store.has_credentials()
-        rprint(f"  {p}{marker}  {'[green]✓[/green]' if has else '[red]✗[/red]'}  app_id={p_creds.get('app_id', '(empty)')}  gateway={p_creds.get('api_gateway_url', '(empty)')}")
+        rprint(f"  {p}{marker}  {'[green]✓[/green]' if has else '[red]✗[/red]'}  app_id={p_creds.get('app_id', '(empty)')}  gateway={p_creds.get('api_gateway_url', '(empty)')}  type={p_creds.get('identity_type') or '-'}")
 
 
 @app.command("delete-profile")

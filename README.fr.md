@@ -32,6 +32,7 @@ Sauvegardez les identifiants via `config set` (stockés par profil dans `~/.lans
 lansenger config set app_id YOUR_APP_ID
 lansenger config set app_secret YOUR_APP_SECRET
 lansenger config set api_gateway_url https://your-gateway.example.com
+lansenger config set identity_type personal-bot   # optionnel : type d'identité — personal-bot / org-app / org-bot
 ```
 
 **Authentification OAuth2 (remplissez si vous avez besoin d'un userToken)** :

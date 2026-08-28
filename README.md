@@ -32,6 +32,7 @@ Save credentials via `config set` (stored by profile in `~/.lansenger/sdk_state.
 lansenger config set app_id YOUR_APP_ID
 lansenger config set app_secret YOUR_APP_SECRET
 lansenger config set api_gateway_url https://your-gateway.example.com
+lansenger config set identity_type personal-bot   # optional: credential identity type — personal-bot / org-app / org-bot
 ```
 
 **OAuth2 user auth (fill in when you need userToken)**:

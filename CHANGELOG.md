@@ -6,6 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [0.12.3] - 2026-08-28
+
+### Added
+
+- **config**: `config set identity_type` — persist the credential identity type (`personal-bot` / `org-app` / `org-bot`); displayed in `config show` and `config list-profiles` (`type=...`). Lets agents distinguish personal-bot vs org-app credentials.
+
+### Fixed
+
+- **cli**: `LANSENGER_APP_TOKEN` / `LANSENGER_USER_TOKEN` env-var mode now works — the env fallback previously only accepted `app_id`/`app_secret` and threw a traceback when no credentials were configured; the no-credentials error message now includes env var guidance.
+
 ## [0.11.0] - 2026-07-29
 
 ### Added
