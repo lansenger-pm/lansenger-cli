@@ -85,6 +85,7 @@ lansenger health check
 | `todo` | 待辦任務管理 | `create`, `update`, `update-status`, `delete`, `list`, `fetch-by-source`, `fetch-by-id`, `status-counts`, `executor-status`, `add-executors`, `delete-executors`, `executor-list` |
 | `bot-command` | 機器人命令 | `create`, `query`, `delete` |
 | `personal-app` | 個人應用 | `create`, `update`, `info`, `delete`, `list` |
+| `notice` | 官方帳號通知（通知系統） | `send`, `accounts` |
 | `oauth` | OAuth2 使用者認證 | `authorize-url`, `exchange-code`, `refresh-token`, `user-info`, `parse-callback`, `validate-state` |
 | `callback` | 回呼事件解析 | `parse-payload`, `decrypt-payload`, `verify-signature`, `event-types` |
 | `media` | 媒體檔案操作 | `upload`, `upload-app`, `download`, `download-to-file` |
@@ -334,6 +335,31 @@ lansenger streaming create user123 single stream-session-001
 
 # 取得串流訊息狀態
 lansenger streaming fetch MSG_ID
+```
+
+### 通知（通知系統）
+
+```bash
+# 查詢官方帳號（code 列即发送所需的 accountCode）
+lansenger notice accounts --org-id org001
+
+# 發送文字通知，按手機號投放（接收/抄送各最多 10 个）
+lansenger notice send "关于系统升级的通知" ACC001 \
+  --content "系统将于本周六进行升级维护" \
+  --release-phones "13800138000,13800138001" \
+  --create-mobile "13800138000" \
+  --confirm-flag 1
+
+# 或按 staffId/部門投放（最多 200 个）
+lansenger notice send "部门通知" ACC001 \
+  --user-type 2 \
+  --content "请及时填写本周周报" \
+  --release-range '[{"objId":"dept-1","objName":"研发部","objType":2}]' \
+  --cc-staff-ids "staff-002" \
+  --create-user-id "staff-001"
+
+# 帶 --as / --user-token 時，--create-mobile / --create-user-id 可省略
+lansenger --as staff001 notice send "通知" ACC001 --content "..." --release-phones "138..."
 ```
 
 ## 全域選項

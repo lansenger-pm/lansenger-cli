@@ -6,6 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [0.13.0] - 2026-09-17
+
+### Added
+
+- **notice**: `notice send` command — 通知系统 `/xtra/notice/server/openapi/v1/send`，通过官方账号发送通知。`--content-type` 1=文本/2=链接，`--user-type` 1=手机号（`--release-phones`/`--cc-phones`，各 ≤10）/ 2=staffId+部门（`--release-range` JSON / `--cc-staff-ids`，各 ≤200）；确认/转发/回复/匿名标志与提醒策略以可选 flag 暴露。带 `--as` / `--user-token` 时 `--create-mobile` / `--create-user-id` 可省略（SDK 侧自动放宽校验）。
+- **notice**: `notice accounts` command — 查询组织官方账号列表（`code` 字段即发送所需的 accountCode），文本模式附账号表格。
+- **deps**: `lansenger-sdk>=1.8.0`（notices 域所在版本）。
+
+---
+
 ## [0.12.3] - 2026-08-28
 
 ### Added

@@ -85,6 +85,7 @@ lansenger health check
 | `todo` | Gestion des tâches | `create`, `update`, `update-status`, `delete`, `list`, `fetch-by-source`, `fetch-by-id`, `status-counts`, `executor-status`, `add-executors`, `delete-executors`, `executor-list` |
 | `bot-command` | Commandes de bot | `create`, `query`, `delete` |
 | `personal-app` | Applications personnelles | `create`, `update`, `info`, `delete`, `list` |
+| `notice` | Notifications via comptes officiels (通知系统) | `send`, `accounts` |
 | `oauth` | Authentification OAuth2 | `authorize-url`, `exchange-code`, `refresh-token`, `user-info`, `parse-callback`, `validate-state` |
 | `callback` | Analyse des événements callback | `parse-payload`, `decrypt-payload`, `verify-signature`, `event-types` |
 | `media` | Opérations sur les fichiers média | `upload`, `upload-app`, `download`, `download-to-file` |
@@ -334,6 +335,31 @@ lansenger streaming create user123 single stream-session-001
 
 # Obtenir le statut du message streaming
 lansenger streaming fetch MSG_ID
+```
+
+### Notifications (通知系统)
+
+```bash
+# Trouver les comptes officiels (la colonne "code" est le accountCode)
+lansenger notice accounts --org-id org001
+
+# Envoyer une notification texte ciblée par téléphone (max 10)
+lansenger notice send "关于系统升级的通知" ACC001 \
+  --content "系统将于本周六进行升级维护" \
+  --release-phones "13800138000,13800138001" \
+  --create-mobile "13800138000" \
+  --confirm-flag 1
+
+# Ou cibler staff/départements (max 200)
+lansenger notice send "部门通知" ACC001 \
+  --user-type 2 \
+  --content "请及时填写本周周报" \
+  --release-range '[{"objId":"dept-1","objName":"研发部","objType":2}]' \
+  --cc-staff-ids "staff-002" \
+  --create-user-id "staff-001"
+
+# Avec --as / --user-token, --create-mobile / --create-user-id peuvent être omis
+lansenger --as staff001 notice send "通知" ACC001 --content "..." --release-phones "138..."
 ```
 
 ## Options globales
