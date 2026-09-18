@@ -86,6 +86,7 @@ lansenger health check
 | `bot-command` | Commandes de bot | `create`, `query`, `delete` |
 | `personal-app` | Applications personnelles | `create`, `update`, `info`, `delete`, `list` |
 | `notice` | Notifications via comptes officiels (通知系统) | `send`, `accounts` |
+| `questionnaire` | Questionnaires (问卷系统) | `save`, `save-questions`, `publish`, `withdraw`, `finish`, `delete`, `detail`, `brief`, `accounts`, `created-list`, `answers`, `answer-detail`, `answer-data`, `upload-url`, ... |
 | `oauth` | Authentification OAuth2 | `authorize-url`, `exchange-code`, `refresh-token`, `user-info`, `parse-callback`, `validate-state` |
 | `callback` | Analyse des événements callback | `parse-payload`, `decrypt-payload`, `verify-signature`, `event-types` |
 | `media` | Opérations sur les fichiers média | `upload`, `upload-app`, `download`, `download-to-file` |
@@ -335,6 +336,24 @@ lansenger streaming create user123 single stream-session-001
 
 # Obtenir le statut du message streaming
 lansenger streaming fetch MSG_ID
+```
+
+### Questionnaires (问卷系统)
+
+```bash
+# Find manageable office accounts (the "code" column is the accountCode)
+lansenger questionnaire accounts
+
+# Create a questionnaire, add questions, publish
+lansenger questionnaire save "2026年度员工满意度调查" ACC001 --welcome "欢迎参加"
+lansenger questionnaire save-questions QN001 --questions '[
+  {"questionName":"您对当前工作环境是否满意？","questionType":"radio","requiredFlag":1,
+   "questionOptionList":[{"optionName":"非常满意","optionOrder":1}]}]'
+lansenger questionnaire publish QN001 --scope 1 --staff-ids "U10001,U10002"
+
+# Analyze answers
+lansenger questionnaire answers ACC001 QN001
+lansenger questionnaire answer-detail ACC001 AR20260101000001
 ```
 
 ### Notifications (通知系统)

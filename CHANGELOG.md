@@ -6,6 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [0.14.0] - 2026-09-18
+
+### Added
+
+- **questionnaire**: 问卷系统命令组（22 个子命令）— `save` / `save-questions` / `delete-question`（门禁）/ `publish` / `withdraw` / `finish` / `delete`（门禁）/ `detail` / `brief` / `answer-url` / `copy` / `query-codes` / `accounts` / `created-list` / `my-created` / `participated` / `answers` / `answer-detail` / `last-answer-detail` / `answer-data` / `last-answer-record` / `upload-url`。
+- **questionnaire**: 删除类命令（`delete` / `delete-question`）接入高风险门禁（exit 10 + `--yes` / `--dry-run`）。
+- **deps**: `lansenger-sdk>=1.9.0`（questionnaires 域所在版本）。
+
+---
+
 ## [0.13.0] - 2026-09-17
 
 ### Added
