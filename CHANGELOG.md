@@ -6,46 +6,25 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
-## [0.16.0] - 2026-09-20
+## [0.12.4] - 2026-09-20
 
 ### Added
 
-- **personal-todo**: 个人待办命令组（6 个子命令）— `save` / `update` / `list` / `upload-resource` / `download-url` / `upload-url`。
-- **personal-todo**: `upload-resource` 支持从本地文件读取并自动 base64 编码，自动计算文件大小。
-- **deps**: `lansenger-sdk>=1.11.0`（personal_todos 域所在版本）。
+- **notice**: 新增 `send` / `accounts`，支持完整投放、提醒、附件参数和官方账号查询。
+- **questionnaire**: 新增 22 个子命令，删除类命令接入高风险门禁。
+- **boardroom**: 新增 11 个子命令，覆盖查询、预订、修改、取消、扫码确认；取消接入高风险门禁。
+- **personal-todo**: 新增 6 个子命令及本地文件 Base64 上传。
+
+### Fixed
+
+- 修复通知 `--as` 自动补 `createUserId`，显式 `--user-token` 不替代创建人字段。
+- 补齐会议室 `gradings --user-id/--org-id`、预订可选参数和个人待办 `finishTime` / 更新身份字段。
+- 问卷参与与答卷类命令补齐 `--user-id`。
 
 ### Notes
 
-- **personal-todo**: 与应用身份的 `todo` 命令组完全分离；`--org-id` 必须显式传入，目前服务端不提供完成/删除能力。
-
----
-
-## [0.15.0] - 2026-09-18
-
-### Added
-
-- **boardroom**: 会议室预定 V2 命令组（11 个子命令）— `rooms` / `room-detail` / `schedule` / `reserve-detail` / `reserve` / `edit-reserve` / `cancel`（门禁）/ `confirm-sign` / `my-reserves` / `gradings` / `area-offices`。多数命令需 `--grading-id`（先 `boardroom gradings` 查询）。
-- **deps**: `lansenger-sdk>=1.10.0`（boardrooms 域所在版本）。
-
----
-
-## [0.14.0] - 2026-09-18
-
-### Added
-
-- **questionnaire**: 问卷系统命令组（22 个子命令）— `save` / `save-questions` / `delete-question`（门禁）/ `publish` / `withdraw` / `finish` / `delete`（门禁）/ `detail` / `brief` / `answer-url` / `copy` / `query-codes` / `accounts` / `created-list` / `my-created` / `participated` / `answers` / `answer-detail` / `last-answer-detail` / `answer-data` / `last-answer-record` / `upload-url`。
-- **questionnaire**: 删除类命令（`delete` / `delete-question`）接入高风险门禁（exit 10 + `--yes` / `--dry-run`）。
-- **deps**: `lansenger-sdk>=1.9.0`（questionnaires 域所在版本）。
-
----
-
-## [0.13.0] - 2026-09-17
-
-### Added
-
-- **notice**: `notice send` command — 通知系统 `/xtra/notice/server/openapi/v1/send`，通过官方账号发送通知。`--content-type` 1=文本/2=链接，`--user-type` 1=手机号（`--release-phones`/`--cc-phones`，各 ≤10）/ 2=staffId+部门（`--release-range` JSON / `--cc-staff-ids`，各 ≤200）；确认/转发/回复/匿名标志与提醒策略以可选 flag 暴露。`--as` 会自动补 `createUserId`；仅传 `--user-token` 不能替代创建人字段。
-- **notice**: `notice accounts` command — 查询组织官方账号列表（`code` 字段即发送所需的 accountCode），文本模式附账号表格。
-- **deps**: `lansenger-sdk>=1.8.0`（notices 域所在版本）。
+- **deps**: `lansenger-sdk>=1.7.5`。
+- 个人待办与应用身份 `todo` 完全分离，`--org-id` 必须显式传入。
 
 ---
 
