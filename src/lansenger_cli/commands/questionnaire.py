@@ -251,12 +251,14 @@ def created_list(
     page: int = typer.Option(1, "--page", help="Page number"),
     size: int = typer.Option(10, "--size", help="Page size"),
     status: Optional[int] = typer.Option(None, "--status", help="1=draft, 2=ongoing, 3=withdrawn, 4=finished"),
+    user_id: str = typer.Option("", "--user-id", help="User ID (omit when --as/--user-token is set)"),
     user_token: str = typer.Option("", "--user-token", help="User token"),
 ):
     """Page questionnaires created under an office account"""
     client = get_client()
     result = client.fetch_created_questionnaires(
-        account_code, page_no=page, page_size=size, status=status, user_token=user_token,
+        account_code, page_no=page, page_size=size, status=status,
+        user_id=user_id, user_token=user_token,
     )
     output_result(result, fields=_PAGE_FIELDS, title="Created Questionnaires")
     _print_page_items(
@@ -273,12 +275,14 @@ def my_created(
     size: int = typer.Option(10, "--size", help="Page size"),
     title: str = typer.Option("", "--title", help="Filter by title"),
     status: Optional[int] = typer.Option(None, "--status", help="1=draft, 2=ongoing, 3=withdrawn, 4=finished"),
+    user_id: str = typer.Option("", "--user-id", help="User ID (omit when --as/--user-token is set)"),
     user_token: str = typer.Option("", "--user-token", help="User token"),
 ):
     """Page all questionnaires I created (personal + official)"""
     client = get_client()
     result = client.fetch_my_created_questionnaires(
-        org_id, page_no=page, page_size=size, title=title, status=status, user_token=user_token,
+        org_id, page_no=page, page_size=size, title=title, status=status,
+        user_id=user_id, user_token=user_token,
     )
     output_result(result, fields=_PAGE_FIELDS, title="My Created Questionnaires")
     _print_page_items(
@@ -294,12 +298,14 @@ def participated(
     page: int = typer.Option(1, "--page", help="Page number"),
     size: int = typer.Option(10, "--size", help="Page size"),
     status: Optional[int] = typer.Option(None, "--status", help="2=ongoing, 4=finished"),
+    user_id: str = typer.Option("", "--user-id", help="User ID (omit when --as/--user-token is set)"),
     user_token: str = typer.Option("", "--user-token", help="User token"),
 ):
     """Page questionnaires the user answered"""
     client = get_client()
     result = client.fetch_participated_questionnaires(
-        org_id, page_no=page, page_size=size, status=status, user_token=user_token,
+        org_id, page_no=page, page_size=size, status=status,
+        user_id=user_id, user_token=user_token,
     )
     output_result(result, fields=_PAGE_FIELDS, title="Participated Questionnaires")
     _print_page_items(
@@ -315,12 +321,14 @@ def answers(
     questionnaire_code: str = typer.Argument(help="Questionnaire code"),
     page: int = typer.Option(1, "--page", help="Page number"),
     size: int = typer.Option(10, "--size", help="Page size"),
+    user_id: str = typer.Option("", "--user-id", help="User ID (omit when --as/--user-token is set)"),
     user_token: str = typer.Option("", "--user-token", help="User token"),
 ):
     """Page answer records of a questionnaire"""
     client = get_client()
     result = client.fetch_answer_records(
-        account_code, questionnaire_code, page_no=page, page_size=size, user_token=user_token,
+        account_code, questionnaire_code, page_no=page, page_size=size,
+        user_id=user_id, user_token=user_token,
     )
     output_result(result, fields=_PAGE_FIELDS, title="Answer Records")
     _print_page_items(
@@ -334,11 +342,14 @@ def answers(
 def answer_detail(
     account_code: str = typer.Argument(help="Official account CODE"),
     answer_code: str = typer.Argument(help="Answer record code"),
+    user_id: str = typer.Option("", "--user-id", help="User ID (omit when --as/--user-token is set)"),
     user_token: str = typer.Option("", "--user-token", help="User token"),
 ):
     """Fetch one answer record's full detail (questionnaire + questions + answers)"""
     client = get_client()
-    result = client.fetch_questionnaire_answer_detail(account_code, answer_code, user_token=user_token)
+    result = client.fetch_questionnaire_answer_detail(
+        account_code, answer_code, user_id=user_id, user_token=user_token,
+    )
     output_result(
         result,
         fields=["answer_code", "answer_user_name", "answer_status", "answer_commit_time", "questionnaire", "answers"],
@@ -350,12 +361,14 @@ def answer_detail(
 def last_answer_detail(
     questionnaire_code: str = typer.Argument(help="Questionnaire code"),
     answer_record_code: str = typer.Option("", "--answer-record-code", help="Specific answer record code"),
+    user_id: str = typer.Option("", "--user-id", help="User ID (omit when --as/--user-token is set)"),
     user_token: str = typer.Option("", "--user-token", help="User token"),
 ):
     """Fetch the user's last answer detail for a questionnaire"""
     client = get_client()
     result = client.fetch_questionnaire_last_answer_detail(
-        questionnaire_code, answer_record_code=answer_record_code, user_token=user_token,
+        questionnaire_code, answer_record_code=answer_record_code,
+        user_id=user_id, user_token=user_token,
     )
     output_result(
         result,
@@ -370,12 +383,14 @@ def answer_data(
     questionnaire_code: str = typer.Argument(help="Questionnaire code"),
     page: int = typer.Option(1, "--page", help="Page number"),
     size: int = typer.Option(10, "--size", help="Page size"),
+    user_id: str = typer.Option("", "--user-id", help="User ID (omit when --as/--user-token is set)"),
     user_token: str = typer.Option("", "--user-token", help="User token"),
 ):
     """Page answer data for export (JSON structure)"""
     client = get_client()
     result = client.fetch_answer_data(
-        account_code, questionnaire_code, page_no=page, page_size=size, user_token=user_token,
+        account_code, questionnaire_code, page_no=page, page_size=size,
+        user_id=user_id, user_token=user_token,
     )
     output_result(result, fields=_PAGE_FIELDS, title="Answer Data")
     _print_page_items(
@@ -389,12 +404,14 @@ def answer_data(
 def last_answer_record(
     questionnaire_code: str = typer.Argument(help="Questionnaire code"),
     answer_record_code: str = typer.Option("", "--answer-record-code", help="Specific answer record code"),
+    user_id: str = typer.Option("", "--user-id", help="User ID (omit when --as/--user-token is set)"),
     user_token: str = typer.Option("", "--user-token", help="User token"),
 ):
     """Fetch the user's last answer record (main table only)"""
     client = get_client()
     result = client.fetch_questionnaire_last_answer_record(
-        questionnaire_code, answer_record_code=answer_record_code, user_token=user_token,
+        questionnaire_code, answer_record_code=answer_record_code,
+        user_id=user_id, user_token=user_token,
     )
     output_result(
         result,

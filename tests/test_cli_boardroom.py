@@ -62,11 +62,16 @@ def test_reserve_passes_repeat_days():
             "--grading-id", "g1", "--start", "2026-07-22 09:00:00",
             "--end", "2026-07-22 10:00:00", "--notice-time", "会前15分钟",
             "--repeat-type", "week", "--repeat-days", "1,3,5",
+            "--leader-attend", "0", "--other-demand", "需要投影",
+            "--table-cards", "1",
         ])
     assert result.exit_code == 0, result.output
     kwargs = client.reserve_boardroom.call_args.kwargs
     assert kwargs["repeat_type"] == "week"
     assert kwargs["repeat_days"] == [1, 3, 5]
+    assert kwargs["leader_attend"] == "0"
+    assert kwargs["other_demand"] == "需要投影"
+    assert kwargs["table_cards"] == "1"
 
 
 def test_cancel_requires_yes():

@@ -5,6 +5,7 @@ from unittest.mock import MagicMock, patch
 from typer.testing import CliRunner
 
 from lansenger_cli.main import app
+from lansenger_cli.utils import _AutoUserTokenProxy
 from lansenger_sdk.models import (
     QuestionnaireOpResult,
     QuestionnairePageResult,
@@ -103,3 +104,44 @@ def test_created_list_renders_rows():
         result = runner.invoke(app, ["questionnaire", "created-list", "ACC001"])
     assert result.exit_code == 0, result.output
     assert "QN1" in result.output and "满意度" in result.output
+
+
+def test_participated_passes_user_id():
+    with patch("lansenger_cli.commands.questionnaire.get_client") as gc:
+        client = MagicMock()
+        client.fetch_participated_questionnaires.return_value = QuestionnairePageResult(
+            success=True, total=0, page_no=1, page_size=10, has_more=False, items=[],
+        )
+        gc.return_value = client
+        result = runner.invoke(app, [
+            "questionnaire", "participated", "org1", "--user-id", "staff-001",
+        ])
+    assert result.exit_code == 0, result.output
+    kwargs = client.fetch_participated_questionnaires.call_args.kwargs
+    assert kwargs["user_id"] == "staff-001"
+
+
+def test_auto_proxy_injects_questionnaire_user_id():
+    raw_client = MagicMock()
+    raw_client.fetch_participated_questionnaires.return_value = QuestionnairePageResult(
+        success=True, total=0, page_no=1, page_size=10, has_more=False, items=[],
+    )
+    store = MagicMock()
+
+    with patch(
+        "lansenger_cli.utils._load_and_refresh_user_token",
+        return_value="user-token",
+    ):
+        client = _AutoUserTokenProxy(raw_client, store, "staff-001")
+        result = client.fetch_participated_questionnaires(
+            org_id="org1",
+            user_id="",
+            user_token="",
+        )
+
+    assert result.success is True
+    raw_client.fetch_participated_questionnaires.assert_called_once_with(
+        org_id="org1",
+        user_id="staff-001",
+        user_token="user-token",
+    )
