@@ -376,6 +376,34 @@ lansenger personal-todo upload-resource app001 a.pdf application/pdf org001 --fi
 lansenger personal-todo upload-url a.pdf MD5 10240 org001
 ```
 
+### 视频会议开放能力
+
+```bash
+# 创建会议 —— 成员列表必须恰好一名 role="admin" 主持人
+lansenger videoconference create "项目周会" org1 \
+  --start-time 1729500000000 --type 1 \
+  --member '[{"staffId":"u1","employeeName":"主持人","role":"admin"},{"staffId":"u2","employeeName":"参会人","role":"participant"}]'
+
+# 查询会议 / 批量状态 / 详情
+lansenger videoconference list org1 --start-time 1729400000000 --end-time 1729600000000 --fetch-range all
+lansenger videoconference status org1 --mids "123,456"
+lansenger videoconference detail 123 org1 staff001
+
+# 会控（opCode 白名单）
+lansenger videoconference member-control 123 u2 muteall org1 staff001
+
+# 取消 / 结束（高风险门禁）
+lansenger videoconference cancel 123 org1 staff001 --dry-run
+lansenger videoconference stop 123 org1 staff001 --yes
+
+# 录像 —— 下载链接每次最多 3 个
+lansenger videoconference vod-list 123 org1 staff001
+lansenger videoconference vod-download org1 staff001 --vods '[{"vodId":"v1"}]'
+
+# 组织会议配置（PRS >=3.8）
+lansenger videoconference org-conf org1
+```
+
 ### Questionnaires (问卷系统)
 
 ```bash

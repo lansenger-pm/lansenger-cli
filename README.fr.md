@@ -376,6 +376,34 @@ lansenger personal-todo upload-resource app001 a.pdf application/pdf org001 --fi
 lansenger personal-todo upload-url a.pdf MD5 10240 org001
 ```
 
+### Visioconférence (视频会议开放能力)
+
+```bash
+# Créer une réunion — la liste des membres doit contenir exactement un hôte role="admin"
+lansenger videoconference create "Réunion projet" org1 \
+  --start-time 1729500000000 --type 1 \
+  --member '[{"staffId":"u1","employeeName":"Host","role":"admin"},{"staffId":"u2","employeeName":"B","role":"participant"}]'
+
+# Rechercher réunions / statuts / détail
+lansenger videoconference list org1 --start-time 1729400000000 --end-time 1729600000000 --fetch-range all
+lansenger videoconference status org1 --mids "123,456"
+lansenger videoconference detail 123 org1 staff001
+
+# Contrôle hôte (opCode whitelist)
+lansenger videoconference member-control 123 u2 muteall org1 staff001
+
+# Annuler / terminer (confirmation requise)
+lansenger videoconference cancel 123 org1 staff001 --dry-run
+lansenger videoconference stop 123 org1 staff001 --yes
+
+# Enregistrements — 3 vods max par appel pour les URLs de téléchargement
+lansenger videoconference vod-list 123 org1 staff001
+lansenger videoconference vod-download org1 staff001 --vods '[{"vodId":"v1"}]'
+
+# Configuration organisationnelle (PRS >=3.8)
+lansenger videoconference org-conf org1
+```
+
 ### Questionnaires (问卷系统)
 
 ```bash

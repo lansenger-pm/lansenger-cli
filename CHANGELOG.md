@@ -6,6 +6,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [0.13.0] - 2026-09-21
+
+### Added
+
+- **videoconference**: 新增 20 个子命令，覆盖视频会议开放能力全部端点——创建/修改/取消/结束会议、会议详情与列表、操作记录、成员进出记录、云会议室、批量状态、事件订阅、会议参数、历史/进行中会议、会控（opCode）、邀请入会、成员列表、录像列表与下载链接、组织会议配置。
+- **videoconference**: 客户端校验——创建/修改要求成员列表恰好一名 `role="admin"` 主持人；会控 `op-code` 白名单（22 个合法值）；录像下载链接每次最多 3 个；`--fetch-range person` 必须带 `--staff-id`；`--mids` 不得为空。
+- **videoconference**: `cancel` / `stop` 接入高风险门禁（`--yes` / `--dry-run`，缺省退出码 10）。
+
+### Notes
+
+- **deps**: `lansenger-sdk>=1.8.0`（视频会议域方法与模型随 SDK 1.8.0 提供）。
+- 取消仅对未开始的会议有效（已开始请用 `stop`）；错误码 105100/105106 表示组织未启用视频会议。
+
+---
+
 ## [0.12.4] - 2026-09-20
 
 ### Added

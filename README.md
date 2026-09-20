@@ -89,6 +89,7 @@ lansenger health check
 | `questionnaire` | Questionnaires (问卷系统) | `save`, `save-questions`, `publish`, `withdraw`, `finish`, `delete`, `detail`, `brief`, `accounts`, `created-list`, `answers`, `answer-detail`, `answer-data`, `upload-url`, ... |
 | `boardroom` | Meeting-room reservation (会议室预定 V2) | `rooms`, `room-detail`, `schedule`, `reserve-detail`, `reserve`, `edit-reserve`, `cancel`, `confirm-sign`, `my-reserves`, `gradings`, `area-offices` |
 | `personal-todo` | User-owned personal todos (个人待办) | `save`, `update`, `list`, `upload-resource`, `download-url`, `upload-url` |
+| `videoconference` | Videoconference open APIs (视频会议开放能力) | `create`, `modify`, `cancel`, `stop`, `detail`, `list`, `record-list`, `simplerecord`, `fixroom-list`, `status`, `subscribe`, `params`, `history`, `active`, `member-control`, `invite`, `member-list`, `vod-list`, `vod-download`, `org-conf` |
 | `oauth` | OAuth2 user auth | `authorize-url`, `exchange-code`, `refresh-token`, `user-info`, `parse-callback`, `validate-state` |
 | `callback` | Callback event parsing | `parse-payload`, `decrypt-payload`, `verify-signature`, `event-types` |
 | `media` | Media file operations | `upload`, `upload-app`, `download`, `download-to-file` |
@@ -374,6 +375,34 @@ lansenger personal-todo list org001 staff001 --status 0
 # Manage attachments
 lansenger personal-todo upload-resource app001 a.pdf application/pdf org001 --file ./a.pdf
 lansenger personal-todo upload-url a.pdf MD5 10240 org001
+```
+
+### Videoconference (视频会议开放能力)
+
+```bash
+# Create a meeting — member list must carry exactly one role="admin" host
+lansenger videoconference create "项目周会" org1 \
+  --start-time 1729500000000 --type 1 \
+  --member '[{"staffId":"u1","employeeName":"Host","role":"admin"},{"staffId":"u2","employeeName":"B","role":"participant"}]'
+
+# Query meetings / status / detail
+lansenger videoconference list org1 --start-time 1729400000000 --end-time 1729600000000 --fetch-range all
+lansenger videoconference status org1 --mids "123,456"
+lansenger videoconference detail 123 org1 staff001
+
+# Host controls a member (opCode whitelist)
+lansenger videoconference member-control 123 u2 muteall org1 staff001
+
+# Cancel (gated) / stop (gated)
+lansenger videoconference cancel 123 org1 staff001 --dry-run
+lansenger videoconference stop 123 org1 staff001 --yes
+
+# Recordings — download URLs allow max 3 vods per call
+lansenger videoconference vod-list 123 org1 staff001
+lansenger videoconference vod-download org1 staff001 --vods '[{"vodId":"v1"}]'
+
+# Org config (PRS >=3.8)
+lansenger videoconference org-conf org1
 ```
 
 ### Questionnaires (问卷系统)
