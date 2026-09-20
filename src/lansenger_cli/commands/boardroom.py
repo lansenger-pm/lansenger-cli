@@ -237,11 +237,15 @@ def my_reserves(
 
 @app.command("gradings")
 def gradings(
+    user_id: str = typer.Option("", "--user-id", help="User ID (omit when --as/--user-token is set)"),
+    org_id: str = typer.Option("", "--org-id", help="Organization ID (omit when --as/--user-token is set)"),
     user_token: str = typer.Option("", "--user-token", help="User token"),
 ):
     """Fetch gradings visible to the user (gradingId source)"""
     client = get_client()
-    result = client.fetch_boardroom_gradings(user_token=user_token)
+    result = client.fetch_boardroom_gradings(
+        lx_user_id=user_id, org_id=org_id, user_token=user_token,
+    )
     output_result(result, fields=["total"], title="Boardroom Gradings")
     _print_page_items(
         result.gradings, ["id", "name", "type"],

@@ -30,9 +30,14 @@ def test_gradings_outputs_rows():
             gradings=[{"id": "g1", "name": "默认分级", "type": "GRADING_ADMIN"}],
         )
         gc.return_value = client
-        result = runner.invoke(app, ["boardroom", "gradings"])
+        result = runner.invoke(app, [
+            "boardroom", "gradings", "--user-id", "staff-1", "--org-id", "org-1",
+        ])
     assert result.exit_code == 0, result.output
     assert "g1" in result.output and "默认分级" in result.output
+    kwargs = client.fetch_boardroom_gradings.call_args.kwargs
+    assert kwargs["lx_user_id"] == "staff-1"
+    assert kwargs["org_id"] == "org-1"
 
 
 def test_rooms_renders_page():
