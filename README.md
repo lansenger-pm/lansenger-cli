@@ -415,7 +415,7 @@ lansenger notice send "部门通知" ACC001 \
   --cc-staff-ids "staff-002" \
   --create-user-id "staff-001"
 
-# With --as / --user-token set, --create-mobile / --create-user-id can be omitted
+# --as auto-fills --create-user-id; --user-token alone does not replace creator fields
 lansenger --as staff001 notice send "通知" ACC001 --content "..." --release-phones "138..."
 ```
 

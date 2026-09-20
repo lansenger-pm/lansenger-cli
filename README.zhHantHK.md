@@ -415,7 +415,7 @@ lansenger notice send "部门通知" ACC001 \
   --cc-staff-ids "staff-002" \
   --create-user-id "staff-001"
 
-# 帶 --as / --user-token 時，--create-mobile / --create-user-id 可省略
+# --as 會自動補 --create-user-id；僅傳 --user-token 不能替代建立人欄位
 lansenger --as staff001 notice send "通知" ACC001 --content "..." --release-phones "138..."
 ```
 
