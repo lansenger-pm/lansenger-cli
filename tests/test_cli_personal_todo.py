@@ -51,12 +51,15 @@ def test_update_personal_todo_parses_fields():
             "personal-todo", "update", "TASK1", "org1",
             "--update-fields", "subject,dueTime",
             "--subject", "新主题", "--due-time", "300",
+            "--create-user-id", "staff1", "--appid", "app1",
         ])
     assert result.exit_code == 0, result.output
     kwargs = client.update_personal_todo.call_args.kwargs
     assert kwargs["update_fields"] == ["subject", "dueTime"]
     assert kwargs["subject"] == "新主题"
     assert kwargs["due_time"] == 300
+    assert kwargs["create_user_id"] == "staff1"
+    assert kwargs["appid"] == "app1"
 
 
 def test_list_personal_todos_renders_items():
