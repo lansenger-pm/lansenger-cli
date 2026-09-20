@@ -87,6 +87,7 @@ lansenger health check
 | `personal-app` | 个人应用 | `create`, `update`, `info`, `delete`, `list` |
 | `notice` | 官方账号通知（通知系统） | `send`, `accounts` |
 | `questionnaire` | 问卷系统 | `save`, `save-questions`, `publish`, `withdraw`, `finish`, `delete`, `detail`, `brief`, `accounts`, `created-list`, `answers`, `answer-detail`, `answer-data`, `upload-url`, ... |
+| `boardroom` | 会议室预定 V2 | `rooms`, `room-detail`, `schedule`, `reserve-detail`, `reserve`, `edit-reserve`, `cancel`, `confirm-sign`, `my-reserves`, `gradings`, `area-offices` |
 | `oauth` | OAuth2 用户认证 | `authorize-url`, `exchange-code`, `refresh-token`, `user-info`, `parse-callback`, `validate-state` |
 | `callback` | 回调事件解析 | `parse-payload`, `decrypt-payload`, `verify-signature`, `event-types` |
 | `media` | 媒体文件操作 | `upload`, `upload-app`, `download`, `download-to-file` |
@@ -336,6 +337,24 @@ lansenger streaming create user123 single stream-session-001
 
 # 获取流式消息状态
 lansenger streaming fetch MSG_ID
+```
+
+### 会议室（会议室预定 V2）
+
+```bash
+# 查可见分级（gradingId 来源），再查会议室
+lansenger boardroom gradings
+lansenger boardroom rooms --grading-id g1 --date 2026-07-22
+
+# 预订会议室（状态：0审批中 1待扫码确认 5预定成功 ...）
+lansenger boardroom reserve room1 "项目周会" \
+  --grading-id g1 --start "2026-07-22 09:00:00" --end "2026-07-22 10:00:00" \
+  --notice-time "会前15分钟" --people 10
+
+# 当日预订情况 / 取消（门禁）/ 扫码确认
+lansenger boardroom schedule room1 2026-07-22 --grading-id g1
+lansenger boardroom cancel res1 --dry-run
+lansenger boardroom cancel res1 --yes --reason "改期"
 ```
 
 ### Questionnaires (问卷系统)

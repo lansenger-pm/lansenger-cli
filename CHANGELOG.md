@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [0.15.0] - 2026-09-18
+
+### Added
+
+- **boardroom**: 会议室预定 V2 命令组（11 个子命令）— `rooms` / `room-detail` / `schedule` / `reserve-detail` / `reserve` / `edit-reserve` / `cancel`（门禁）/ `confirm-sign` / `my-reserves` / `gradings` / `area-offices`。多数命令需 `--grading-id`（先 `boardroom gradings` 查询）。
+- **deps**: `lansenger-sdk>=1.10.0`（boardrooms 域所在版本）。
+
+---
+
 ## [0.14.0] - 2026-09-18
 
 ### Added
