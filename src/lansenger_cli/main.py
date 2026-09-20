@@ -22,6 +22,7 @@ from lansenger_cli.commands import (
     notice as notice_cmd,
     questionnaire as questionnaire_cmd,
     boardroom as boardroom_cmd,
+    personal_todo as personal_todo_cmd,
 )
 
 app = typer.Typer(
@@ -49,6 +50,7 @@ app.add_typer(personal_app_cmd.app, name="personal-app")
 app.add_typer(notice_cmd.app, name="notice")
 app.add_typer(questionnaire_cmd.app, name="questionnaire")
 app.add_typer(boardroom_cmd.app, name="boardroom")
+app.add_typer(personal_todo_cmd.app, name="personal-todo")
 
 
 @app.callback(invoke_without_command=True)

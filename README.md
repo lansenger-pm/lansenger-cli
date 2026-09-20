@@ -88,6 +88,7 @@ lansenger health check
 | `notice` | Notices via official accounts (通知系统) | `send`, `accounts` |
 | `questionnaire` | Questionnaires (问卷系统) | `save`, `save-questions`, `publish`, `withdraw`, `finish`, `delete`, `detail`, `brief`, `accounts`, `created-list`, `answers`, `answer-detail`, `answer-data`, `upload-url`, ... |
 | `boardroom` | Meeting-room reservation (会议室预定 V2) | `rooms`, `room-detail`, `schedule`, `reserve-detail`, `reserve`, `edit-reserve`, `cancel`, `confirm-sign`, `my-reserves`, `gradings`, `area-offices` |
+| `personal-todo` | User-owned personal todos (个人待办) | `save`, `update`, `list`, `upload-resource`, `download-url`, `upload-url` |
 | `oauth` | OAuth2 user auth | `authorize-url`, `exchange-code`, `refresh-token`, `user-info`, `parse-callback`, `validate-state` |
 | `callback` | Callback event parsing | `parse-payload`, `decrypt-payload`, `verify-signature`, `event-types` |
 | `media` | Media file operations | `upload`, `upload-app`, `download`, `download-to-file` |
@@ -355,6 +356,24 @@ lansenger boardroom reserve room1 "项目周会" \
 lansenger boardroom schedule room1 2026-07-22 --grading-id g1
 lansenger boardroom cancel res1 --dry-run
 lansenger boardroom cancel res1 --yes --reason "改期"
+```
+
+### Personal Todos (个人待办)
+
+```bash
+# Create a personal todo
+lansenger personal-todo save "完成项目方案" staff001 org001 app001 \
+  --start-time 1719792000000 --due-time 1720195200000 --priority 1 \
+  --executors '[{"staffId":"staff001","opt":1}]'
+
+# Update selected fields and query the user's todos
+lansenger personal-todo update TASK001 org001 --update-fields "subject,dueTime" \
+  --subject "完成项目最终方案" --due-time 1720377600000
+lansenger personal-todo list org001 staff001 --status 0
+
+# Manage attachments
+lansenger personal-todo upload-resource app001 a.pdf application/pdf org001 --file ./a.pdf
+lansenger personal-todo upload-url a.pdf MD5 10240 org001
 ```
 
 ### Questionnaires (问卷系统)

@@ -88,6 +88,7 @@ lansenger health check
 | `notice` | 官方帳號通知（通知系統） | `send`, `accounts` |
 | `questionnaire` | 問卷系統 | `save`, `save-questions`, `publish`, `withdraw`, `finish`, `delete`, `detail`, `brief`, `accounts`, `created-list`, `answers`, `answer-detail`, `answer-data`, `upload-url`, ... |
 | `boardroom` | 會議室預訂 V2 | `rooms`, `room-detail`, `schedule`, `reserve-detail`, `reserve`, `edit-reserve`, `cancel`, `confirm-sign`, `my-reserves`, `gradings`, `area-offices` |
+| `personal-todo` | 使用者個人待辦 | `save`, `update`, `list`, `upload-resource`, `download-url`, `upload-url` |
 | `oauth` | OAuth2 使用者認證 | `authorize-url`, `exchange-code`, `refresh-token`, `user-info`, `parse-callback`, `validate-state` |
 | `callback` | 回呼事件解析 | `parse-payload`, `decrypt-payload`, `verify-signature`, `event-types` |
 | `media` | 媒體檔案操作 | `upload`, `upload-app`, `download`, `download-to-file` |
@@ -355,6 +356,24 @@ lansenger boardroom reserve room1 "项目周会" \
 lansenger boardroom schedule room1 2026-07-22 --grading-id g1
 lansenger boardroom cancel res1 --dry-run
 lansenger boardroom cancel res1 --yes --reason "改期"
+```
+
+### 個人待辦
+
+```bash
+# 建立個人待辦
+lansenger personal-todo save "完成專案方案" staff001 org001 app001 \
+  --start-time 1719792000000 --due-time 1720195200000 --priority 1 \
+  --executors '[{"staffId":"staff001","opt":1}]'
+
+# 編輯指定欄位並查詢使用者待辦
+lansenger personal-todo update TASK001 org001 --update-fields "subject,dueTime" \
+  --subject "完成專案最終方案" --due-time 1720377600000
+lansenger personal-todo list org001 staff001 --status 0
+
+# 附件操作
+lansenger personal-todo upload-resource app001 a.pdf application/pdf org001 --file ./a.pdf
+lansenger personal-todo upload-url a.pdf MD5 10240 org001
 ```
 
 ### Questionnaires (问卷系统)

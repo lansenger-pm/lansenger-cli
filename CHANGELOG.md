@@ -6,6 +6,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [0.16.0] - 2026-09-20
+
+### Added
+
+- **personal-todo**: 个人待办命令组（6 个子命令）— `save` / `update` / `list` / `upload-resource` / `download-url` / `upload-url`。
+- **personal-todo**: `upload-resource` 支持从本地文件读取并自动 base64 编码，自动计算文件大小。
+- **deps**: `lansenger-sdk>=1.11.0`（personal_todos 域所在版本）。
+
+### Notes
+
+- **personal-todo**: 与应用身份的 `todo` 命令组完全分离；`--org-id` 必须显式传入，目前服务端不提供完成/删除能力。
+
+---
+
 ## [0.15.0] - 2026-09-18
 
 ### Added
