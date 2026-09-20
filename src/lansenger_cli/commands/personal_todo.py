@@ -37,7 +37,7 @@ def save_personal_todo(
     priority: int = typer.Option(1, "--priority", help="Priority: 0=low, 1=normal, 2=urgent, 3=very urgent"),
     description: str = typer.Option("", "--description", help="Todo description"),
     parent_code: str = typer.Option("", "--parent-code", help="Parent todo code"),
-    finish_time: Optional[int] = typer.Option(None, "--finish-time", help="Finish time in epoch milliseconds"),
+    finish_time: int = typer.Option(0, "--finish-time", help="Finish time in epoch milliseconds"),
     status_tag_no: str = typer.Option("", "--status-tag-no", help="Unfinished status label"),
     status_tag_yes: str = typer.Option("", "--status-tag-yes", help="Finished status label"),
     subscribe_status: Optional[int] = typer.Option(None, "--subscribe-status", help="Subscribe: 1=yes, 0=no"),
