@@ -126,6 +126,8 @@ class _AutoUserTokenProxy:
                 )
             if "user_id" in kwargs and not kwargs.get("user_id"):
                 kwargs["user_id"] = self._staff_id
+            if "create_user_id" in kwargs and not kwargs.get("create_user_id"):
+                kwargs["create_user_id"] = self._staff_id
             return attr(*args, **kwargs)
 
         return wrapper

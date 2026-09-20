@@ -5,6 +5,7 @@ from unittest.mock import MagicMock, patch
 from typer.testing import CliRunner
 
 from lansenger_cli.main import app
+from lansenger_cli.utils import _AutoUserTokenProxy
 from lansenger_sdk.models import NoticeAccountListResult, NoticeSendResult
 
 runner = CliRunner()
@@ -93,3 +94,25 @@ def test_send_api_error_exits_1():
         ])
     assert result.exit_code == 1
     assert "errCode=3123" in result.output
+
+
+def test_auto_proxy_injects_create_user_id_for_notice():
+    raw_client = MagicMock()
+    raw_client.send_notice.return_value = NoticeSendResult(success=True)
+    store = MagicMock()
+
+    with patch(
+        "lansenger_cli.utils._load_and_refresh_user_token",
+        return_value="user-token",
+    ):
+        client = _AutoUserTokenProxy(raw_client, store, "staff-001")
+        result = client.send_notice(
+            create_user_id="",
+            user_token="",
+        )
+
+    assert result.success is True
+    raw_client.send_notice.assert_called_once_with(
+        create_user_id="staff-001",
+        user_token="user-token",
+    )
