@@ -1,5 +1,6 @@
 """Tests for the `lansenger videoconference` command group."""
 
+import re
 from unittest.mock import MagicMock, patch
 
 from typer.testing import CliRunner
@@ -17,6 +18,14 @@ from lansenger_sdk.models import (
 )
 
 runner = CliRunner()
+
+# typer's option highlighter splits option names into styled runs when color
+# output is enabled (e.g. on CI), so assertions must look at plain text.
+_ANSI_RE = re.compile(r"\x1b\[[0-9;]*[A-Za-z]")
+
+
+def plain_text(text: str) -> str:
+    return _ANSI_RE.sub("", text)
 
 HOST_MEMBER = '[{"staffId":"u1","employeeName":"Host","role":"admin"},{"staffId":"u2","employeeName":"B","role":"participant"}]'
 
@@ -134,7 +143,7 @@ def test_meeting_list_validates_person_range():
         "--start-time", "1", "--end-time", "2", "--fetch-range", "person",
     ])
     assert result.exit_code != 0
-    assert "--staff-id" in result.output
+    assert "--staff-id" in plain_text(result.output)
 
 
 def test_meeting_list_passes_params():
