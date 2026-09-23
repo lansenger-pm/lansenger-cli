@@ -11,7 +11,7 @@ from lansenger_cli.utils import (
     output_result,
 )
 
-from lansenger_sdk.videoconferences import VC_FETCH_RANGE_PERSON, VC_OPS
+from lansenger_sdk.videoconferences import VC_FETCH_RANGE_PERSON
 
 app = typer.Typer(help="Videoconference open APIs (视频会议开放能力)")
 
@@ -100,6 +100,7 @@ def modify_meeting(
     group_new: int = typer.Option(0, "--group-new", help="Auto-create group: 0=no, 1=yes"),
     conf_password: str = typer.Option("", "--conf-password", help="Meeting password (omit to keep)"),
     control_password: str = typer.Option("", "--control-password", help="Host-control password (omit to keep)"),
+    user_stop_time: Optional[int] = typer.Option(None, "--user-stop-time", help="Auto-stop time in epoch milliseconds (PRS >=3.8)"),
     user_token: str = typer.Option("", "--user-token", help="User token"),
 ):
     """Modify a meeting that has not started."""
@@ -109,7 +110,8 @@ def modify_meeting(
         mid=mid, subject=subject, start_time=start_time, members=members,
         org_id=org_id, operator=operator, auto_record=auto_record, type=type,
         group_new=group_new, conf_password=conf_password,
-        control_password=control_password, user_token=user_token,
+        control_password=control_password, user_stop_time=user_stop_time,
+        user_token=user_token,
     )
     output_result(result, fields=["done", "message"], title="Meeting Modified")
 
@@ -342,9 +344,12 @@ def member_control(
     operator: str = typer.Argument(help="Operator staff ID"),
     user_token: str = typer.Option("", "--user-token", help="User token"),
 ):
-    """Host controls a member (opCode operation)."""
-    if op_code not in VC_OPS:
-        raise typer.BadParameter(f"op-code must be one of {', '.join(VC_OPS)}")
+    """Host controls a member (opCode operation).
+
+    `op_code` is forwarded to the server verbatim — the server is the authority
+    on which values are accepted. The SDK's `VC_OPS` list is a reference of
+    known values, not a validator, so unknown values are not rejected locally.
+    """
     result = get_client().control_member(
         mid=mid, staff_id=staff_id, op_code=op_code, operator=operator,
         org_id=org_id, user_token=user_token,

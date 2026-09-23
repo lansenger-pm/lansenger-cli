@@ -91,6 +91,7 @@ def test_modify_meeting_passes_fields():
             "videoconference", "modify", "123", "org1", "staff9",
             "--subject", "新主题", "--start-time", "1800000000000",
             "--member", HOST_MEMBER,
+            "--user-stop-time", "1800003600000",
         ])
     assert result.exit_code == 0, result.output
     kwargs = client.modify_meeting.call_args.kwargs
@@ -98,6 +99,22 @@ def test_modify_meeting_passes_fields():
     assert kwargs["operator"] == "staff9"
     assert kwargs["subject"] == "新主题"
     assert kwargs["start_time"] == 1800000000000
+    # 与 create 对齐：modify 也必须能透传自动结束时间
+    assert kwargs["user_stop_time"] == 1800003600000
+
+
+def test_modify_meeting_omits_user_stop_time_when_not_given():
+    with patch("lansenger_cli.commands.videoconference.get_client") as gc:
+        client = MagicMock()
+        client.modify_meeting.return_value = VideoconferenceOpResult(success=True, done=True)
+        gc.return_value = client
+        result = runner.invoke(app, [
+            "videoconference", "modify", "123", "org1", "staff9",
+            "--subject", "新主题", "--start-time", "1800000000000",
+            "--member", HOST_MEMBER,
+        ])
+    assert result.exit_code == 0, result.output
+    assert client.modify_meeting.call_args.kwargs["user_stop_time"] is None
 
 
 def test_cancel_and_stop_require_confirmation():
@@ -183,12 +200,17 @@ def test_status_requires_mids():
     assert kwargs["mids"] == ["123", "456"]
 
 
-def test_member_control_validates_op_code():
-    result = runner.invoke(app, [
-        "videoconference", "member-control", "123", "u1", "not-an-op", "org1", "staff9",
-    ])
-    assert result.exit_code != 0
-    assert "op-code must be one of" in result.output
+def test_member_control_passes_op_code_through():
+    """op_code 不做客户端校验：未知值也原样透传给 SDK（服务端才是权威）。"""
+    with patch("lansenger_cli.commands.videoconference.get_client") as gc:
+        client = MagicMock()
+        client.control_member.return_value = VideoconferenceOpResult(success=True, done=True)
+        gc.return_value = client
+        unknown = runner.invoke(app, [
+            "videoconference", "member-control", "123", "u1", "zzz_not_an_op", "org1", "staff9",
+        ])
+    assert unknown.exit_code == 0, unknown.output
+    assert client.control_member.call_args.kwargs["op_code"] == "zzz_not_an_op"
 
     with patch("lansenger_cli.commands.videoconference.get_client") as gc:
         client = MagicMock()

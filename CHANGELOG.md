@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [Unreleased]
+
+### Fixed
+
+- **videoconference**: `modify` 新增 `--user-stop-time`（自动结束时间，epoch 毫秒），与 `create` 对齐——此前该参数只在创建时可传，修改时无法设置。
+- **videoconference**: 会控 `member-control` 移除 `op-code` 白名单客户端校验，改为原样透传（服务端才是权威）。此前客户端会拦掉服务端实际接受的取值（例如 `mute`）。
+
+---
+
 ## [0.13.0] - 2026-09-21
 
 ### Added

@@ -390,7 +390,7 @@ lansenger videoconference list org1 --start-time 1729400000000 --end-time 172960
 lansenger videoconference status org1 --mids "123,456"
 lansenger videoconference detail 123 org1 staff001
 
-# Host controls a member (opCode whitelist)
+# Host controls a member (opCode is passed through to the server)
 lansenger videoconference member-control 123 u2 muteall org1 staff001
 
 # Cancel (gated) / stop (gated)
