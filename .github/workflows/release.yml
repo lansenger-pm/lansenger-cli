@@ -46,7 +46,7 @@ jobs:
             if pip install -e ".[dev]"; then
               exit 0
             fi
-            echo "pip install failed (attempt $i/5) — retrying in 60s (PyPI index lag)..."
+            echo "pip install failed (attempt $i/5) -- retrying in 60s (PyPI index lag)..."
             sleep 60
           done
           exit 1
