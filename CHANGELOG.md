@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+
+- **personal-todo**: `resource upload` 成功后额外打印一行可直接粘进 `--resources` 的条目片段（非 JSON 输出时才提示，不污染 JSON 消费方）。条目已做过 `mimeType`/`size` → `fileType`/`fileSize` 映射，避免直接照抄上传响应被后端 errCode 500 打回。
+
 ### Fixed
 
 - **videoconference**: `modify` 新增 `--user-stop-time`（自动结束时间，epoch 毫秒），与 `create` 对齐——此前该参数只在创建时可传，修改时无法设置。

@@ -189,6 +189,13 @@ def upload_personal_todo_resource(
         fields=["resource_id", "file_name", "size", "mime_type", "download_url"],
         title="Personal Todo Resource",
     )
+    # 把上传结果直接拼成可粘进 --resources 的条目（注意：写体用 fileType/fileSize，
+    # 不是上传返回的 mimeType/size，避免被后端 500 打回）。仅非 JSON 输出时提示，
+    # 不污染 JSON 消费方。
+    if result.success and not is_json_output():
+        snippet = json.dumps([result.to_resource_entry()], ensure_ascii=False)
+        typer.echo("# 挂附件时这样传 --resources（写体字段是 fileType/fileSize）:")
+        typer.echo(snippet)
 
 
 @app.command("download-url")
