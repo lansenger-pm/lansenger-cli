@@ -38,7 +38,18 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - run: pip install -e ".[dev]"
+      # A dependency may have been published minutes earlier while PyPI's
+      # simple index is still catching up (observed 2026-09-23: lansenger-sdk
+      # 1.9.1 was invisible for ~20 min). Retry instead of failing the release.
+      - run: |
+          for i in 1 2 3 4 5; do
+            if pip install -e ".[dev]"; then
+              exit 0
+            fi
+            echo "pip install failed (attempt $i/5) — retrying in 60s (PyPI index lag)..."
+            sleep 60
+          done
+          exit 1
       - run: pytest -q
 
   publish:
