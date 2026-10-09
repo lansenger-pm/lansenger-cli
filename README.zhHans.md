@@ -2,7 +2,7 @@
 
 # Lansenger CLI
 
-蓝信（Lansenger）命令行工具 — 在终端直接调用蓝信开放平台 API，发送消息、管理群组、查询人员/部门、操作日程与待办等。
+蓝信（Lansenger）命令行工具 — 在终端直接调用蓝信开放平台 API，发送消息、管理群组、查询人员/部门、操作日程等。
 
 ## 安装
 
@@ -82,13 +82,8 @@ lansenger health check
 | `staff` | 查询人员信息 | `basic-info`, `detail`, `ancestors`, `id-mapping`, `org-extra-fields`, `search`, `org-info` |
 | `department` | 查询部门信息 | `detail`, `children`, `staffs` |
 | `calendar` | 日程操作 | `primary`, `create-schedule`, `fetch-schedule`, `delete-schedule`, `list-schedules`, `attendees`, `add-attendees`, `delete-attendees`, `update-attendees`, `update-schedule`, `attendee-meta` |
-| `todo` | 待办任务管理 | `create`, `update`, `update-status`, `delete`, `list`, `fetch-by-source`, `fetch-by-id`, `status-counts`, `executor-status`, `add-executors`, `delete-executors`, `executor-list` |
 | `bot-command` | 机器人命令 | `create`, `query`, `delete` |
 | `personal-app` | 个人应用 | `create`, `update`, `info`, `delete`, `list` |
-| `notice` | 官方账号通知（通知系统） | `send`, `accounts` |
-| `questionnaire` | 问卷系统 | `save`, `save-questions`, `publish`, `withdraw`, `finish`, `delete`, `detail`, `brief`, `accounts`, `created-list`, `answers`, `answer-detail`, `answer-data`, `upload-url`, ... |
-| `boardroom` | 会议室预定 V2 | `rooms`, `room-detail`, `schedule`, `reserve-detail`, `reserve`, `edit-reserve`, `cancel`, `confirm-sign`, `my-reserves`, `gradings`, `area-offices` |
-| `personal-todo` | 用户个人待办 | `save`, `update`, `list`, `upload-resource`, `download-url`, `upload-url` |
 | `oauth` | OAuth2 用户认证 | `authorize-url`, `exchange-code`, `refresh-token`, `user-info`, `parse-callback`, `validate-state` |
 | `callback` | 回调事件解析 | `parse-payload`, `decrypt-payload`, `verify-signature`, `event-types` |
 | `media` | 媒体文件操作 | `upload`, `upload-app`, `download`, `download-to-file` |
@@ -268,23 +263,6 @@ lansenger calendar fetch-schedule cal001 schedule001 --user-token YOUR_TOKEN
 lansenger calendar delete-schedule cal001 schedule001 --user-token YOUR_TOKEN
 ```
 
-### 待办任务
-
-```bash
-# 创建待办
-lansenger todo create "审批文档" https://app.com/doc https://app.com/doc \
-  "staff001,staff002" org001 --desc "请审批" --type 2
-
-# 更新待办状态（11=待阅, 12=已阅, 21=待办, 22=已办）
-lansenger todo update-status task001 22 org001
-
-# 查看待办列表
-lansenger todo list org001 --status 21,22
-
-# 删除待办
-lansenger todo delete task001 org001
-```
-
 ### OAuth2 用户认证
 
 ```bash
@@ -340,42 +318,6 @@ lansenger streaming create user123 single stream-session-001
 lansenger streaming fetch MSG_ID
 ```
 
-### 会议室（会议室预定 V2）
-
-```bash
-# 查可见分级（gradingId 来源），再查会议室
-lansenger boardroom gradings
-lansenger boardroom rooms --grading-id g1 --date 2026-07-22
-
-# 预订会议室（状态：0审批中 1待扫码确认 5预定成功 ...）
-lansenger boardroom reserve room1 "项目周会" \
-  --grading-id g1 --start "2026-07-22 09:00:00" --end "2026-07-22 10:00:00" \
-  --notice-time "会前15分钟" --people 10
-
-# 当日预订情况 / 取消（门禁）/ 扫码确认
-lansenger boardroom schedule room1 2026-07-22 --grading-id g1
-lansenger boardroom cancel res1 --dry-run
-lansenger boardroom cancel res1 --yes --reason "改期"
-```
-
-### 个人待办
-
-```bash
-# 创建个人待办
-lansenger personal-todo save "完成项目方案" staff001 org001 app001 \
-  --start-time 1719792000000 --due-time 1720195200000 --priority 1 \
-  --executors '[{"staffId":"staff001","opt":1}]'
-
-# 编辑指定字段并查询用户待办
-lansenger personal-todo update TASK001 org001 --update-fields "subject,dueTime" \
-  --subject "完成项目最终方案" --due-time 1720377600000
-lansenger personal-todo list org001 staff001 --status 0
-
-# 附件操作
-lansenger personal-todo upload-resource app001 a.pdf application/pdf org001 --file ./a.pdf
-lansenger personal-todo upload-url a.pdf MD5 10240 org001
-```
-
 ### 视频会议开放能力
 
 ```bash
@@ -402,49 +344,6 @@ lansenger videoconference vod-download org1 staff001 --vods '[{"vodId":"v1"}]'
 
 # 组织会议配置（PRS >=3.8）
 lansenger videoconference org-conf org1
-```
-
-### Questionnaires (问卷系统)
-
-```bash
-# Find manageable office accounts (the "code" column is the accountCode)
-lansenger questionnaire accounts
-
-# Create a questionnaire, add questions, publish
-lansenger questionnaire save "2026年度员工满意度调查" ACC001 --welcome "欢迎参加"
-lansenger questionnaire save-questions QN001 --questions '[
-  {"questionName":"您对当前工作环境是否满意？","questionType":"radio","requiredFlag":1,
-   "questionOptionList":[{"optionName":"非常满意","optionOrder":1}]}]'
-lansenger questionnaire publish QN001 --scope 1 --staff-ids "U10001,U10002"
-
-# Analyze answers
-lansenger questionnaire answers ACC001 QN001
-lansenger questionnaire answer-detail ACC001 AR20260101000001
-```
-
-### 通知（通知系统）
-
-```bash
-# 查询官方账号（code 列即发送所需的 accountCode）
-lansenger notice accounts --org-id org001
-
-# 发送文本通知，按手机号投放（接收/抄送各最多 10 个）
-lansenger notice send "关于系统升级的通知" ACC001 \
-  --content "系统将于本周六进行升级维护" \
-  --release-phones "13800138000,13800138001" \
-  --create-mobile "13800138000" \
-  --confirm-flag 1
-
-# 或按 staffId/部门投放（最多 200 个）
-lansenger notice send "部门通知" ACC001 \
-  --user-type 2 \
-  --content "请及时填写本周周报" \
-  --release-range '[{"objId":"dept-1","objName":"研发部","objType":2}]' \
-  --cc-staff-ids "staff-002" \
-  --create-user-id "staff-001"
-
-# --as 会自动补 --create-user-id；仅传 --user-token 不能替代创建人字段
-lansenger --as staff001 notice send "通知" ACC001 --content "..." --release-phones "138..."
 ```
 
 ## 全局选项
@@ -552,7 +451,6 @@ lansenger config show --profile my-app
 | `staff *`（通讯录只读） | N | **Y** | **Y** | `search` 额外需要 userToken |
 | `department *` | N | **Y** | **Y** | 仅组织级应用 |
 | `calendar *` | N | **Y** | **Y** | 有 userToken = 用户身份；无 = 机器人身份 |
-| `todo *` | N | **Y** | **Y** | 仅组织级应用 |
 | `chat list/messages` | N | **Y** | **Y** | 仅组织级应用 |
 | `group *`（群组管理 V2） | N | N | **Y** | 需要机器人已在群内 |
 | `media upload` | **Y** | **Y** | **Y** | 通用上传 |
@@ -566,7 +464,7 @@ lansenger config show --profile my-app
 
 > **个人机器人**只能收发消息和上传/下载文件。不能访问通讯录、日历或 OAuth2。
 >
-> **组织应用 vs 组织应用 + 机器人**：使用相同的 appID/appSecret。唯一区别在于消息通道——只有机器人可以发送机器人私聊和群消息（因为只有机器人可以加入群组）。所有其他 API（通讯录、日历、待办、会话、OAuth2、流式消息）两者完全一致。目前仅自建应用支持机器人能力。
+> **组织应用 vs 组织应用 + 机器人**：使用相同的 appID/appSecret。唯一区别在于消息通道——只有机器人可以发送机器人私聊和群消息（因为只有机器人可以加入群组）。所有其他 API（通讯录、日历、会话、OAuth2、流式消息）两者完全一致。目前仅自建应用支持机器人能力。
 
 ### 开发者中心权限
 

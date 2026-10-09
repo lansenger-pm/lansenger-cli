@@ -6,6 +6,24 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [0.14.0] - 2026-10-09
+
+### Changed
+
+- **dep**: `lansenger-sdk` 下限提到 `>=1.11.0`。
+
+### Removed
+
+- 移除 7 个应用域：qingjia（请假 V2）、jiaban（加班 V2）、questionnaire（问卷）、notice（通知）、todo（应用待办）、boardroom（会议室预定 V2）、personalTodo（个人待办）。这些应用与蓝信标准接口不同、且会按交付定制，不属于「交付给谁都不变」的标准版，故从 CLI 中剥离。对应 `src/lansenger_cli/commands/*.py` 命令模块、`main.py` 注册与单元测试已移除，5 个语言版本的 README 同步删去相应章节、命令总览表行与身份能力矩阵行。
+
+### Fixed
+
+- **视频会议 `--member` 参数校验**：`videoconference create` / `modify` 的 `--member` 传入非 JSON 对象（例如 `'["u1"]'`）时立即报错并以状态码 2 退出，错误信息给出正确写法，不再把非法成员下发到接口。
+- **列表命令表格渲染**：`videoconference history` / `active` / `fixroom-list` 等分页列表此前把接口返回的全部列（最多 34 列）铺开，终端里挤成一团；现在按关键字段（`id` / `mid` / `meetingNumber` / `subject` / `name` / `staffId` 等）自动挑选最多 6 列，单元格截断到 40 字符，并过滤 `password` / `secret` 类字段。
+- **`media download-to-file` 失败提示**：下载失败（媒体不存在、身份无权限等）时输出 `Error: Download failed: … (errCode=…)` 并以退出码 1 结束，不再抛出 Python traceback。
+
+---
+
 ## [0.13.2] - 2026-09-23
 
 ### Added

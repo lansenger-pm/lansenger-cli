@@ -10,7 +10,6 @@ from lansenger_cli.commands import (
     staff as staff_cmd,
     department as department_cmd,
     calendar as calendar_cmd,
-    todo as todo_cmd,
     oauth as oauth_cmd,
     callback as callback_cmd,
     media as media_cmd,
@@ -19,10 +18,6 @@ from lansenger_cli.commands import (
     chat as chat_cmd,
     bot_command as bot_command_cmd,
     personal_app as personal_app_cmd,
-    notice as notice_cmd,
-    questionnaire as questionnaire_cmd,
-    boardroom as boardroom_cmd,
-    personal_todo as personal_todo_cmd,
     videoconference as videoconference_cmd,
 )
 
@@ -39,7 +34,6 @@ app.add_typer(group_cmd.app, name="group")
 app.add_typer(staff_cmd.app, name="staff")
 app.add_typer(department_cmd.app, name="department")
 app.add_typer(calendar_cmd.app, name="calendar")
-app.add_typer(todo_cmd.app, name="todo")
 app.add_typer(oauth_cmd.app, name="oauth")
 app.add_typer(callback_cmd.app, name="callback")
 app.add_typer(media_cmd.app, name="media")
@@ -48,10 +42,6 @@ app.add_typer(chat_cmd.app, name="chat")
 app.add_typer(health_cmd.app, name="health")
 app.add_typer(bot_command_cmd.app, name="bot-command")
 app.add_typer(personal_app_cmd.app, name="personal-app")
-app.add_typer(notice_cmd.app, name="notice")
-app.add_typer(questionnaire_cmd.app, name="questionnaire")
-app.add_typer(boardroom_cmd.app, name="boardroom")
-app.add_typer(personal_todo_cmd.app, name="personal-todo")
 app.add_typer(videoconference_cmd.app, name="videoconference")
 
 

@@ -327,3 +327,50 @@ def test_member_json_must_be_a_list():
     ])
     assert result.exit_code != 0
     assert "JSON list" in result.output
+
+
+def test_member_flag_rejects_non_object_entries():
+    """--member '["u1"]' 必须给出友好报错，而不是抛 AttributeError traceback。"""
+    result = runner.invoke(app, [
+        "videoconference", "create", "周会", "org1",
+        "--start-time", "1700000000000",
+        "--member", '["u1"]',
+    ])
+    assert result.exit_code != 0
+    out = plain_text(result.output)
+    assert "JSON object" in out
+    assert "AttributeError" not in out
+    assert "Traceback" not in out
+
+
+def test_history_renders_page_items():
+    """history 的 items 之前只渲染 offset/total，表格不输出。"""
+    with patch("lansenger_cli.commands.videoconference.get_client") as gc:
+        client = MagicMock()
+        client.fetch_history_meetings.return_value = VideoconferenceListResult(
+            success=True, offset=0, total=2,
+            items=[
+                {"id": 1380079, "subject": "周会", "status": 0, "startTime": 1790233200000},
+                {"id": 1380080, "subject": "评审", "status": 1, "startTime": 1790236800000},
+            ],
+        )
+        gc.return_value = client
+        result = runner.invoke(app, ["videoconference", "history", "org1", "u1"])
+    assert result.exit_code == 0, result.output
+    out = plain_text(result.output)
+    assert "周会" in out and "评审" in out
+    assert "subject" in out
+
+
+def test_active_renders_page_items():
+    with patch("lansenger_cli.commands.videoconference.get_client") as gc:
+        client = MagicMock()
+        client.fetch_active_meetings.return_value = VideoconferenceListResult(
+            success=True, offset=0, total=1,
+            items=[{"id": 1380079, "subject": "站会", "status": 0, "startTime": 1790233200000}],
+        )
+        gc.return_value = client
+        result = runner.invoke(app, ["videoconference", "active", "org1", "u1"])
+    assert result.exit_code == 0, result.output
+    out = plain_text(result.output)
+    assert "站会" in out

@@ -2,7 +2,7 @@
 
 # Lansenger CLI
 
-Outil en ligne de commande Lansenger — interagissez avec les API Lansenger directement depuis le terminal : envoyez des messages, gérez des groupes, interrogez le personnel/les départements, gérez les calendriers et les tâches, et plus encore.
+Outil en ligne de commande Lansenger — interagissez avec les API Lansenger directement depuis le terminal : envoyez des messages, gérez des groupes, interrogez le personnel/les départements, gérez les calendriers, et plus encore.
 
 ## Installation
 
@@ -82,13 +82,8 @@ lansenger health check
 | `staff` | Interroger les infos du personnel | `basic-info`, `detail`, `ancestors`, `id-mapping`, `org-extra-fields`, `search`, `org-info` |
 | `department` | Interroger les départements | `detail`, `children`, `staffs` |
 | `calendar` | Calendrier et planification | `primary`, `create-schedule`, `fetch-schedule`, `delete-schedule`, `list-schedules`, `attendees`, `add-attendees`, `delete-attendees`, `update-attendees`, `update-schedule`, `attendee-meta` |
-| `todo` | Gestion des tâches | `create`, `update`, `update-status`, `delete`, `list`, `fetch-by-source`, `fetch-by-id`, `status-counts`, `executor-status`, `add-executors`, `delete-executors`, `executor-list` |
 | `bot-command` | Commandes de bot | `create`, `query`, `delete` |
 | `personal-app` | Applications personnelles | `create`, `update`, `info`, `delete`, `list` |
-| `notice` | Notifications via comptes officiels (通知系统) | `send`, `accounts` |
-| `questionnaire` | Questionnaires (问卷系统) | `save`, `save-questions`, `publish`, `withdraw`, `finish`, `delete`, `detail`, `brief`, `accounts`, `created-list`, `answers`, `answer-detail`, `answer-data`, `upload-url`, ... |
-| `boardroom` | Réservation de salles (会议室预定 V2) | `rooms`, `room-detail`, `schedule`, `reserve-detail`, `reserve`, `edit-reserve`, `cancel`, `confirm-sign`, `my-reserves`, `gradings`, `area-offices` |
-| `personal-todo` | Todos personnels (个人待办) | `save`, `update`, `list`, `upload-resource`, `download-url`, `upload-url` |
 | `oauth` | Authentification OAuth2 | `authorize-url`, `exchange-code`, `refresh-token`, `user-info`, `parse-callback`, `validate-state` |
 | `callback` | Analyse des événements callback | `parse-payload`, `decrypt-payload`, `verify-signature`, `event-types` |
 | `media` | Opérations sur les fichiers média | `upload`, `upload-app`, `download`, `download-to-file` |
@@ -268,23 +263,6 @@ lansenger calendar fetch-schedule cal001 schedule001 --user-token YOUR_TOKEN
 lansenger calendar delete-schedule cal001 schedule001 --user-token YOUR_TOKEN
 ```
 
-### Tâches
-
-```bash
-# Créer une tâche
-lansenger todo create "Approuver document" https://app.com/doc https://app.com/doc \
-  "staff001,staff002" org001 --desc "À réviser" --type 2
-
-# Mettre à jour le statut (11=non lu, 12=lu, 21=en attente, 22=fait)
-lansenger todo update-status task001 22 org001
-
-# Lister les tâches
-lansenger todo list org001 --status 21,22
-
-# Supprimer une tâche
-lansenger todo delete task001 org001
-```
-
 ### Authentification OAuth2
 
 ```bash
@@ -340,42 +318,6 @@ lansenger streaming create user123 single stream-session-001
 lansenger streaming fetch MSG_ID
 ```
 
-### Boardroom (会议室预定 V2)
-
-```bash
-# Find visible gradings (gradingId source), then rooms
-lansenger boardroom gradings
-lansenger boardroom rooms --grading-id g1 --date 2026-07-22
-
-# Reserve a room (status: 0审批中 1待扫码确认 5预定成功 ...)
-lansenger boardroom reserve room1 "项目周会" \
-  --grading-id g1 --start "2026-07-22 09:00:00" --end "2026-07-22 10:00:00" \
-  --notice-time "会前15分钟" --people 10
-
-# Daily schedule / cancel (gated) / confirm
-lansenger boardroom schedule room1 2026-07-22 --grading-id g1
-lansenger boardroom cancel res1 --dry-run
-lansenger boardroom cancel res1 --yes --reason "改期"
-```
-
-### Todos personnels (个人待办)
-
-```bash
-# Créer un todo personnel
-lansenger personal-todo save "Terminer le projet" staff001 org001 app001 \
-  --start-time 1719792000000 --due-time 1720195200000 --priority 1 \
-  --executors '[{"staffId":"staff001","opt":1}]'
-
-# Mettre à jour et lister les todos
-lansenger personal-todo update TASK001 org001 --update-fields "subject,dueTime" \
-  --subject "Terminer la version finale" --due-time 1720377600000
-lansenger personal-todo list org001 staff001 --status 0
-
-# Gérer les pièces jointes
-lansenger personal-todo upload-resource app001 a.pdf application/pdf org001 --file ./a.pdf
-lansenger personal-todo upload-url a.pdf MD5 10240 org001
-```
-
 ### Visioconférence (视频会议开放能力)
 
 ```bash
@@ -402,49 +344,6 @@ lansenger videoconference vod-download org1 staff001 --vods '[{"vodId":"v1"}]'
 
 # Configuration organisationnelle (PRS >=3.8)
 lansenger videoconference org-conf org1
-```
-
-### Questionnaires (问卷系统)
-
-```bash
-# Find manageable office accounts (the "code" column is the accountCode)
-lansenger questionnaire accounts
-
-# Create a questionnaire, add questions, publish
-lansenger questionnaire save "2026年度员工满意度调查" ACC001 --welcome "欢迎参加"
-lansenger questionnaire save-questions QN001 --questions '[
-  {"questionName":"您对当前工作环境是否满意？","questionType":"radio","requiredFlag":1,
-   "questionOptionList":[{"optionName":"非常满意","optionOrder":1}]}]'
-lansenger questionnaire publish QN001 --scope 1 --staff-ids "U10001,U10002"
-
-# Analyze answers
-lansenger questionnaire answers ACC001 QN001
-lansenger questionnaire answer-detail ACC001 AR20260101000001
-```
-
-### Notifications (通知系统)
-
-```bash
-# Trouver les comptes officiels (la colonne "code" est le accountCode)
-lansenger notice accounts --org-id org001
-
-# Envoyer une notification texte ciblée par téléphone (max 10)
-lansenger notice send "关于系统升级的通知" ACC001 \
-  --content "系统将于本周六进行升级维护" \
-  --release-phones "13800138000,13800138001" \
-  --create-mobile "13800138000" \
-  --confirm-flag 1
-
-# Ou cibler staff/départements (max 200)
-lansenger notice send "部门通知" ACC001 \
-  --user-type 2 \
-  --content "请及时填写本周周报" \
-  --release-range '[{"objId":"dept-1","objName":"研发部","objType":2}]' \
-  --cc-staff-ids "staff-002" \
-  --create-user-id "staff-001"
-
-# Avec --as / --user-token, --create-mobile / --create-user-id peuvent être omis
-lansenger --as staff001 notice send "通知" ACC001 --content "..." --release-phones "138..."
 ```
 
 ## Options globales
@@ -552,7 +451,6 @@ La plateforme Lansenger propose trois types d'identité avec différents accès 
 | `staff *` (contacts lecture seule) | N | **Y** | **Y** | `search` nécessite en plus userToken |
 | `department *` | N | **Y** | **Y** | Applications niveau organisation uniquement |
 | `calendar *` | N | **Y** | **Y** | Avec userToken = identité utilisateur ; sans = identité robot |
-| `todo *` | N | **Y** | **Y** | Applications niveau organisation uniquement |
 | `chat list/messages` | N | **Y** | **Y** | Applications niveau organisation uniquement |
 | `group *` (gestion de groupes V2) | N | N | **Y** | Nécessite que le robot soit dans le groupe |
 | `media upload` | **Y** | **Y** | **Y** | Téléchargement général |
@@ -566,7 +464,7 @@ La plateforme Lansenger propose trois types d'identité avec différents accès 
 
 > **Robot personnel** ne peut qu'envoyer/recevoir des messages et télécharger des fichiers. Ne peut pas accéder aux contacts, calendriers ou OAuth2.
 >
-> **App Org vs App Org + Robot** : Même appID/appSecret. La seule différence réside dans les canaux de messagerie — seuls les robots peuvent envoyer des DM robot et des messages de groupe (car seuls les robots peuvent rejoindre des groupes). Toutes les autres API (contacts, calendrier, tâches, conversations, OAuth2, streaming) fonctionnent de manière identique pour les deux. Actuellement, seules les apps auto-hébergées supportent la capacité robot.
+> **App Org vs App Org + Robot** : Même appID/appSecret. La seule différence réside dans les canaux de messagerie — seuls les robots peuvent envoyer des DM robot et des messages de groupe (car seuls les robots peuvent rejoindre des groupes). Toutes les autres API (contacts, calendrier, conversations, OAuth2, streaming) fonctionnent de manière identique pour les deux. Actuellement, seules les apps auto-hébergées supportent la capacité robot.
 
 ### Permissions du Centre Développeur
 

@@ -27,6 +27,11 @@ def _json_list(value: str, name: str) -> list:
 
 
 def _require_members_with_host(members: list):
+    for m in members:
+        if not isinstance(m, dict):
+            raise typer.BadParameter(
+                'each --member entry must be a JSON object, e.g. \'{"staffId":"u1","employeeName":"A","role":"admin"}\''
+            )
     hosts = [m for m in members if str(m.get("role", "")) == "admin"]
     if len(hosts) != 1:
         raise typer.BadParameter(
@@ -34,16 +39,49 @@ def _require_members_with_host(members: list):
         )
 
 
+# 自动推断列时优先展示的字段，其次才按服务端返回顺序补齐。
+_PREFERRED_ITEM_KEYS = (
+    "id", "mid", "meetingNumber", "subject", "name", "employeeName", "staffId",
+    "startTime", "endTime", "ctime", "mtime", "status", "type", "duration",
+    "size", "vodId", "msgId", "adminName", "ownerName",
+)
+_MAX_AUTO_COLUMNS = 6
+_MAX_CELL_CHARS = 40
+
+
+def _auto_columns(item: dict, max_cols: int = _MAX_AUTO_COLUMNS) -> list:
+    """从一条记录推断表格列：优先业务字段，剔除凭据类字段，并限制列数。"""
+    keys = [
+        k for k in item.keys()
+        if "password" not in str(k).lower() and "secret" not in str(k).lower()
+    ]
+    columns = [k for k in _PREFERRED_ITEM_KEYS if k in keys]
+    for key in keys:
+        if len(columns) >= max_cols:
+            break
+        if key not in columns:
+            columns.append(key)
+    return columns[:max_cols]
+
+
+def _clip(value, limit: int = _MAX_CELL_CHARS) -> str:
+    text = "" if value is None else str(value)
+    return text if len(text) <= limit else text[: limit - 1] + "…"
+
+
 def _print_page_items(items, columns=None, row_mapper=None, title="Result"):
     if not items or is_json_output():
         return
     if columns is None:
-        columns = list(items[0].keys())
-        return
+        first = items[0]
+        if not isinstance(first, dict) or not first:
+            # 标量列表或空对象：交给 output_result 的总量信息即可，不臆造表格列。
+            return
+        columns = _auto_columns(first)
 
     def safe_mapper(item):
         mapper = row_mapper or (lambda i: [i.get(c, "") for c in columns])
-        return [str(v) if v is not None else "" for v in mapper(item)]
+        return [_clip(v) for v in mapper(item)]
 
     output_list(items, columns=columns, title=title, row_mapper=safe_mapper)
 

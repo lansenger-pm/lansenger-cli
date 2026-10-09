@@ -2,7 +2,7 @@
 
 # Lansenger CLI
 
-Lansenger command-line tool — interact with Lansenger APIs directly from the terminal: send messages, manage groups, query staff/departments, operate calendars and todos, and more.
+Lansenger command-line tool — interact with Lansenger APIs directly from the terminal: send messages, manage groups, query staff/departments, operate calendars, and more.
 
 ## Install
 
@@ -82,13 +82,8 @@ lansenger health check
 | `staff` | Query staff info | `basic-info`, `detail`, `ancestors`, `id-mapping`, `org-extra-fields`, `search`, `org-info` |
 | `department` | Query department info | `detail`, `children`, `staffs` |
 | `calendar` | Calendar & schedule | `primary`, `create-schedule`, `fetch-schedule`, `delete-schedule`, `list-schedules`, `attendees`, `add-attendees`, `delete-attendees`, `update-attendees`, `update-schedule`, `attendee-meta` |
-| `todo` | Todo task management | `create`, `update`, `update-status`, `delete`, `list`, `fetch-by-source`, `fetch-by-id`, `status-counts`, `executor-status`, `add-executors`, `delete-executors`, `executor-list` |
 | `bot-command` | Bot slash commands | `create`, `query`, `delete` |
 | `personal-app` | Personal apps/bots | `create`, `update`, `info`, `delete`, `list` |
-| `notice` | Notices via official accounts (通知系统) | `send`, `accounts` |
-| `questionnaire` | Questionnaires (问卷系统) | `save`, `save-questions`, `publish`, `withdraw`, `finish`, `delete`, `detail`, `brief`, `accounts`, `created-list`, `answers`, `answer-detail`, `answer-data`, `upload-url`, ... |
-| `boardroom` | Meeting-room reservation (会议室预定 V2) | `rooms`, `room-detail`, `schedule`, `reserve-detail`, `reserve`, `edit-reserve`, `cancel`, `confirm-sign`, `my-reserves`, `gradings`, `area-offices` |
-| `personal-todo` | User-owned personal todos (个人待办) | `save`, `update`, `list`, `upload-resource`, `download-url`, `upload-url` |
 | `videoconference` | Videoconference open APIs (视频会议开放能力) | `create`, `modify`, `cancel`, `stop`, `detail`, `list`, `record-list`, `simplerecord`, `fixroom-list`, `status`, `subscribe`, `params`, `history`, `active`, `member-control`, `invite`, `member-list`, `vod-list`, `vod-download`, `org-conf` |
 | `oauth` | OAuth2 user auth | `authorize-url`, `exchange-code`, `refresh-token`, `user-info`, `parse-callback`, `validate-state` |
 | `callback` | Callback event parsing | `parse-payload`, `decrypt-payload`, `verify-signature`, `event-types` |
@@ -269,23 +264,6 @@ lansenger calendar fetch-schedule cal001 schedule001 --user-token YOUR_TOKEN
 lansenger calendar delete-schedule cal001 schedule001 --user-token YOUR_TOKEN
 ```
 
-### Todo Tasks
-
-```bash
-# Create todo
-lansenger todo create "Approve Document" https://app.com/doc https://app.com/doc \
-  "staff001,staff002" org001 --desc "Please review" --type 2
-
-# Update todo status (11=unread, 12=read, 21=pending, 22=done)
-lansenger todo update-status task001 22 org001
-
-# List todos
-lansenger todo list org001 --status 21,22
-
-# Delete todo
-lansenger todo delete task001 org001
-```
-
 ### OAuth2 User Auth
 
 ```bash
@@ -341,42 +319,6 @@ lansenger streaming create user123 single stream-session-001
 lansenger streaming fetch MSG_ID
 ```
 
-### Boardroom (会议室预定 V2)
-
-```bash
-# Find visible gradings (gradingId source), then rooms
-lansenger boardroom gradings
-lansenger boardroom rooms --grading-id g1 --date 2026-07-22
-
-# Reserve a room (status: 0审批中 1待扫码确认 5预定成功 ...)
-lansenger boardroom reserve room1 "项目周会" \
-  --grading-id g1 --start "2026-07-22 09:00:00" --end "2026-07-22 10:00:00" \
-  --notice-time "会前15分钟" --people 10
-
-# Daily schedule / cancel (gated) / confirm
-lansenger boardroom schedule room1 2026-07-22 --grading-id g1
-lansenger boardroom cancel res1 --dry-run
-lansenger boardroom cancel res1 --yes --reason "改期"
-```
-
-### Personal Todos (个人待办)
-
-```bash
-# Create a personal todo
-lansenger personal-todo save "完成项目方案" staff001 org001 app001 \
-  --start-time 1719792000000 --due-time 1720195200000 --priority 1 \
-  --executors '[{"staffId":"staff001","opt":1}]'
-
-# Update selected fields and query the user's todos
-lansenger personal-todo update TASK001 org001 --update-fields "subject,dueTime" \
-  --subject "完成项目最终方案" --due-time 1720377600000
-lansenger personal-todo list org001 staff001 --status 0
-
-# Manage attachments
-lansenger personal-todo upload-resource app001 a.pdf application/pdf org001 --file ./a.pdf
-lansenger personal-todo upload-url a.pdf MD5 10240 org001
-```
-
 ### Videoconference (视频会议开放能力)
 
 ```bash
@@ -403,49 +345,6 @@ lansenger videoconference vod-download org1 staff001 --vods '[{"vodId":"v1"}]'
 
 # Org config (PRS >=3.8)
 lansenger videoconference org-conf org1
-```
-
-### Questionnaires (问卷系统)
-
-```bash
-# Find manageable office accounts (the "code" column is the accountCode)
-lansenger questionnaire accounts
-
-# Create a questionnaire, add questions, publish
-lansenger questionnaire save "2026年度员工满意度调查" ACC001 --welcome "欢迎参加"
-lansenger questionnaire save-questions QN001 --questions '[
-  {"questionName":"您对当前工作环境是否满意？","questionType":"radio","requiredFlag":1,
-   "questionOptionList":[{"optionName":"非常满意","optionOrder":1}]}]'
-lansenger questionnaire publish QN001 --scope 1 --staff-ids "U10001,U10002"
-
-# Analyze answers
-lansenger questionnaire answers ACC001 QN001
-lansenger questionnaire answer-detail ACC001 AR20260101000001
-```
-
-### Notices (通知系统)
-
-```bash
-# Find official accounts (the "code" column is the accountCode)
-lansenger notice accounts --org-id org001
-
-# Send a text notice to phones (max 10)
-lansenger notice send "关于系统升级的通知" ACC001 \
-  --content "系统将于本周六进行升级维护" \
-  --release-phones "13800138000,13800138001" \
-  --create-mobile "13800138000" \
-  --confirm-flag 1
-
-# Or target staff/departments (max 200)
-lansenger notice send "部门通知" ACC001 \
-  --user-type 2 \
-  --content "请及时填写本周周报" \
-  --release-range '[{"objId":"dept-1","objName":"研发部","objType":2}]' \
-  --cc-staff-ids "staff-002" \
-  --create-user-id "staff-001"
-
-# --as auto-fills --create-user-id; --user-token alone does not replace creator fields
-lansenger --as staff001 notice send "通知" ACC001 --content "..." --release-phones "138..."
 ```
 
 ## Global Options
@@ -553,7 +452,6 @@ The Lansenger platform has three identity types with different API access:
 | `staff *` (contacts read-only) | N | **Y** | **Y** | `search` additionally requires userToken |
 | `department *` | N | **Y** | **Y** | Org-level apps only |
 | `calendar *` | N | **Y** | **Y** | With userToken = user identity; without = bot identity |
-| `todo *` | N | **Y** | **Y** | Org-level apps only |
 | `chat list/messages` | N | **Y** | **Y** | Org-level apps only |
 | `group *` (group management V2) | N | N | **Y** | Requires bot to be in group |
 | `media upload` | **Y** | **Y** | **Y** | General upload |
@@ -566,7 +464,7 @@ The Lansenger platform has three identity types with different API access:
 
 > **Personal Bot** can only send/receive messages and upload/download files. Cannot access contacts, groups, calendars, or OAuth2.
 >
-> **Org App vs Org App + Bot**: Same appID/appSecret. The only difference is messaging channels — only bots can send bot DMs and group messages (because only bots can join groups). All other APIs (contacts, calendar, todo, chat, OAuth2, streaming) work identically for both. Currently only self-built apps support bot capability.
+> **Org App vs Org App + Bot**: Same appID/appSecret. The only difference is messaging channels — only bots can send bot DMs and group messages (because only bots can join groups). All other APIs (contacts, calendar, chat, OAuth2, streaming) work identically for both. Currently only self-built apps support bot capability.
 
 ### Developer Center Permissions
 

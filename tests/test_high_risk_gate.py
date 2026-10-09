@@ -62,14 +62,6 @@ def test_update_members_remove_requires_yes():
     mock_client.update_group_members.assert_not_called()
 
 
-def test_todo_delete_without_yes_exits_10():
-    runner = CliRunner()
-    with patch("lansenger_cli.commands.todo.get_client") as gc:
-        result = runner.invoke(app, ["todo", "delete", "t1", "org1"])
-    assert result.exit_code == 10
-    gc.assert_not_called()
-
-
 def test_calendar_delete_schedule_without_yes_exits_10():
     runner = CliRunner()
     with patch("lansenger_cli.commands.calendar.get_client") as gc:

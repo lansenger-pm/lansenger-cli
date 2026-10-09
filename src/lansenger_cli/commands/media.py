@@ -2,7 +2,8 @@ import typer
 import json
 from rich import print as rprint
 
-from lansenger_cli.utils import get_client, output_result, is_json_output
+from lansenger_cli.utils import EXIT_ERROR, get_client, is_json_output, output_result
+from lansenger_sdk import LansengerFileError
 
 app = typer.Typer(help="Upload and download media files")
 
@@ -78,9 +79,18 @@ def download_media_to_file(
 ):
     """Download media to local file"""
     client = get_client()
-    saved_path = client.download_media_to_file(
-        media_id=media_id, target_path=target_path, media_type=media_type,
-    )
+    try:
+        saved_path = client.download_media_to_file(
+            media_id=media_id, target_path=target_path, media_type=media_type,
+        )
+    except LansengerFileError as exc:
+        # download_media_to_file 按文档契约在失败时抛异常（与返回结果对象的
+        # download_media 不同），CLI 必须把它转成友好错误而不是打印 traceback。
+        if is_json_output():
+            rprint(json.dumps({"success": False, "saved_path": "", "error": str(exc)}, ensure_ascii=False, indent=2))
+        else:
+            rprint(f"[red]Error:[/red] {exc}")
+        raise SystemExit(EXIT_ERROR) from None
     if is_json_output():
         rprint(json.dumps({"saved_path": saved_path}, ensure_ascii=False))
         return
