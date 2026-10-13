@@ -84,7 +84,7 @@ lansenger health check
 | `calendar` | 行事曆操作 | `primary`, `create-schedule`, `fetch-schedule`, `delete-schedule`, `list-schedules`, `attendees`, `add-attendees`, `delete-attendees`, `update-attendees`, `update-schedule`, `attendee-meta` |
 | `bot-command` | 機器人命令 | `create`, `query`, `delete` |
 | `personal-app` | 個人應用 | `create`, `update`, `info`, `delete`, `list` |
-| `oauth` | OAuth2 使用者認證 | `authorize-url`, `exchange-code`, `refresh-token`, `user-info`, `parse-callback`, `validate-state` |
+| `oauth` | OAuth2 使用者認證 | `authorize-url`, `device-authorize`, `device-login`, `device-poll`, `exchange-code`, `local-callback`, `refresh-token`, `user-info`, `parse-callback`, `validate-state` |
 | `callback` | 回呼事件解析 | `parse-payload`, `decrypt-payload`, `verify-signature`, `event-types` |
 | `media` | 媒體檔案操作 | `upload`, `upload-app`, `download`, `download-to-file` |
 | `streaming` | 串流訊息（AI 場景） | `create`, `fetch` |
@@ -277,6 +277,13 @@ lansenger oauth refresh-token YOUR_REFRESH_TOKEN
 
 # 取得使用者資訊
 lansenger oauth user-info YOUR_USER_TOKEN
+
+# 裝置碼登入——無頭/遠端友善（無需本機回呼伺服器）；需新版開放平台，舊版會提示回退方案
+lansenger oauth device-login
+
+# 腳本/Agent 可用的底層步驟
+lansenger oauth device-authorize
+lansenger oauth device-poll DEVICE_CODE --wait
 ```
 
 ### 回呼事件

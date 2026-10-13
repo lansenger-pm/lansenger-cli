@@ -6,6 +6,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [0.15.0] - 2026-10-13
+
+### Added
+
+- OAuth2 设备码授权（deviceflow，新版开平）三个命令：`oauth device-authorize` / `oauth device-poll`（可 `--wait`）/ `oauth device-login`（一条式：申请设备码 → 浏览器授权 → 轮询 → 兑换 → 自动落库，无头/远程环境无需本地回调服务器）。旧版开平自动降级：`error_type="deviceflow_unsupported"` + 回退指引（authorize-url / local-callback），退出码契约 0/1/10 不变。
+- `oauth device-authorize` / `oauth device-login` 新增 `--from`（AutoClaw/CLI/OpenClaw/MCP，默认 CLI）。
+
+### Changed
+
+- **dep**: `lansenger-sdk` 下限提到 `>=1.12.0`（deviceflow 协议层在 SDK；**发布顺序：先发 SDK 1.12.0 到 PyPI，再合入本版**，否则 CI 解析依赖失败）。
+- README 命令总览表补上此前遗漏的 `local-callback`（历史漂移修正）。
+
 ## [0.14.0] - 2026-10-09
 
 ### Changed

@@ -2,6 +2,7 @@ import typer
 import json
 import subprocess
 import time
+import webbrowser
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.parse import urlparse, parse_qs
 from rich import print as rprint
@@ -11,6 +12,9 @@ from lansenger_cli.utils import get_client, get_store, output_result, is_json_ou
 
 console = Console()
 app = typer.Typer(help="OAuth2 user authentication operations")
+
+_sleep = time.sleep  # patchable for tests (device flow polling)
+_monotonic = time.monotonic  # patchable for tests (deadline checks)
 
 
 def _copy_to_clipboard(text: str) -> bool:
@@ -241,3 +245,156 @@ def local_callback(
         else:
             rprint("\n[cyan]Use this code to exchange manually:[/cyan]")
             rprint(f"  lansenger oauth exchange-code {code} --redirect-uri {redirect_uri}")
+
+
+# --- OAuth2 device flow (新版开平；旧版自动降级，见 docs/action-boundary.md) ---
+
+
+@app.command("device-authorize")
+def device_authorize(
+    client_id: str = typer.Option("", "--client-id", help="OAuth2 clientId (default: app_id)"),
+    source: str = typer.Option("CLI", "--from", help="Client source: AutoClaw/CLI/OpenClaw/MCP"),
+):
+    """Request a device code (device flow step 1)."""
+    client = get_client()
+    result = client.request_device_authorization(client_id=client_id, source=source)
+    if not result.success and not is_json_output() and result.error_type == "deviceflow_unsupported":
+        rprint("[dim]Fallback: lansenger oauth authorize-url <redirect_uri>  |  lansenger oauth local-callback[/dim]")
+    output_result(
+        result,
+        fields=[
+            "device_code", "user_code", "verification_uri_complete",
+            "interval", "expires_in", "expires_at", "open_api_domain",
+        ],
+        title="Device Authorization",
+    )
+    if not is_json_output():
+        rprint(f"\n[yellow]Open:[/yellow] {result.verification_uri_complete}")
+        rprint(f"[yellow]userCode:[/yellow] [bold]{result.user_code}[/bold]")
+        if _copy_to_clipboard(result.verification_uri_complete):
+            rprint("[dim](verification URL copied to clipboard)[/dim]")
+
+
+@app.command("device-poll")
+def device_poll(
+    device_code: str = typer.Argument(help="deviceCode from device-authorize"),
+    client_id: str = typer.Option("", "--client-id", help="OAuth2 clientId (default: app_id)"),
+    wait: bool = typer.Option(False, "--wait", help="Poll every 5s until approved/denied/expired"),
+    timeout: int = typer.Option(600, "--timeout", "-t", help="Max wait seconds when --wait"),
+):
+    """Poll once (or with --wait) for the device authorization outcome.
+
+    Exit codes: 0 = pending/approved (oauth2_code on approved), 1 = denied/
+    expired/error. Scripts should prefer single polls with their own loop.
+    """
+    client = get_client()
+    deadline = _monotonic() + timeout
+    while True:
+        result = client.poll_device_token(device_code, client_id=client_id)
+        if not (result.success and result.state == "authorization_pending" and wait):
+            break
+        if _monotonic() >= deadline:
+            if is_json_output():
+                import sys
+
+                print(json.dumps({"ok": False, "error": {"type": "timeout", "message": f"still pending after {timeout}s"}}, ensure_ascii=False), file=sys.stderr)
+            else:
+                rprint(f"[red]Timeout: still pending after {timeout}s[/red]")
+            raise typer.Exit(1)
+        _sleep(5)
+    output_result(result, fields=["state", "oauth2_code"], title="Device Poll")
+
+
+@app.command("device-login")
+def device_login(
+    client_id: str = typer.Option("", "--client-id", help="OAuth2 clientId (default: app_id)"),
+    source: str = typer.Option("CLI", "--from", help="Client source: AutoClaw/CLI/OpenClaw/MCP"),
+    no_browser: bool = typer.Option(False, "--no-browser", help="Do not auto-open the verification URL"),
+    timeout: int = typer.Option(600, "--timeout", "-t", help="Max wait seconds for user approval"),
+):
+    """One-shot device flow login: request → verify in browser → poll → exchange → save.
+
+    Works on headless/remote hosts (no localhost callback needed). Legacy
+    open platforms without deviceflow exit 1 with a fallback hint.
+    """
+    client = get_client()
+    auth = client.request_device_authorization(client_id=client_id, source=source)
+    if not auth.success:
+        if not is_json_output() and auth.error_type == "deviceflow_unsupported":
+            rprint("[dim]Fallback: lansenger oauth authorize-url <redirect_uri>  |  lansenger oauth local-callback[/dim]")
+        output_result(auth, fields=["error", "error_type"], title="Device Login Failed")
+
+    interval = max(1, auth.interval or 5)
+    deadline = _monotonic() + timeout
+    if is_json_output():
+        import sys
+
+        event = {
+            "event": "device_authorization",
+            "device_code": auth.device_code,
+            "user_code": auth.user_code,
+            "verification_uri_complete": auth.verification_uri_complete,
+            "interval": interval,
+            "expires_in": auth.expires_in,
+        }
+        print(json.dumps(event, ensure_ascii=False), file=sys.stderr)
+    else:
+        rprint(f"[green]1. Open:[/green] {auth.verification_uri_complete}")
+        rprint(f"[green]   userCode:[/green] [bold]{auth.user_code}[/bold]")
+        if _copy_to_clipboard(auth.verification_uri_complete):
+            rprint("[dim](URL copied to clipboard)[/dim]")
+        rprint("[yellow]2. Waiting for approval…[/yellow] (Ctrl+C to cancel)")
+    if not no_browser and auth.verification_uri_complete:
+        try:
+            webbrowser.open(auth.verification_uri_complete)
+        except Exception:
+            pass
+
+    poll = None
+    try:
+        while True:
+            if _monotonic() >= deadline:
+                if is_json_output():
+                    import sys
+
+                    print(json.dumps({"ok": False, "error": {"type": "timeout", "message": f"timeout after {timeout}s"}}, ensure_ascii=False), file=sys.stderr)
+                else:
+                    rprint(f"[red]Timeout: no approval within {timeout}s[/red]")
+                raise typer.Exit(1)
+            poll = client.poll_device_token(auth.device_code, client_id=client_id)
+            if poll.success and poll.state == "authorization_pending":
+                _sleep(interval)
+                continue
+            break
+    except KeyboardInterrupt:
+        if is_json_output():
+            import sys
+
+            print(json.dumps({"ok": False, "error": {"type": "cancelled", "message": "interrupted by user"}}, ensure_ascii=False), file=sys.stderr)
+        else:
+            rprint("[red]Cancelled[/red]")
+        raise typer.Exit(1) from None
+
+    if not poll.success:
+        output_result(poll, fields=["state", "error"], title="Device Approval")
+    if not is_json_output():
+        rprint("[green]✓ Approved — exchanging code…[/green]")
+
+    exchange = client.exchange_code(code=poll.oauth2_code)
+    if exchange.success and exchange.user_token:
+        store = get_store()
+        existing = store.load_user_token()
+        rt = exchange.refresh_token or existing.get("refresh_token", "")
+        store.save_user_token(
+            exchange.user_token, rt,
+            exchange.expires_in, 300,
+            exchange.refresh_expires_in or 0,
+            staff_id=exchange.staff_id or "",
+        )
+        if not is_json_output():
+            rprint("[green]✓ userToken obtained and saved (use --as to act as this user)[/green]")
+    output_result(
+        exchange,
+        fields=["user_token", "expires_in", "refresh_token", "refresh_expires_in", "staff_id", "scope"],
+        title="Device Login",
+    )
