@@ -84,7 +84,7 @@ lansenger health check
 | `calendar` | Calendrier et planification | `primary`, `create-schedule`, `fetch-schedule`, `delete-schedule`, `list-schedules`, `attendees`, `add-attendees`, `delete-attendees`, `update-attendees`, `update-schedule`, `attendee-meta` |
 | `bot-command` | Commandes de bot | `create`, `query`, `delete` |
 | `personal-app` | Applications personnelles | `create`, `update`, `info`, `delete`, `list` |
-| `oauth` | Authentification OAuth2 | `authorize-url`, `exchange-code`, `refresh-token`, `user-info`, `parse-callback`, `validate-state` |
+| `oauth` | Authentification OAuth2 | `authorize-url`, `device-authorize`, `device-login`, `device-poll`, `exchange-code`, `local-callback`, `refresh-token`, `user-info`, `parse-callback`, `validate-state` |
 | `callback` | Analyse des événements callback | `parse-payload`, `decrypt-payload`, `verify-signature`, `event-types` |
 | `media` | Opérations sur les fichiers média | `upload`, `upload-app`, `download`, `download-to-file` |
 | `streaming` | Messages en streaming (IA) | `create`, `fetch` |
@@ -277,6 +277,15 @@ lansenger oauth refresh-token YOUR_REFRESH_TOKEN
 
 # Récupérer les infos utilisateur
 lansenger oauth user-info YOUR_USER_TOKEN
+
+# Connexion par code d'appareil — adaptée aux environnements headless/distants
+# (sans serveur de callback local) ; nécessite la nouvelle plateforme ouverte,
+# les anciennes versions affichent une solution de repli
+lansenger oauth device-login
+
+# Étapes de bas niveau pour scripts / agents
+lansenger oauth device-authorize
+lansenger oauth device-poll DEVICE_CODE --wait
 ```
 
 ### Événements callback

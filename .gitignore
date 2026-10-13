@@ -4,17 +4,33 @@ __pycache__/
 dist/
 *.egg-info/
 .pytest_cache/
+.ruff_cache/
+.cache/
 build/
 .DS_Store
 package/
 skills-*.tgz
-docs/
+
+# Harness 本地运行日志（verify 每次运行产生，不入库）
+harness/verify-logs/
+
+# 本地敏感值黑名单（安全门检测器数据源；含会话高危值片段，绝不入库，0600）
+harness/security-blocklist.local
+
 # Agent/IDE local files
 .trae/
 .claude/
 .cursor/
 .codex/
+# Fabric / qagent 会话运行产物（.agents/ 下的 settings 等配置如需共享可手动跟踪）
+.qagent/
+.agents/runs/
+.qax-fabric/
 
-# Agent local files
-AGENTS.md
-CLAUDE.md
+# .project/（本地项目文档根：PRD/spec/评估等）——沿用 73253e3 的「agent 工作文档不进远端」
+# 政策：其中可能含内部测试环境信息，公开仓不入库；跨仓引用已改为自描述。
+.project/
+
+# 注：AGENTS.md、docs/ 不再忽略（2026-10-13 Harness 化：AGENTS.md 现为人工维护的
+# 项目约束文档（公开安全，已审计无内部端点/凭证），与 2026-08-06 移除的会话型
+# agent 文件性质不同；release.yml 的版本校验也引用 AGENTS.md）。

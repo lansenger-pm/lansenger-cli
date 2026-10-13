@@ -85,7 +85,7 @@ lansenger health check
 | `bot-command` | Bot slash commands | `create`, `query`, `delete` |
 | `personal-app` | Personal apps/bots | `create`, `update`, `info`, `delete`, `list` |
 | `videoconference` | Videoconference open APIs (视频会议开放能力) | `create`, `modify`, `cancel`, `stop`, `detail`, `list`, `record-list`, `simplerecord`, `fixroom-list`, `status`, `subscribe`, `params`, `history`, `active`, `member-control`, `invite`, `member-list`, `vod-list`, `vod-download`, `org-conf` |
-| `oauth` | OAuth2 user auth | `authorize-url`, `exchange-code`, `refresh-token`, `user-info`, `parse-callback`, `validate-state` |
+| `oauth` | OAuth2 user auth | `authorize-url`, `device-authorize`, `device-login`, `device-poll`, `exchange-code`, `local-callback`, `refresh-token`, `user-info`, `parse-callback`, `validate-state` |
 | `callback` | Callback event parsing | `parse-payload`, `decrypt-payload`, `verify-signature`, `event-types` |
 | `media` | Media file operations | `upload`, `upload-app`, `download`, `download-to-file` |
 | `streaming` | Streaming messages (AI) | `create`, `fetch` |
@@ -278,6 +278,14 @@ lansenger oauth refresh-token YOUR_REFRESH_TOKEN
 
 # Fetch user info
 lansenger oauth user-info YOUR_USER_TOKEN
+
+# Device code login — headless/remote friendly (no localhost callback server);
+# requires the new open platform, legacy servers print a fallback hint
+lansenger oauth device-login
+
+# Low-level steps for scripts / agents
+lansenger oauth device-authorize
+lansenger oauth device-poll DEVICE_CODE --wait
 ```
 
 ### Callback Events

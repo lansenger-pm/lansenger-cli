@@ -84,7 +84,7 @@ lansenger health check
 | `calendar` | 日程操作 | `primary`, `create-schedule`, `fetch-schedule`, `delete-schedule`, `list-schedules`, `attendees`, `add-attendees`, `delete-attendees`, `update-attendees`, `update-schedule`, `attendee-meta` |
 | `bot-command` | 机器人命令 | `create`, `query`, `delete` |
 | `personal-app` | 个人应用 | `create`, `update`, `info`, `delete`, `list` |
-| `oauth` | OAuth2 用户认证 | `authorize-url`, `exchange-code`, `refresh-token`, `user-info`, `parse-callback`, `validate-state` |
+| `oauth` | OAuth2 用户认证 | `authorize-url`, `device-authorize`, `device-login`, `device-poll`, `exchange-code`, `local-callback`, `refresh-token`, `user-info`, `parse-callback`, `validate-state` |
 | `callback` | 回调事件解析 | `parse-payload`, `decrypt-payload`, `verify-signature`, `event-types` |
 | `media` | 媒体文件操作 | `upload`, `upload-app`, `download`, `download-to-file` |
 | `streaming` | 流式消息（AI 场景） | `create`, `fetch` |
@@ -277,6 +277,13 @@ lansenger oauth refresh-token YOUR_REFRESH_TOKEN
 
 # 获取用户信息
 lansenger oauth user-info YOUR_USER_TOKEN
+
+# 设备码登录——无头/远程友好（无需本地回调服务器）；需新版开放平台，旧版会提示回退方案
+lansenger oauth device-login
+
+# 脚本/Agent 可用的低层步骤
+lansenger oauth device-authorize
+lansenger oauth device-poll DEVICE_CODE --wait
 ```
 
 ### 回调事件
