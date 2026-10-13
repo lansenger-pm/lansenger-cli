@@ -385,6 +385,8 @@ def device_login(
         raise typer.Exit(1) from None
 
     if not poll.success:
+        if not is_json_output() and poll.error_type == "deviceflow_unsupported":
+            rprint("[dim]Fallback: lansenger oauth authorize-url <redirect_uri>  |  lansenger oauth local-callback[/dim]")
         output_result(poll, fields=["state", "error"], title="Device Approval")
     if not is_json_output():
         rprint("[green]✓ Approved — exchanging code…[/green]")
