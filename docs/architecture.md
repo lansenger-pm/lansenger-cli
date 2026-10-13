@@ -15,7 +15,7 @@ flowchart TD
         UTILS["utils.py<br/>全局状态 setter · get_client 工厂 · 退出码契约 0/1/10<br/>confirm_high_risk 高危门 · output_result 输出契约"]
     end
 
-    SDK["lansenger-sdk ≥ 1.11.0<br/>LansengerSyncClient · CredentialStore<br/>LansengerConfig · LansengerAuthError · LansengerConfigError"]
+    SDK["lansenger-sdk ≥ 1.12.0<br/>LansengerSyncClient · CredentialStore<br/>LansengerConfig · LansengerAuthError · LansengerConfigError"]
     API["蓝信开放 API（网关 / Passport OAuth2 / 媒体）"]
 
     TESTS["tests/（CliRunner + mock get_client）"]
@@ -51,7 +51,7 @@ flowchart TD
 | C3 | **全局选项** `--json/-j --profile/-P --as --app-token --user-token --verbose/-v` | main.py callback + utils setter | 新全局选项须加 setter + fixture 重置 + 5 README 使用说明 |
 | C4 | **输出形态** `--json` → 原始 JSON（stdout；失败信息 stderr）/ 默认 rich 表格 | utils.py `output_result` | 所有 commands 的展示代码 · README 示例（5 语言） |
 | C5 | **配置键** `~/.lansenger/sdk_state.json` 键面 + `LANSENGER_*` 环境变量名 | config.py + SDK CredentialStore | config 命令 · 5 README「配置凭据」节 · AGENTS.md 红线引用 |
-| C6 | **SDK 版本下限** `lansenger-sdk>=1.11.0` | pyproject.toml | CHANGELOG `dep:` 条目 · 全量 44 例回归 · 5 README（如有版本表述） |
+| C6 | **SDK 版本下限** `lansenger-sdk>=1.12.0` | pyproject.toml | CHANGELOG `dep:` 条目 · 全量 64 例回归 · 5 README（如有版本表述）· docs/architecture.md §2 SDK 版本 + C6 本行 |
 | C7 | **版本三元组** pyproject `version` == git tag `v*` == CHANGELOG 最新条目 | release.yml 硬校验 | 发版流程：三处同 PR 改齐，tag 在合并后打 |
 | C8 | **用户可见命令面** 命令名 / 参数 / 子命令树 | main.py 注册表 | **5 个语言版 README** 命令总览表 + 域章节 + tests 镜像；漏一份即漂移（0.14.0 移除 7 域为全量同步范例） |
 
@@ -60,9 +60,9 @@ flowchart TD
 | 层 | 本仓落位 | 现状 |
 |---|---|---|
 | T0 纯函数 | utils 的输出格式化 / 参数解析 | 隐式（经 T1 覆盖） |
-| T1 域逻辑 | `commands.<域>` 参数组装与结果处理 | 7/16 域有测试（config/health/media/videoconference/high-risk-gate/logging 等），44 例 |
+| T1 域逻辑 | `commands.<域>` 参数组装与结果处理 | 7/16 域有测试（config/health/media/videoconference/oauth/high-risk-gate/logging 等），64 例 |
 | T2 集成 | CliRunner 全局选项 + 退出码 + 高危门 | ✅ test_high_risk_gate.py / test_cli_config.py |
-| 缺口 | group/staff/department/calendar/oauth/callback/streaming/chat/bot-command/personal-app 无专门测试文件 | ⚠️ 演进项：新改动域必须补最小回归，存量渐进补齐 |
+| 缺口 | group/staff/department/calendar/callback/streaming/chat/bot-command/personal-app 无专门测试文件 | ⚠️ 演进项：新改动域必须补最小回归，存量渐进补齐 |
 
 ## 5. 运行时视图（推断）
 

@@ -10,12 +10,12 @@
 | 语言 | Python ≥ 3.10 | pyproject.toml `requires-python` |
 | CLI 框架 | typer ≥ 0.9（rich_markup_mode="rich"） | pyproject.toml + main.py |
 | 输出渲染 | rich ≥ 13 | pyproject.toml |
-| 核心依赖 | lansenger-sdk ≥ 1.11.0（同步客户端 + CredentialStore + 认证） | pyproject.toml |
+| 核心依赖 | lansenger-sdk ≥ 1.12.0（同步客户端 + CredentialStore + 认证） | pyproject.toml |
 | 构建 | setuptools ≥ 64（PEP 621）；`uv build` 实测可用 | pyproject.toml `[build-system]` |
 | 包管理 | uv（uv.lock 存在，实测 uv 0.12.5）；发布走 PyPI | uv.lock、release.yml |
 | Lint | ruff（line-length=120，select F/E/W/B，ignore E501/F401/F821/F841/B008） | pyproject.toml `[tool.ruff]` |
 | 类型检查 | 无（mypy/pyright 未配置） | 缺失 |
-| 测试 | pytest ≥ 7（实测 44 passed in 0.77s） | tests/ + 实测 |
+| 测试 | pytest ≥ 7（实测 64 passed） | tests/ + 实测 |
 | CI | GitHub Actions：ci.yml = pytest 矩阵 3.10–3.13；release.yml = tag↔pyproject 版本硬校验 + 测试 + 发布 | .github/workflows/ |
 | 运行时凭证 | 用户凭证存 `~/.lansenger/sdk_state.json`（README 声明 0600，CLI 代码未见 chmod 实现——可能由 SDK 负责，验证=人工待办） | README.md、config.py |
 
@@ -30,7 +30,7 @@ lansenger-cli/
 │   │                      #   calendar/oauth/callback/media/streaming/chat/health/
 │   │                      #   bot-command/personal-app/videoconference + __init__）
 │   ├── __init__.py / __main__.py
-├── tests/                 # 7 个测试文件（44 例），CliRunner + mock get_client 模式
+├── tests/                 # 7 个测试文件（64 例），CliRunner + mock get_client 模式
 ├── .github/workflows/     # ci.yml / release.yml
 ├── scripts/               # 【新增 Harness】verify.sh、scan_secrets.py、hooks/
 ├── docs/                  # 【新增 Harness】architecture.md、action-boundary.md
@@ -49,7 +49,7 @@ lansenger-cli/
 | 检查 | 命令 | 状态 |
 |---|---|---|
 | Lint | `uv run ruff check .` | ✅ 实测 All checks passed |
-| 单测 | `uv run --extra dev pytest -q` | ✅ 实测 44 passed |
+| 单测 | `uv run --extra dev pytest -q` | ✅ 实测 64 passed |
 | 构建 | `uv build` | ✅ 实测通过 |
 | CI 单测 | ci.yml（Python 3.10/3.11/3.12/3.13 矩阵） | ✅ 远端执行 |
 | 发版门禁 | release.yml：git tag 必须等于 pyproject version | ✅ 机制级 |
