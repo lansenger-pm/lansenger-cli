@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [0.15.1] - 2026-10-13
+
+### Fixed
+
+- `oauth device-login` 轮询阶段失败时缺少回退指引：authorize 阶段判 `deviceflow_unsupported` 会提示 `authorize-url` / `local-callback`，而 authorize 通过、轮询阶段才判不支持时只打印错误就退出 1。现两个阶段提示对称（`--json` 输出契约不变，`error_type` 一直在结果文档里）。
+
 ## [0.15.0] - 2026-10-13
 
 ### Added

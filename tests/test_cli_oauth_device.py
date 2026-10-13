@@ -246,6 +246,21 @@ def test_device_login_unsupported_json_stdout(store_mock):
     assert data["error_type"] == "deviceflow_unsupported"
 
 
+def test_device_login_poll_unsupported_fallback_hint(store_mock):
+    """authorize 通过、轮询阶段才判不支持时，也要给回退提示（与 authorize 阶段对称）。"""
+    poll_unsupported = fake_result(
+        success=False,
+        error="deviceflow unavailable (HTTP 404): route not found",
+        error_type="deviceflow_unsupported",
+    )
+    with patch("lansenger_cli.commands.oauth.get_client") as gc, \
+         patch.object(oauth_mod, "_sleep"):
+        gc.return_value = _login_client(store_mock, [poll_unsupported])
+        result = run(["oauth", "device-login", "--no-browser"])
+    assert result.exit_code == 1
+    assert "local-callback" in result.stdout
+
+
 def test_device_poll_wait_timeout_exit_1():
     """--wait 到 deadline 仍 pending → exit 1（评审 P1：不得把超时当成功）。"""
     times = iter([0, 10**9, 10**9 + 1])
