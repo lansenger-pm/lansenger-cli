@@ -18,6 +18,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **dep**: `lansenger-sdk` 下限提到 `>=1.12.0`（deviceflow 协议层在 SDK；**发布顺序：先发 SDK 1.12.0 到 PyPI，再合入本版**，否则 CI 解析依赖失败）。
 - README 命令总览表补上此前遗漏的 `local-callback`（历史漂移修正）。
 
+### Fixed
+
+- `oauth device-poll --wait` 轮询期间按 Ctrl-C 之前以信号码 130 退出（未捕获 `KeyboardInterrupt`）；现捕获并统一为退出码 1，与 `oauth device-login` 同形状，遵守 C1 0/1/10 退出码契约。
+
 ## [0.14.0] - 2026-10-09
 
 ### Changed

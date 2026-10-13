@@ -289,19 +289,28 @@ def device_poll(
     """
     client = get_client()
     deadline = _monotonic() + timeout
-    while True:
-        result = client.poll_device_token(device_code, client_id=client_id)
-        if not (result.success and result.state == "authorization_pending" and wait):
-            break
-        if _monotonic() >= deadline:
-            if is_json_output():
-                import sys
+    try:
+        while True:
+            result = client.poll_device_token(device_code, client_id=client_id)
+            if not (result.success and result.state == "authorization_pending" and wait):
+                break
+            if _monotonic() >= deadline:
+                if is_json_output():
+                    import sys
 
-                print(json.dumps({"ok": False, "error": {"type": "timeout", "message": f"still pending after {timeout}s"}}, ensure_ascii=False), file=sys.stderr)
-            else:
-                rprint(f"[red]Timeout: still pending after {timeout}s[/red]")
-            raise typer.Exit(1)
-        _sleep(5)
+                    print(json.dumps({"ok": False, "error": {"type": "timeout", "message": f"still pending after {timeout}s"}}, ensure_ascii=False), file=sys.stderr)
+                else:
+                    rprint(f"[red]Timeout: still pending after {timeout}s[/red]")
+                raise typer.Exit(1)
+            _sleep(5)
+    except KeyboardInterrupt:
+        if is_json_output():
+            import sys
+
+            print(json.dumps({"ok": False, "error": {"type": "cancelled", "message": "interrupted by user"}}, ensure_ascii=False), file=sys.stderr)
+        else:
+            rprint("[red]Cancelled[/red]")
+        raise typer.Exit(1) from None
     output_result(result, fields=["state", "oauth2_code"], title="Device Poll")
 
 

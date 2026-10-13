@@ -256,3 +256,12 @@ def test_device_poll_wait_timeout_exit_1():
         result = run(["oauth", "device-poll", "d" * 40, "--wait", "--timeout", "600"])
     assert result.exit_code == 1
     assert "pending" in result.stdout.lower()
+
+
+def test_device_poll_keyboard_interrupt_exit_1():
+    """--wait 轮询期 Ctrl-C → exit 1（遵守 C1 0/1/10；不得以信号码 130 退出）。"""
+    with patch("lansenger_cli.commands.oauth.get_client") as gc, \
+         patch.object(oauth_mod, "_sleep", side_effect=KeyboardInterrupt):
+        gc.return_value.poll_device_token.return_value = POLL_PENDING
+        result = run(["oauth", "device-poll", "d" * 40, "--wait"])
+    assert result.exit_code == 1
