@@ -14,8 +14,9 @@
 # 安装 CLI（可编辑模式）
 pip install -e .
 
-# 安装 SDK（可编辑模式，如需调试 SDK 联动）
-pip install -e ../lansenger-skills-official
+# 安装 SDK（可编辑模式，如需调试 SDK 联动；SDK 源码仓为 lansenger-sdk-python，
+# PyPI 包名 lansenger-sdk 的元数据 Homepage 错指向 skills 仓，勿按包元数据找源码）
+pip install -e ../lansenger-sdk-python
 
 # 安装开发依赖
 pip install pytest
@@ -32,6 +33,14 @@ pip install pytest
 ```bash
 pytest
 ```
+
+## AI 辅助开发（Agent Harness）
+
+本仓库已 Harness 化（七层约束栈，2026-10-13 起生效）：
+
+- Agent 入口与红线：[AGENTS.md](AGENTS.md)（平台自动加载）；行动边界：[docs/action-boundary.md](docs/action-boundary.md)
+- 提交前统一验证：`bash scripts/verify.sh`（lint + test + build + 凭证扫描，四态输出）；可选激活 pre-commit：`git config core.hooksPath scripts/hooks`
+- 踩坑回写 [KNOWLEDGE.md](KNOWLEDGE.md)；约束回归案例见 [evals/README.md](evals/README.md)
 
 ## 提交信息格式
 

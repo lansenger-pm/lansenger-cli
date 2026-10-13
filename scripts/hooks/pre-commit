@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# pre-commit 门禁（Harness ⑤验证层·提交前阻断）
+#
+# 本文件由 Bootstrap 落盘；激活属于 git 配置写入（Agent 不代做），人工执行一次：
+#   git config core.hooksPath scripts/hooks
+# 取消激活：
+#   git config --unset core.hooksPath
+set -u
+cd "$(dirname "$0")/../.."
+echo "[pre-commit] 运行统一验证：bash scripts/verify.sh"
+bash scripts/verify.sh || {
+  echo "[pre-commit] verify 未全绿（FAIL>0），提交被阻断。修复后重试，或向人工说明原因。"
+  exit 1
+}
