@@ -10,9 +10,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
-- `message reply <msg_id> --emoji TYPE_THUMB|TYPE_OK|TYPE_ADD_ONE|TYPE_FIREWORK|TYPE_LOVE|TYPE_DOUBT`：用表情回复消息（平台文档 4.6.17）。`--emoji` 只接受这六个取值：非法取值在本地拦截、给出中文错误并退出 1（`--json` 模式下结构化错误写 stderr，stdout 保持纯 JSON），不会发出任何 API 请求。
-- `message reply <msg_id> --cancel`：取消该消息上已有的表情回复（`replyType=2`），不需要 `--emoji`；既没给 `--emoji` 也没给 `--cancel` 时同样本地拦截并退出 1。
-- `message send-authorization-request`：发送授权请求消息（`authorizationReq`，平台文档 4.6.4.14），让用户授权某项权限。参数与实现完全对齐既有 `message send-account-message`（同走公众号通道，同样**不接高危门**——只有 `message revoke` 这类不可逆写才接门）：`--chat-id/-C`、`--dept/-D`、`--account-id`、`--entry-id`、`--user-token`，以及 `--type/-t`（别名 `--authorization-type`）目前只支持 `1`（位置请求授权），其他取值本地拦截并退出 1。
+- `message reply <msg_id> --emoji TYPE_THUMB|TYPE_OK|TYPE_ADD_ONE|TYPE_FIREWORK|TYPE_LOVE|TYPE_DOUBT`：用表情回复消息（平台文档 4.6.17）。`--emoji` **必填**且只接受这六个取值：非法/缺失在本地拦截、给出中文错误并退出 1（`--json` 模式下结构化错误写 stderr，stdout 保持纯 JSON），不会发出任何 API 请求。
+- `message reply <msg_id> --emoji TYPE_OK --cancel`：取消该消息上已有的这个表情回复（`replyType=2`）。**取消同样必须带 `--emoji`**——真机实测不带 `emojiId` 会被平台拒绝（`errCode=40060 消息为空或格式错误||emojiId is empty`）：平台要靠它判断取消哪一个表情。
+- `message send-authorization-request <chatId>`：给某位员工发送授权请求消息（`authorizationReq`，平台文档 4.6.4.14），让用户授权某项权限。**该 msgType 只支持「机器人 → 员工私聊」通道**——真机实测走公众号通道会被平台拒绝（`errCode=50084 非法的msgType||authorizationReq msgType only support bot-to-staff private chat`），因此只收一个 `chatId` 位置参数（员工 openId）、`--type/-t`（别名 `--authorization-type`，当前只支持 `1`=位置请求授权）与 `--ref-msg-id`（引用回复，prs5.9.0）；同样**不接高危门**（只有 `message revoke` 这类不可逆写才接门）。
 - 两条新命令的**人看文案为中文**（`--help` 说明、表格标题「表情回复」/「授权请求结果」、参数错误提示），与最近两个版本的 device 命令口径一致；机器面（`--json` 字段名 `success/reply_type/msg_id/emoji_id`、退出码 0/1/10）保持英文不变。
 
 ### Changed

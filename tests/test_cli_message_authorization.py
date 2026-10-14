@@ -47,20 +47,15 @@ def test_authorization_request_passes_all_kwargs():
         result = runner.invoke(
             app,
             [
-                "message", "send-authorization-request",
-                "--chat-id", "u1", "--dept", "d1",
-                "--account-id", "acct-1", "--entry-id", "entry-9",
-                "--type", "1", "--user-token", "ut-1",
+                "message", "send-authorization-request", "u1",
+                "--type", "1", "--ref-msg-id", "m-9",
             ],
         )
     assert result.exit_code == 0, result.output
     client.send_authorization_request.assert_called_once_with(
-        chat_ids=["u1"],
-        department_ids=["d1"],
-        account_id="acct-1",
-        entry_id="entry-9",
+        chat_id="u1",
         authorization_type=1,
-        user_token="ut-1",
+        ref_msg_id="m-9",
     )
     assert "授权请求结果" in result.output
 
@@ -69,16 +64,21 @@ def test_authorization_request_defaults_match_sdk_signature():
     client = MagicMock()
     client.send_authorization_request.return_value = _FakeAccountMessageResult()
     with patch("lansenger_cli.commands.message.get_client", return_value=client):
-        result = runner.invoke(app, ["message", "send-authorization-request"])
+        result = runner.invoke(app, ["message", "send-authorization-request", "u1"])
     assert result.exit_code == 0, result.output
     client.send_authorization_request.assert_called_once_with(
-        chat_ids=None,
-        department_ids=None,
-        account_id="",
-        entry_id="",
+        chat_id="u1",
         authorization_type=1,
-        user_token="",
+        ref_msg_id="",
     )
+
+
+def test_authorization_request_requires_a_receiver():
+    """The msgType only supports bot -> staff private chat, so a chatId is mandatory."""
+    with patch("lansenger_cli.commands.message.get_client") as gc:
+        result = runner.invoke(app, ["message", "send-authorization-request"])
+    assert result.exit_code != 0
+    gc.assert_not_called()
 
 
 def test_authorization_request_is_not_gated_like_send_account_message():
@@ -86,7 +86,7 @@ def test_authorization_request_is_not_gated_like_send_account_message():
     client = MagicMock()
     client.send_authorization_request.return_value = _FakeAccountMessageResult()
     with patch("lansenger_cli.commands.message.get_client", return_value=client):
-        result = runner.invoke(app, ["message", "send-authorization-request", "--chat-id", "u1"])
+        result = runner.invoke(app, ["message", "send-authorization-request", "u1"])
     assert result.exit_code == 0, result.output
     assert "Confirmation required" not in result.output
     client.send_authorization_request.assert_called_once()
@@ -96,7 +96,7 @@ def test_authorization_request_is_not_gated_like_send_account_message():
 def test_authorization_request_rejects_other_authorization_types(bad):
     with patch("lansenger_cli.commands.message.get_client") as gc:
         result = runner.invoke(
-            app, ["message", "send-authorization-request", "--chat-id", "u1", "--type", bad]
+            app, ["message", "send-authorization-request", "u1", "--type", bad]
         )
     assert result.exit_code == 1
     assert "授权类型" in result.output
@@ -109,7 +109,7 @@ def test_authorization_request_accepts_authorization_type_alias():
     with patch("lansenger_cli.commands.message.get_client", return_value=client):
         result = runner.invoke(
             app,
-            ["message", "send-authorization-request", "--chat-id", "u1", "--authorization-type", "1"],
+            ["message", "send-authorization-request", "u1", "--authorization-type", "1"],
         )
     assert result.exit_code == 0, result.output
     assert client.send_authorization_request.call_args.kwargs["authorization_type"] == 1
@@ -121,7 +121,7 @@ def test_authorization_request_failure_exits_1():
         success=False, message_id=None, error="boom"
     )
     with patch("lansenger_cli.commands.message.get_client", return_value=client):
-        result = runner.invoke(app, ["message", "send-authorization-request", "--chat-id", "u1"])
+        result = runner.invoke(app, ["message", "send-authorization-request", "u1"])
     assert result.exit_code == 1
     assert "boom" in result.output
 
@@ -131,7 +131,7 @@ def test_authorization_request_json_shape():
     client.send_authorization_request.return_value = _FakeAccountMessageResult()
     with patch("lansenger_cli.commands.message.get_client", return_value=client):
         result = runner.invoke(
-            app, ["--json", "message", "send-authorization-request", "--chat-id", "u1"]
+            app, ["--json", "message", "send-authorization-request", "u1"]
         )
     assert result.exit_code == 0, result.output
     payload = json.loads(result.stdout)
@@ -142,7 +142,7 @@ def test_authorization_request_json_shape():
 def test_authorization_request_json_param_error_keeps_stdout_clean():
     with patch("lansenger_cli.commands.message.get_client") as gc:
         result = runner.invoke(
-            app, ["--json", "message", "send-authorization-request", "--type", "2"]
+            app, ["--json", "message", "send-authorization-request", "u1", "--type", "2"]
         )
     assert result.exit_code == 1
     assert result.stdout.strip() == ""

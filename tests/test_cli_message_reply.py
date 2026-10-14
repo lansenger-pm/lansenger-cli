@@ -52,15 +52,24 @@ def test_reply_success_calls_client_with_kwargs():
     assert "表情回复" in result.output
 
 
-def test_reply_cancel_sets_reply_type_2_without_emoji():
+def test_reply_cancel_sends_the_emoji_too():
     client = MagicMock()
-    client.reply_message.return_value = _FakeReplyResult(reply_type=2)
+    client.reply_message.return_value = _FakeReplyResult(reply_type=2, emoji_id="TYPE_THUMB")
     with patch("lansenger_cli.commands.message.get_client", return_value=client):
-        result = runner.invoke(app, ["message", "reply", "m-1", "--cancel"])
+        result = runner.invoke(app, ["message", "reply", "m-1", "--emoji", "TYPE_THUMB", "--cancel"])
     assert result.exit_code == 0, result.output
     client.reply_message.assert_called_once_with(
-        msg_id="m-1", emoji_id="", reply_type=2, user_token=""
+        msg_id="m-1", emoji_id="TYPE_THUMB", reply_type=2, user_token=""
     )
+
+
+def test_reply_cancel_without_emoji_exits_1():
+    """replyType=2 also needs emojiId (real server error 40060 when it is empty)."""
+    with patch("lansenger_cli.commands.message.get_client") as gc:
+        result = runner.invoke(app, ["message", "reply", "m-1", "--cancel"])
+    assert result.exit_code == 1
+    assert "表情类型" in result.output
+    gc.assert_not_called()
 
 
 def test_reply_passes_user_token():
@@ -97,10 +106,11 @@ def test_reply_invalid_emoji_exits_1_with_chinese_error(bad):
 
 
 def test_reply_without_emoji_and_without_cancel_exits_1():
+    """emojiId is mandatory on the platform side (both reply and cancel)."""
     with patch("lansenger_cli.commands.message.get_client") as gc:
         result = runner.invoke(app, ["message", "reply", "m-1"])
     assert result.exit_code == 1
-    assert "必须指定" in result.output
+    assert "表情类型" in result.output
     gc.assert_not_called()
 
 

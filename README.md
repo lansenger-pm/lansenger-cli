@@ -163,10 +163,10 @@ lansenger message revoke msg001 msg002
 lansenger message reply msg001 --emoji TYPE_OK
 
 # Cancel that emoji reply
-lansenger message reply msg001 --cancel
+lansenger message reply msg001 --emoji TYPE_OK --cancel
 
-# Send an authorization request (authorizationType=1 = location permission)
-lansenger message send-authorization-request --chat-id user001
+# Send an authorization request to one staff member (bot -> staff private chat only; authorizationType=1 = location permission)
+lansenger message send-authorization-request user001
 
 # Query group ID list
 lansenger message query-groups --page 0 --size 100
@@ -480,7 +480,7 @@ The Lansenger platform has three identity types with different API access:
 | `message send-user-message` (user-to-user) | N | **Y** | **Y** | Requires userToken + OAuth2 |
 | `message revoke` | **Y** | **Y** | **Y** | Revoke own messages |
 | `message reply` | **Y** | **Y** | **Y** | Emoji reply / cancel on a message (reversible, so no `--yes` gate) |
-| `message send-authorization-request` | N | **Y** | **Y** | authorizationReq sent over the public account channel; `--type 1` = location permission |
+| `message send-authorization-request` | N | **Y** | **Y** | authorizationReq over the bot -> staff private chat channel; `--type 1` = location permission |
 | `staff *` (contacts read-only) | N | **Y** | **Y** | `search` additionally requires userToken |
 | `department *` | N | **Y** | **Y** | Org-level apps only |
 | `calendar *` | N | **Y** | **Y** | With userToken = user identity; without = bot identity |

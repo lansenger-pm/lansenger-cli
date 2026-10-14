@@ -162,10 +162,10 @@ lansenger message revoke msg001 msg002
 lansenger message reply msg001 --emoji TYPE_OK
 
 # 取消该表情回复
-lansenger message reply msg001 --cancel
+lansenger message reply msg001 --emoji TYPE_OK --cancel
 
-# 发送授权请求消息（authorizationType=1 即位置请求授权）
-lansenger message send-authorization-request --chat-id user001
+# 给某位员工发送授权请求消息（仅支持机器人 → 员工私聊；authorizationType=1 即位置请求授权）
+lansenger message send-authorization-request user001
 
 # 查询群 ID 列表
 lansenger message query-groups --page 0 --size 100
@@ -475,7 +475,7 @@ lansenger config show --profile my-app
 | `message send-user-message`（用户对用户） | N | **Y** | **Y** | 需要 userToken + OAuth2 |
 | `message revoke` | **Y** | **Y** | **Y** | 撤回自己发送的消息 |
 | `message reply` | **Y** | **Y** | **Y** | 表情回复 / 取消表情回复（可逆，不过 `--yes` 门） |
-| `message send-authorization-request` | N | **Y** | **Y** | 走公众号通道发送 authorizationReq；`--type 1` = 位置请求授权 |
+| `message send-authorization-request` | N | **Y** | **Y** | 走「机器人 → 员工私聊」通道发送 authorizationReq；`--type 1` = 位置请求授权 |
 | `staff *`（通讯录只读） | N | **Y** | **Y** | `search` 额外需要 userToken |
 | `department *` | N | **Y** | **Y** | 仅组织级应用 |
 | `calendar *` | N | **Y** | **Y** | 有 userToken = 用户身份；无 = 机器人身份 |
