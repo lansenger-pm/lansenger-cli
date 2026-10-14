@@ -186,3 +186,58 @@ def test_device_authorize_qr_png_in_json_mode_keeps_stdout_clean(tmp_path):
     assert result.exit_code == 0
     assert json.loads(result.stdout)["device_code"] == "d" * 40
     assert target.exists()
+
+
+def test_to_data_uri_carries_a_base64_png():
+    matrix = qr.encode(SHORT_URI)
+    uri = qr.to_data_uri(matrix, scale=4, quiet_zone=2)
+    assert uri.startswith("data:image/png;base64,")
+    raw = base64.b64decode(uri.split(",", 1)[1])
+    assert raw.startswith(b"\x89PNG\r\n\x1a\n")
+    assert raw == qr.to_png(matrix, scale=4, quiet_zone=2)
+
+
+def test_device_authorize_qr_data_uri_prints_uri_for_panels():
+    result = run(["oauth", "device-authorize", "--qr", "none", "--qr-data-uri"])
+    assert result.exit_code == 0
+    assert "data:image/png;base64," in result.stdout
+    assert "█" not in result.stdout
+
+
+def test_device_authorize_qr_data_uri_in_json_mode_goes_to_stderr():
+    result = run(["--json", "oauth", "device-authorize", "--qr-data-uri"])
+    assert result.exit_code == 0
+    assert json.loads(result.stdout)["device_code"] == "d" * 40
+    assert "data:image" not in result.stdout
+    stderr = getattr(result, "stderr", "")
+    if stderr:
+        assert "device_qr" in stderr and "data:image/png;base64," in stderr
+
+
+def test_device_login_fails_fast_when_credentials_are_broken():
+    with patch("lansenger_cli.commands.oauth.get_client") as gc:
+        gc.return_value.health_check.return_value = False
+        result = runner.invoke(app, ["--json", "oauth", "device-login", "--no-browser"])
+    assert result.exit_code == 1
+    gc.return_value.request_device_authorization.assert_not_called()
+    raw = getattr(result, "stderr", "") or result.stdout
+    payload = json.loads(raw.strip().splitlines()[-1])
+    assert payload["error"]["type"] == "auth_failed"
+    assert "app_secret" in payload["hint"]
+
+
+def test_device_login_reports_exchange_failure_instead_of_traceback():
+    approved = fake_result(state="access_approved", oauth2_code="one-time-code")
+    with patch("lansenger_cli.commands.oauth.get_client") as gc:
+        client = gc.return_value
+        client.health_check.return_value = True
+        client.request_device_authorization.return_value = AUTH_OK
+        client.poll_device_token.return_value = approved
+        client.exchange_code.side_effect = RuntimeError("Token error (errCode=40018): APP Secret错误(33740)")
+        result = runner.invoke(app, ["--json", "oauth", "device-login", "--no-browser"])
+    assert result.exit_code == 1
+    raw = getattr(result, "stderr", "") or result.stdout
+    payload = json.loads(raw.strip().splitlines()[-1])
+    assert payload["error"]["type"] == "exchange_failed"
+    assert "40018" in payload["error"]["message"]
+    assert "Traceback" not in result.stdout and "Traceback" not in raw

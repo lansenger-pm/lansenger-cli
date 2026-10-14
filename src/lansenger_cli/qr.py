@@ -8,6 +8,7 @@ standard RS block / alignment pattern tables for versions 1-15.
 
 from __future__ import annotations
 
+import base64
 import struct
 import zlib
 
@@ -434,3 +435,8 @@ def to_png(matrix: list[list[bool]], *, scale: int = 6, quiet_zone: int = 4) -> 
         + chunk(b"IDAT", zlib.compress(bytes(raw), 9))
         + chunk(b"IEND", b"")
     )
+
+
+def to_data_uri(matrix: list[list[bool]], *, scale: int = 6, quiet_zone: int = 4) -> str:
+    """Render the matrix as a base64 PNG data: URI (embeddable in chats, HTML and web panels)."""
+    return "data:image/png;base64," + base64.b64encode(to_png(matrix, scale=scale, quiet_zone=quiet_zone)).decode("ascii")

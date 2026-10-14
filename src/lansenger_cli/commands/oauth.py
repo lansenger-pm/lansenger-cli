@@ -11,7 +11,7 @@ from rich import print as rprint
 from rich.console import Console
 
 from lansenger_cli import qr
-from lansenger_cli.utils import get_client, get_store, output_result, is_json_output
+from lansenger_cli.utils import get_active_profile, get_client, get_store, is_json_output, output_result
 
 console = Console()
 app = typer.Typer(help="OAuth2 user authentication operations")
@@ -40,10 +40,14 @@ def _stdout_is_utf8() -> bool:
     return "utf" in (getattr(sys.stdout, "encoding", "") or "").lower()
 
 
-def _print_device_qr(uri: str, mode: str, png_path: str = "") -> None:
-    """Print a scannable QR for the device verification URL (and/or save it as PNG)."""
-    if not uri or (mode == "none" and not png_path):
-        return
+def _print_device_qr(uri: str, mode: str, png_path: str = "", data_uri: bool = False) -> str:
+    """Print a scannable QR for the device verification URL (and/or save it as PNG).
+
+    Returns a base64 PNG data: URI when ``data_uri`` is set, so a caller can hand the QR
+    to a panel that cannot render terminal text or read local files.
+    """
+    if not uri:
+        return ""
     matrix = qr.encode(uri)
     if png_path:
         target = Path(png_path).expanduser()
@@ -53,10 +57,50 @@ def _print_device_qr(uri: str, mode: str, png_path: str = "") -> None:
             print(note, file=sys.stderr)
         else:
             console.print(note, style="dim")
-    if mode == "none" or is_json_output():
+    if mode != "none" and not is_json_output():
+        use_unicode = mode == "utf8" or (mode == "auto" and _stdout_is_utf8())
+        console.print(qr.render_text(matrix, unicode=use_unicode), style="black on white", soft_wrap=True, highlight=False)
+    return qr.to_data_uri(matrix) if data_uri else ""
+
+
+def _emit_qr_data_uri(data_uri: str) -> None:
+    """Hand the QR to a panel: a stderr JSON event in --json mode, a plain URI otherwise."""
+    if not data_uri:
         return
-    use_unicode = mode == "utf8" or (mode == "auto" and _stdout_is_utf8())
-    console.print(qr.render_text(matrix, unicode=use_unicode), style="black on white", soft_wrap=True, highlight=False)
+    if is_json_output():
+        print(json.dumps({"event": "device_qr", "format": "png", "data_uri": data_uri}, ensure_ascii=False), file=sys.stderr)
+    else:
+        console.print(data_uri, soft_wrap=True, highlight=False)
+
+
+def _fail_fast_credentials() -> None:
+    """Abort a device login before the user scans when the profile cannot get an appToken.
+
+    The last step of a device login exchanges the OAuth2 code through the API gateway, which
+    needs an appToken (app_id + app_secret). Without working credentials the user would scan,
+    approve, and still get nothing, so the check runs before the device code is requested.
+    """
+    message = "cannot obtain an appToken with the active profile credentials; the token exchange of this device login would fail"
+    hint = f"lansenger config set app_secret <new-secret> -P {get_active_profile()}"
+    if is_json_output():
+        print(json.dumps({"ok": False, "error": {"type": "auth_failed", "message": message}, "hint": hint}, ensure_ascii=False), file=sys.stderr)
+    else:
+        rprint("[red]Credential check failed:[/red] app_id/app_secret cannot obtain an appToken — device login cannot finish.")
+        rprint(f"[dim]Fix: {hint}  (or check app_id / api_gateway_url)[/dim]")
+    raise typer.Exit(1)
+
+
+def _fail_exchange(exc: Exception) -> None:
+    """Report a failed token exchange as a structured CLI error instead of a traceback."""
+    message = f"{type(exc).__name__}: {exc}"
+    hint = f"lansenger config set app_secret <new-secret> -P {get_active_profile()}"
+    if is_json_output():
+        print(json.dumps({"ok": False, "error": {"type": "exchange_failed", "message": message}, "hint": hint}, ensure_ascii=False), file=sys.stderr)
+    else:
+        rprint(f"[red]Token exchange failed:[/red] {message}")
+        rprint("[dim]The device authorization was approved — only the exchange failed.[/dim]")
+        rprint(f"[dim]Hint: {hint}  (or check app_id / api_gateway_url)[/dim]")
+    raise typer.Exit(1)
 
 
 @app.command("authorize-url")
@@ -282,6 +326,7 @@ def device_authorize(
     source: str = typer.Option("CLI", "--from", help="Client source: AutoClaw/CLI/OpenClaw/MCP"),
     qr_mode: str = typer.Option("auto", "--qr", help="Print a scannable QR: auto/utf8/ascii/none"),
     qr_png: str = typer.Option("", "--qr-png", help="Write the QR to this PNG file (also works with --json)"),
+    qr_data_uri: bool = typer.Option(False, "--qr-data-uri", help="Emit the QR as a data: URI (for chats and web panels)"),
 ):
     """Request a device code (device flow step 1)."""
     client = get_client()
@@ -296,7 +341,7 @@ def device_authorize(
         ],
         title="Device Authorization",
     )
-    _print_device_qr(result.verification_uri_complete, qr_mode, qr_png)
+    _emit_qr_data_uri(_print_device_qr(result.verification_uri_complete, qr_mode, qr_png, qr_data_uri))
     if not is_json_output():
         rprint(f"\n[yellow]Open:[/yellow] {result.verification_uri_complete}")
         rprint(f"[yellow]userCode:[/yellow] [bold]{result.user_code}[/bold]")
@@ -347,6 +392,7 @@ def device_login(
     timeout: int = typer.Option(600, "--timeout", "-t", help="Max wait seconds for user approval"),
     qr_mode: str = typer.Option("auto", "--qr", help="Print a scannable QR: auto/utf8/ascii/none"),
     qr_png: str = typer.Option("", "--qr-png", help="Write the QR to this PNG file (also works with --json)"),
+    qr_data_uri: bool = typer.Option(False, "--qr-data-uri", help="Emit the QR as a data: URI (for chats and web panels)"),
 ):
     """One-shot device flow login: request → verify in browser → poll → exchange → save.
 
@@ -354,6 +400,8 @@ def device_login(
     open platforms without deviceflow exit 1 with a fallback hint.
     """
     client = get_client()
+    if not client.health_check():
+        _fail_fast_credentials()
     auth = client.request_device_authorization(client_id=client_id, source=source)
     if not auth.success:
         if not is_json_output() and auth.error_type == "deviceflow_unsupported":
@@ -362,26 +410,30 @@ def device_login(
 
     interval = max(1, auth.interval or 5)
     deadline = _monotonic() + timeout
+    uri = auth.verification_uri_complete
     if is_json_output():
         event = {
             "event": "device_authorization",
             "device_code": auth.device_code,
             "user_code": auth.user_code,
-            "verification_uri_complete": auth.verification_uri_complete,
+            "verification_uri_complete": uri,
             "interval": interval,
             "expires_in": auth.expires_in,
         }
+        if qr_data_uri and uri:
+            event["qr_data_uri"] = qr.to_data_uri(qr.encode(uri))
         print(json.dumps(event, ensure_ascii=False), file=sys.stderr)
+        _print_device_qr(uri, qr_mode, qr_png)
     else:
-        rprint(f"[green]1. Open:[/green] {auth.verification_uri_complete}")
+        rprint(f"[green]1. Open:[/green] {uri}")
         rprint(f"[green]   userCode:[/green] [bold]{auth.user_code}[/bold]")
-        if _copy_to_clipboard(auth.verification_uri_complete):
+        if _copy_to_clipboard(uri):
             rprint("[dim](URL copied to clipboard)[/dim]")
         rprint("[yellow]2. Waiting for approval…[/yellow] (Ctrl+C to cancel)")
-    _print_device_qr(auth.verification_uri_complete, qr_mode, qr_png)
-    if not no_browser and auth.verification_uri_complete:
+        _emit_qr_data_uri(_print_device_qr(uri, qr_mode, qr_png, qr_data_uri))
+    if not no_browser and uri:
         try:
-            webbrowser.open(auth.verification_uri_complete)
+            webbrowser.open(uri)
         except Exception:
             pass
 
@@ -413,7 +465,10 @@ def device_login(
     if not is_json_output():
         rprint("[green]✓ Approved — exchanging code…[/green]")
 
-    exchange = client.exchange_code(code=poll.oauth2_code)
+    try:
+        exchange = client.exchange_code(code=poll.oauth2_code)
+    except Exception as exc:  # credential/network failures from the SDK surface as a structured CLI error
+        _fail_exchange(exc)
     if exchange.success and exchange.user_token:
         store = get_store()
         existing = store.load_user_token()

@@ -12,7 +12,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - `oauth device-authorize` / `oauth device-login` 终端二维码：默认直接在终端画出可扫二维码（UTF-8 半块字符；渲染时锁定黑底白字，深色终端同样可扫），`--qr auto|utf8|ascii|none` 控制形态或关闭（非 UTF-8 终端降级为 ASCII）。
 - `--qr-png FILE`：把同一张二维码另存为 PNG（供聊天窗口/界面嵌入）；`--json` 模式下 stdout 仍是纯 JSON，落盘提示走 stderr。
+- `--qr-data-uri`：把同一张二维码以 `data:image/png;base64,...` 形式吐出（非 `--json` 模式打印到 stdout，`--json` 模式作为 `{"event":"device_qr"}` 事件写 stderr），供聊天窗口/网页面板等无法读取文件或终端文本的面板直接嵌图。
 - 零依赖 QR 编码器 `src/lansenger_cli/qr.py`（仅标准库 `struct`/`zlib`；支持版本 1-15、ECC L/M，自动选版与掩码择优），不引入任何第三方依赖。
+
+### Fixed
+
+- `oauth device-login` 兑换前先做凭据自检（`health_check()`）：app_id/app_secret 换不到 appToken 时立即 exit 1，给出 `auth_failed` 结构化错误与修复提示，避免用户扫码授权后才发现兑换失败。
+- `oauth device-login` 兑换阶段的 SDK 异常（凭证/网络）不再抛裸 traceback：统一为 `exchange_failed` 结构化错误 + 退出 1，并说明「授权已通过，仅兑换失败」。
 
 ## [0.15.1] - 2026-10-13
 

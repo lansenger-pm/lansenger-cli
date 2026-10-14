@@ -279,12 +279,13 @@ lansenger oauth refresh-token YOUR_REFRESH_TOKEN
 lansenger oauth user-info YOUR_USER_TOKEN
 
 # 裝置碼登入——無頭/遠端友善（無需本機回呼伺服器）；需新版開放平台，舊版會提示回退方案。
-# 終端會直接畫出可掃 QR Code（--qr auto|utf8|ascii|none）；--qr-png 另存 PNG，便於嵌到會話/介面
+# 終端會直接畫出可掃 QR Code（--qr auto|utf8|ascii|none）；--qr-png 另存 PNG、--qr-data-uri 輸出 base64 data: URI，便於嵌到會話/介面
 lansenger oauth device-login
 
 # 腳本/Agent 可用的底層步驟
 lansenger oauth device-authorize
 lansenger oauth device-authorize --qr none --qr-png /tmp/device-qr.png
+lansenger oauth device-authorize --qr none --qr-data-uri   # data: URI for chats/panels
 lansenger oauth device-poll DEVICE_CODE --wait
 ```
 
