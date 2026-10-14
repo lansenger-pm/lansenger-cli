@@ -6,6 +6,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [0.17.0] - 2026-10-14
+
+### Added
+
+- `message reply <msg_id> --emoji TYPE_THUMB|TYPE_OK|TYPE_ADD_ONE|TYPE_FIREWORK|TYPE_LOVE|TYPE_DOUBT`：用表情回复消息（平台文档 4.6.17）。`--emoji` 只接受这六个取值：非法取值在本地拦截、给出中文错误并退出 1（`--json` 模式下结构化错误写 stderr，stdout 保持纯 JSON），不会发出任何 API 请求。
+- `message reply <msg_id> --cancel`：取消该消息上已有的表情回复（`replyType=2`），不需要 `--emoji`；既没给 `--emoji` 也没给 `--cancel` 时同样本地拦截并退出 1。
+- `message send-authorization-request`：发送授权请求消息（`authorizationReq`，平台文档 4.6.4.14），让用户授权某项权限。参数与实现完全对齐既有 `message send-account-message`（同走公众号通道，同样**不接高危门**——只有 `message revoke` 这类不可逆写才接门）：`--chat-id/-C`、`--dept/-D`、`--account-id`、`--entry-id`、`--user-token`，以及 `--type/-t`（别名 `--authorization-type`）目前只支持 `1`（位置请求授权），其他取值本地拦截并退出 1。
+- 两条新命令的**人看文案为中文**（`--help` 说明、表格标题「表情回复」/「授权请求结果」、参数错误提示），与最近两个版本的 device 命令口径一致；机器面（`--json` 字段名 `success/reply_type/msg_id/emoji_id`、退出码 0/1/10）保持英文不变。
+
+### Changed
+
+- 本次**不抬** `lansenger-sdk` 依赖下限（仍为 `>=1.12.2`）：CLI 侧先只做封装，待 `lansenger-sdk` 1.13.0 上 PyPI 后再单独提交把下限抬到 `>=1.13.0`。CLI 单测全部 mock 客户端，在本地 1.12.2 环境下同样通过。
+
 ## [0.16.1] - 2026-10-14
 
 ### Fixed
