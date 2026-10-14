@@ -1,13 +1,16 @@
 import typer
 import json
 import subprocess
+import sys
 import time
 import webbrowser
 from http.server import HTTPServer, BaseHTTPRequestHandler
+from pathlib import Path
 from urllib.parse import urlparse, parse_qs
 from rich import print as rprint
 from rich.console import Console
 
+from lansenger_cli import qr
 from lansenger_cli.utils import get_client, get_store, output_result, is_json_output
 
 console = Console()
@@ -31,6 +34,29 @@ def _copy_to_clipboard(text: str) -> bool:
         return True
     except (subprocess.SubprocessError, FileNotFoundError):
         return False
+
+
+def _stdout_is_utf8() -> bool:
+    return "utf" in (getattr(sys.stdout, "encoding", "") or "").lower()
+
+
+def _print_device_qr(uri: str, mode: str, png_path: str = "") -> None:
+    """Print a scannable QR for the device verification URL (and/or save it as PNG)."""
+    if not uri or (mode == "none" and not png_path):
+        return
+    matrix = qr.encode(uri)
+    if png_path:
+        target = Path(png_path).expanduser()
+        target.write_bytes(qr.to_png(matrix))
+        note = f"(QR saved to {target} · {len(matrix)}x{len(matrix)} modules)"
+        if is_json_output():
+            print(note, file=sys.stderr)
+        else:
+            console.print(note, style="dim")
+    if mode == "none" or is_json_output():
+        return
+    use_unicode = mode == "utf8" or (mode == "auto" and _stdout_is_utf8())
+    console.print(qr.render_text(matrix, unicode=use_unicode), style="black on white", soft_wrap=True, highlight=False)
 
 
 @app.command("authorize-url")
@@ -254,6 +280,8 @@ def local_callback(
 def device_authorize(
     client_id: str = typer.Option("", "--client-id", help="OAuth2 clientId (default: app_id)"),
     source: str = typer.Option("CLI", "--from", help="Client source: AutoClaw/CLI/OpenClaw/MCP"),
+    qr_mode: str = typer.Option("auto", "--qr", help="Print a scannable QR: auto/utf8/ascii/none"),
+    qr_png: str = typer.Option("", "--qr-png", help="Write the QR to this PNG file (also works with --json)"),
 ):
     """Request a device code (device flow step 1)."""
     client = get_client()
@@ -268,6 +296,7 @@ def device_authorize(
         ],
         title="Device Authorization",
     )
+    _print_device_qr(result.verification_uri_complete, qr_mode, qr_png)
     if not is_json_output():
         rprint(f"\n[yellow]Open:[/yellow] {result.verification_uri_complete}")
         rprint(f"[yellow]userCode:[/yellow] [bold]{result.user_code}[/bold]")
@@ -296,8 +325,6 @@ def device_poll(
                 break
             if _monotonic() >= deadline:
                 if is_json_output():
-                    import sys
-
                     print(json.dumps({"ok": False, "error": {"type": "timeout", "message": f"still pending after {timeout}s"}}, ensure_ascii=False), file=sys.stderr)
                 else:
                     rprint(f"[red]Timeout: still pending after {timeout}s[/red]")
@@ -305,8 +332,6 @@ def device_poll(
             _sleep(5)
     except KeyboardInterrupt:
         if is_json_output():
-            import sys
-
             print(json.dumps({"ok": False, "error": {"type": "cancelled", "message": "interrupted by user"}}, ensure_ascii=False), file=sys.stderr)
         else:
             rprint("[red]Cancelled[/red]")
@@ -320,6 +345,8 @@ def device_login(
     source: str = typer.Option("CLI", "--from", help="Client source: AutoClaw/CLI/OpenClaw/MCP"),
     no_browser: bool = typer.Option(False, "--no-browser", help="Do not auto-open the verification URL"),
     timeout: int = typer.Option(600, "--timeout", "-t", help="Max wait seconds for user approval"),
+    qr_mode: str = typer.Option("auto", "--qr", help="Print a scannable QR: auto/utf8/ascii/none"),
+    qr_png: str = typer.Option("", "--qr-png", help="Write the QR to this PNG file (also works with --json)"),
 ):
     """One-shot device flow login: request → verify in browser → poll → exchange → save.
 
@@ -336,8 +363,6 @@ def device_login(
     interval = max(1, auth.interval or 5)
     deadline = _monotonic() + timeout
     if is_json_output():
-        import sys
-
         event = {
             "event": "device_authorization",
             "device_code": auth.device_code,
@@ -353,6 +378,7 @@ def device_login(
         if _copy_to_clipboard(auth.verification_uri_complete):
             rprint("[dim](URL copied to clipboard)[/dim]")
         rprint("[yellow]2. Waiting for approval…[/yellow] (Ctrl+C to cancel)")
+    _print_device_qr(auth.verification_uri_complete, qr_mode, qr_png)
     if not no_browser and auth.verification_uri_complete:
         try:
             webbrowser.open(auth.verification_uri_complete)
@@ -364,8 +390,6 @@ def device_login(
         while True:
             if _monotonic() >= deadline:
                 if is_json_output():
-                    import sys
-
                     print(json.dumps({"ok": False, "error": {"type": "timeout", "message": f"timeout after {timeout}s"}}, ensure_ascii=False), file=sys.stderr)
                 else:
                     rprint(f"[red]Timeout: no approval within {timeout}s[/red]")
@@ -377,8 +401,6 @@ def device_login(
             break
     except KeyboardInterrupt:
         if is_json_output():
-            import sys
-
             print(json.dumps({"ok": False, "error": {"type": "cancelled", "message": "interrupted by user"}}, ensure_ascii=False), file=sys.stderr)
         else:
             rprint("[red]Cancelled[/red]")

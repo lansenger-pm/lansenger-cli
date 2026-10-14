@@ -23,7 +23,7 @@
 |---|---|---|
 | 统一验证（提交前必跑） | `bash scripts/verify.sh` | ✅ 可用（lint+test+build+secrets 四态） |
 | Lint | `uv run ruff check .` | ✅ 可用 |
-| 单测 | `uv run --extra dev pytest -q` | ✅ 可用（64 passed；**uv 必须带 `--extra dev`**） |
+| 单测 | `uv run --extra dev pytest -q` | ✅ 可用（78 passed；**uv 必须带 `--extra dev`**） |
 | 构建 | `uv build` | ✅ 可用 |
 | 本地跑 CLI | `uv run lansenger --help` / `uv run lansenger <group> <cmd>` | ✅ 可用（无凭证命令可直接跑） |
 | pip 安装 | `pip install -e ".[dev]"` | ⚠️ 受限可用（CI 同款命令；本地未实测） |
@@ -44,7 +44,7 @@
 - 🚫 不用真实凭证对真实环境执行写命令（message send / group create / calendar 写等）验证功能——用 mock 测试。
 - 🚫 不绕过 verify 提交；不删失败测试；同一失败连试 3 次不换方法（停下诊断）。
 - ⚠️ 用户可见面变更（命令增删/参数/输出格式/退出码）**必须同步 5 个语言版 README**（README.md / zhHans / zhHant / zhHantHK / fr）的命令总览表与相关章节 + CHANGELOG——历史漏改即文档漂移。
-- ⚠️ 升级 `lansenger-sdk` 下限须全量回归 64 例 + CHANGELOG dep 条目；新依赖引入须事先询问。
+- ⚠️ 升级 `lansenger-sdk` 下限须全量回归 78 例 + CHANGELOG dep 条目；新依赖引入须事先询问。
 - 不改 `dist/` 等构建产物；不动 `.github/workflows/` 除非任务明确要求。
 
 ## 5. 非目标（本仓库不负责什么）

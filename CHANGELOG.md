@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [0.16.0] - 2026-10-14
+
+### Added
+
+- `oauth device-authorize` / `oauth device-login` 终端二维码：默认直接在终端画出可扫二维码（UTF-8 半块字符；渲染时锁定黑底白字，深色终端同样可扫），`--qr auto|utf8|ascii|none` 控制形态或关闭（非 UTF-8 终端降级为 ASCII）。
+- `--qr-png FILE`：把同一张二维码另存为 PNG（供聊天窗口/界面嵌入）；`--json` 模式下 stdout 仍是纯 JSON，落盘提示走 stderr。
+- 零依赖 QR 编码器 `src/lansenger_cli/qr.py`（仅标准库 `struct`/`zlib`；支持版本 1-15、ECC L/M，自动选版与掩码择优），不引入任何第三方依赖。
+
 ## [0.15.1] - 2026-10-13
 
 ### Fixed

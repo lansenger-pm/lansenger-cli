@@ -280,11 +280,14 @@ lansenger oauth refresh-token YOUR_REFRESH_TOKEN
 lansenger oauth user-info YOUR_USER_TOKEN
 
 # Device code login — headless/remote friendly (no localhost callback server);
-# requires the new open platform, legacy servers print a fallback hint
+# requires the new open platform, legacy servers print a fallback hint.
+# A scannable QR is drawn in the terminal (--qr auto|utf8|ascii|none); --qr-png
+# also saves it as a PNG for chat/UI embedding
 lansenger oauth device-login
 
 # Low-level steps for scripts / agents
 lansenger oauth device-authorize
+lansenger oauth device-authorize --qr none --qr-png /tmp/device-qr.png
 lansenger oauth device-poll DEVICE_CODE --wait
 ```
 

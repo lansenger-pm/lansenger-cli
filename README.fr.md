@@ -280,11 +280,14 @@ lansenger oauth user-info YOUR_USER_TOKEN
 
 # Connexion par code d'appareil — adaptée aux environnements headless/distants
 # (sans serveur de callback local) ; nécessite la nouvelle plateforme ouverte,
-# les anciennes versions affichent une solution de repli
+# les anciennes versions affichent une solution de repli.
+# Un QR code scannable est dessiné dans le terminal (--qr auto|utf8|ascii|none) ;
+# --qr-png enregistre le même QR en PNG pour l'intégrer à un chat/une interface
 lansenger oauth device-login
 
 # Étapes de bas niveau pour scripts / agents
 lansenger oauth device-authorize
+lansenger oauth device-authorize --qr none --qr-png /tmp/device-qr.png
 lansenger oauth device-poll DEVICE_CODE --wait
 ```
 
