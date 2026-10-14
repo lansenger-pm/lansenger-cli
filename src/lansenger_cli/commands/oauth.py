@@ -62,7 +62,10 @@ def _print_device_qr(uri: str, mode: str, png_path: str = "", data_uri: bool = F
             console.print(note, style="dim")
     if mode != "none" and not is_json_output():
         use_unicode = mode == "utf8" or (mode == "auto" and _stdout_is_utf8())
-        console.print(qr.render_text(matrix, unicode=use_unicode), style="black on white", soft_wrap=True, highlight=False)
+        if use_unicode and console.color_system:
+            console.print(qr.render_ansi(matrix), soft_wrap=True, highlight=False)
+        else:
+            console.print(qr.render_text(matrix, unicode=use_unicode), style="black on white", soft_wrap=True, highlight=False)
     return qr.to_data_uri(matrix) if data_uri else ""
 
 

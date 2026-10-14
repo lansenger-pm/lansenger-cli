@@ -280,6 +280,7 @@ lansenger oauth user-info YOUR_USER_TOKEN
 
 # 裝置碼登入——無頭/遠端友善（無需本機回呼伺服器）；需新版開放平台，舊版會提示回退方案。
 # 終端會直接畫出可掃 QR Code（--qr auto|utf8|ascii|none）；--qr-png 另存 PNG、--qr-data-uri 輸出 base64 data: URI，便於嵌到會話/介面
+# 終端 QR Code 用「色塊半塊」繪製（無色終端自動回退為純字元塊）
 # 授權確認由使用者本人在藍信手機端掃碼/開啟連結完成，終端不代為觸發；確需開啟本機瀏覽器時加 --open-browser
 lansenger oauth device-login
 

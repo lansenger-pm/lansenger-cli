@@ -38,7 +38,7 @@ flowchart TD
 | `main.py` | 注册 16 命令组；全局选项解析并写入 utils 状态；`--version` 显示 CLI+SDK 双版本 | 全局选项名（见 §3-C3） |
 | `utils.py` | 共享运行时：状态 setter/getter、`get_client()`（profile + token 注入策略）、退出码、高危门、输出 | 退出码 0/1/10、`confirm_high_risk`、`output_result` |
 | `commands/*.py` | 一个蓝信 API 域一个模块；参数校验 → （高危则过门）→ `get_client()` 调 SDK → `output_result` | 命令名与参数面 = 用户可见契约（5 README） |
-| `qr.py` | 零依赖 QR 编码/渲染（仅标准库 `struct`/`zlib`）：版本 1-15、ECC L/M、自动选版 + 掩码择优；输出半块字符文本（非 UTF-8 降级 ASCII）与 1-bit PNG | 渲染形态是用户可见面（`--qr auto/utf8/ascii/none` · `--qr-png` · `--qr-data-uri`）；golden 哈希见 tests/test_cli_qr.py |
+| `qr.py` | 零依赖 QR 编码/渲染（仅标准库 `struct`/`zlib`）：版本 1-15、ECC L/M、自动选版 + 掩码择优；输出半块字符文本（有色终端用 16 色色块半块 `render_ansi`，非 UTF-8 降级 ASCII）与 1-bit PNG | 渲染形态是用户可见面（`--qr auto/utf8/ascii/none` · `--qr-png` · `--qr-data-uri`）；golden 哈希见 tests/test_cli_qr.py |
 | `tests/` | CliRunner 端到端驱动 + `MagicMock` mock `commands.<域>.get_client`；autouse fixture 重置全局状态 | 测试文件须与命令域镜像 |
 
 **依赖方向**：`main → commands → utils → lansenger_sdk`（单向）。禁止：commands 互相 import、utils 反向 import commands、绕过 utils 直连 SDK（推断自现有代码一致性，无 lint 强制——演进项）。
@@ -54,7 +54,7 @@ flowchart TD
 | C3 | **全局选项** `--json/-j --profile/-P --as --app-token --user-token --verbose/-v` | main.py callback + utils setter | 新全局选项须加 setter + fixture 重置 + 5 README 使用说明 |
 | C4 | **输出形态** `--json` → 原始 JSON（stdout；失败信息 stderr）/ 默认 rich 表格 | utils.py `output_result` | 所有 commands 的展示代码 · README 示例（5 语言）· 设备码 QR 文本只在非 `--json` 模式输出（`--qr-png` 在 JSON 模式仅落盘、提示走 stderr；`--qr-data-uri` 在 JSON 模式作为 `{"event":"device_qr"}` 事件写 stderr，stdout 始终纯 JSON）· 设备码三条命令的人看文案为中文（`--help`/引导/状态/错误），机器面（`--json` 字段、`error_type`、事件名、退出码）保持英文 |
 | C5 | **配置键** `~/.lansenger/sdk_state.json` 键面 + `LANSENGER_*` 环境变量名 | config.py + SDK CredentialStore | config 命令 · 5 README「配置凭据」节 · AGENTS.md 红线引用 |
-| C6 | **SDK 版本下限** `lansenger-sdk>=1.12.0` | pyproject.toml | CHANGELOG `dep:` 条目 · 全量 88 例回归 · 5 README（如有版本表述）· docs/architecture.md §2 SDK 版本 + C6 本行 |
+| C6 | **SDK 版本下限** `lansenger-sdk>=1.12.0` | pyproject.toml | CHANGELOG `dep:` 条目 · 全量 92 例回归 · 5 README（如有版本表述）· docs/architecture.md §2 SDK 版本 + C6 本行 |
 | C7 | **版本三元组** pyproject `version` == git tag `v*` == CHANGELOG 最新条目 | release.yml 硬校验 | 发版流程：三处同 PR 改齐，tag 在合并后打 |
 | C8 | **用户可见命令面** 命令名 / 参数 / 子命令树 | main.py 注册表 | **5 个语言版 README** 命令总览表 + 域章节 + tests 镜像；漏一份即漂移（0.14.0 移除 7 域为全量同步范例） |
 
@@ -63,7 +63,7 @@ flowchart TD
 | 层 | 本仓落位 | 现状 |
 |---|---|---|
 | T0 纯函数 | utils 的输出格式化 / 参数解析 | 隐式（经 T1 覆盖） |
-| T1 域逻辑 | `commands.<域>` 参数组装与结果处理 | 8/17 域/模块有测试（config/health/media/videoconference/oauth/qr/high-risk-gate/logging 等），88 例 |
+| T1 域逻辑 | `commands.<域>` 参数组装与结果处理 | 8/17 域/模块有测试（config/health/media/videoconference/oauth/qr/high-risk-gate/logging 等），92 例 |
 | T2 集成 | CliRunner 全局选项 + 退出码 + 高危门 | ✅ test_high_risk_gate.py / test_cli_config.py |
 | 缺口 | group/staff/department/calendar/callback/streaming/chat/bot-command/personal-app 无专门测试文件 | ⚠️ 演进项：新改动域必须补最小回归，存量渐进补齐 |
 

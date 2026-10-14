@@ -282,6 +282,7 @@ lansenger oauth user-info YOUR_USER_TOKEN
 # Device code login — headless/remote friendly (no localhost callback server);
 # requires the new open platform, legacy servers print a fallback hint.
 # A scannable QR is drawn in the terminal (--qr auto|utf8|ascii|none); --qr-png
+# Terminal QR is painted with colour half-blocks (falls back to plain block characters when colour is off)
 # also saves it as a PNG, --qr-data-uri emits the same PNG as a base64 data:
 # URI for chats and web panels that cannot read a file or terminal text.
 # Approval is the user's own act on the Lanxin mobile app (scan the QR / open

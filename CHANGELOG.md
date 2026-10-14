@@ -22,6 +22,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - 三条 device 命令的**人看文案改为中文**（`--help` 说明、引导语、状态、超时/取消、错误提示）：机器面保持英文不变（`--json` 字段、`error_type`/事件名、退出码 0/1/10）。本仓其余命令仍为英文，属本次按需求的定点改动。
 - `oauth device-authorize` 人看输出不再打印原始字段表，改为「扫码引导 + 二维码 + 下一步命令」：明确提示该命令只申请设备码、不等待确认，并给出 `device-login` / `device-poll <device_code> --wait` 两条后续命令（字段本身仍可经 `--json` 取）。
 - 二维码静默区（quiet zone）由 2 模块改为标准要求的 4 模块；`oauth device-login` 人看输出不再回显 userToken/refreshToken（`--json` 仍返回完整字段）。
+- 终端二维码改用**色块半块**渲染：仍是一行两模块，但 `▀` 的上/下两半分别用前景/背景色画（只用 16 色黑/白），模块之间不再依赖字体字形的拼接，消除半块字符在不少终端上出现的横向缝隙；终端不支持颜色（`NO_COLOR`/`TERM=dumb`/重定向）或非 UTF-8 时，仍回退为原来的纯字符块渲染。
 
 ### Fixed
 

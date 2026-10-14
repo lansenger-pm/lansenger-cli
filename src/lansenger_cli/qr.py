@@ -402,6 +402,38 @@ def render_text(matrix: list[list[bool]], *, unicode: bool = True, quiet_zone: i
     return "\n".join(lines)
 
 
+def render_ansi(matrix: list[list[bool]], *, quiet_zone: int = 4) -> str:
+    """Render the matrix with half blocks painted by colour instead of by glyph coverage.
+
+    Each text line still carries two module rows, but the two halves of ``▀`` get their own
+    colour (foreground = upper module, background = lower module), so neighbouring modules
+    share exact edges: the font's glyph metrics can no longer leave seams between them.
+    Only the black/white pair of the 16-colour palette is used, so every colour terminal
+    renders it; callers must fall back to `render_text` when colour is unavailable.
+    """
+    size = len(matrix)
+    width = size + quiet_zone * 2
+
+    def dark_at(row: int, col: int) -> bool:
+        r, c = row - quiet_zone, col - quiet_zone
+        return 0 <= r < size and 0 <= c < size and matrix[r][c]
+
+    lines: list[str] = []
+    for row in range(0, width, 2):
+        buf: list[str] = []
+        current: tuple[bool, bool] | None = None
+        for col in range(width):
+            top = dark_at(row, col)
+            bottom = row + 1 < width and dark_at(row + 1, col)
+            if (top, bottom) != current:
+                buf.append(f"\x1b[{30 if top else 37}m\x1b[{40 if bottom else 47}m")
+                current = (top, bottom)
+            buf.append("▀")
+        buf.append("\x1b[0m")
+        lines.append("".join(buf))
+    return "\n".join(lines)
+
+
 def to_png(matrix: list[list[bool]], *, scale: int = 6, quiet_zone: int = 4) -> bytes:
     """Render the matrix as a 1-bit greyscale PNG (black modules on white)."""
     size = len(matrix) + quiet_zone * 2

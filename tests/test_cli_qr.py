@@ -14,9 +14,11 @@ from types import SimpleNamespace
 from unittest.mock import patch
 
 import pytest
+from rich.console import Console
 from typer.testing import CliRunner
 
 from lansenger_cli import qr
+from lansenger_cli.commands import oauth as oauth_cmd
 from lansenger_cli.main import app
 from lansenger_cli.utils import set_json_output, set_active_profile
 
@@ -279,3 +281,34 @@ def test_device_login_human_output_keeps_the_raw_token_out_of_the_table():
     assert result.exit_code == 0
     assert "staff_id=staff-001" in result.stdout
     assert "u" * 36 not in result.stdout
+
+
+def test_render_ansi_paints_both_halves_of_every_cell():
+    matrix = qr.encode("HELLO")
+    width = len(matrix) + 4 * 2
+    lines = qr.render_ansi(matrix).splitlines()
+    assert len(lines) == (width + 1) // 2
+    assert all(line.count("▀") == width for line in lines)
+    assert all(line.endswith("\x1b[0m") for line in lines)
+    assert any("\x1b[30m" in line and "\x1b[47m" in line for line in lines)
+
+
+def test_render_ansi_keeps_the_quiet_zone_light():
+    first = qr.render_ansi(qr.encode("HELLO")).splitlines()[0]
+    assert first.startswith("\x1b[37m\x1b[47m")
+
+
+def test_render_ansi_keeps_the_geometry_of_render_text():
+    matrix = qr.encode(REAL_URI)
+    ansi_lines = qr.render_ansi(matrix).splitlines()
+    text_lines = qr.render_text(matrix).splitlines()
+    assert len(ansi_lines) == len(text_lines)
+    assert ansi_lines[0].count("▀") == len(text_lines[0])
+
+
+def test_device_authorize_paints_the_qr_when_the_terminal_has_colour(monkeypatch):
+    monkeypatch.setattr(oauth_cmd, "console", Console(color_system="standard", force_terminal=True))
+    result = run(["oauth", "device-authorize"])
+    assert result.exit_code == 0
+    assert "\x1b[30m" in result.stdout
+    assert "WDJB-MJHT" in result.stdout
