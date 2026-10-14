@@ -355,8 +355,9 @@ def device_authorize(
     _emit_qr_data_uri(_print_device_qr(result.verification_uri_complete, qr_mode, qr_png, qr_data_uri, qr_ecc))
     rprint("[yellow]本命令只申请设备码：不等待确认，也不会完成登录。[/yellow]")
     rprint("[dim]  扫码后自动完成登录： lansenger oauth device-login[/dim]")
-    rprint(f"[dim]  用设备码继续等待：   lansenger oauth device-poll {result.device_code} --wait[/dim]")
-    rprint(f"[dim]  链接 {result.verification_uri_complete} · 有效期 {result.expires_in}s[/dim]")
+    console.print("[dim]  用设备码继续等待：[/dim]", soft_wrap=True)
+    console.print(f"[dim]    lansenger oauth device-poll {result.device_code} --wait[/dim]", soft_wrap=True)
+    console.print(f"[dim]  链接 {result.verification_uri_complete} · 有效期 {result.expires_in}s[/dim]", soft_wrap=True)
     if _copy_to_clipboard(result.verification_uri_complete):
         rprint("[dim]（链接已复制到剪贴板）[/dim]")
 
@@ -462,7 +463,7 @@ def device_login(
         if _copy_to_clipboard(uri):
             rprint("[dim]（链接已复制到剪贴板）[/dim]")
         _emit_qr_data_uri(_print_device_qr(uri, qr_mode, qr_png, qr_data_uri, qr_ecc))
-        rprint(f"[dim]   链接: {uri}[/dim]")
+        console.print(f"[dim]   链接: {uri}[/dim]", soft_wrap=True)
         rprint("[yellow]2. 等待手机端确认…[/yellow]（Ctrl+C 取消）")
     if open_browser and not no_browser and uri:
         try:
