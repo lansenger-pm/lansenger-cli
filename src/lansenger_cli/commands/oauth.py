@@ -395,7 +395,7 @@ def device_login(
     qr_png: str = typer.Option("", "--qr-png", help="Write the QR to this PNG file (also works with --json)"),
     qr_data_uri: bool = typer.Option(False, "--qr-data-uri", help="Emit the QR as a data: URI (for chats and web panels)"),
 ):
-    """One-shot device flow login: request → verify in browser → poll → exchange → save.
+    """One-shot device flow login: request → show the QR → wait for the user's approval on the Lanxin mobile app → exchange → save.
 
     Works on headless/remote hosts (no localhost callback needed). Legacy
     open platforms without deviceflow exit 1 with a fallback hint.
