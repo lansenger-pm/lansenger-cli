@@ -332,6 +332,8 @@ lansenger media upload-app /path/to/file.pdf --media-type file
 lansenger media download-to-file MEDIA_ID --output /path/to/save.pdf
 ```
 
+> **注意**：`media upload`（4.5.1）需要先在开发者中心开通「上传素材」权限，否则平台会拒绝上传。
+
 ### 流式消息
 
 ```bash
