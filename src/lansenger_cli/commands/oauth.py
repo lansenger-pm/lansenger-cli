@@ -68,7 +68,7 @@ def _emit_qr_data_uri(data_uri: str) -> None:
     if not data_uri:
         return
     if is_json_output():
-        print(json.dumps({"event": "device_qr", "format": "png", "data_uri": data_uri}, ensure_ascii=False), file=sys.stderr)
+        print(json.dumps({"event": "device_qr", "format": "png", "qr_data_uri": data_uri}, ensure_ascii=False), file=sys.stderr)
     else:
         console.print(data_uri, soft_wrap=True, highlight=False)
 

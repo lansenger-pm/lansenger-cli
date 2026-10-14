@@ -211,7 +211,9 @@ def test_device_authorize_qr_data_uri_in_json_mode_goes_to_stderr():
     assert "data:image" not in result.stdout
     stderr = getattr(result, "stderr", "")
     if stderr:
-        assert "device_qr" in stderr and "data:image/png;base64," in stderr
+        event = json.loads(stderr.strip().splitlines()[-1])
+        assert event["event"] == "device_qr"
+        assert event["qr_data_uri"].startswith("data:image/png;base64,")
 
 
 def test_device_login_fails_fast_when_credentials_are_broken():
