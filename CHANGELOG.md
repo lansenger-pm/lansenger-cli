@@ -15,6 +15,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - `--qr-data-uri`：把同一张二维码以 `data:image/png;base64,...` 形式吐出（非 `--json` 模式打印到 stdout，`--json` 模式作为 `{"event":"device_qr"}` 事件写 stderr），供聊天窗口/网页面板等无法读取文件或终端文本的面板直接嵌图。
 - 零依赖 QR 编码器 `src/lansenger_cli/qr.py`（仅标准库 `struct`/`zlib`；支持版本 1-15、ECC L/M，自动选版与掩码择优），不引入任何第三方依赖。
 
+### Changed
+
+- `oauth device-login` 默认**不再自动打开本机浏览器**（0.15.x 会 `webbrowser.open`）：设备码流程的授权确认是用户本人在蓝信手机端扫码/打开链接完成的自主行为，终端与对话面板只负责把二维码/链接交给用户，不代为触发。确需打开本机浏览器时用新增的 `--open-browser`（`--no-browser` 保留为兼容用的空开关，已废弃）。
+
 ### Fixed
 
 - `oauth device-login` 兑换前先做凭据自检（`health_check()`）：app_id/app_secret 换不到 appToken 时立即 exit 1，给出 `auth_failed` 结构化错误与修复提示，避免用户扫码授权后才发现兑换失败。

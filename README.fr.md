@@ -284,6 +284,8 @@ lansenger oauth user-info YOUR_USER_TOKEN
 # Un QR code scannable est dessiné dans le terminal (--qr auto|utf8|ascii|none) ;
 # --qr-png enregistre le même QR en PNG, --qr-data-uri l'émet en data: URI base64
 # (pour les chats et interfaces web qui ne peuvent pas lire un fichier)
+# L'approbation est un acte de l'utilisateur sur l'application mobile Lanxin
+# (scanner le QR / ouvrir le lien) ; le CLI n'ouvre jamais de navigateur sauf --open-browser
 lansenger oauth device-login
 
 # Étapes de bas niveau pour scripts / agents

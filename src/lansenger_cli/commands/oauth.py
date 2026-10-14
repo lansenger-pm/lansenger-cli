@@ -388,7 +388,8 @@ def device_poll(
 def device_login(
     client_id: str = typer.Option("", "--client-id", help="OAuth2 clientId (default: app_id)"),
     source: str = typer.Option("CLI", "--from", help="Client source: AutoClaw/CLI/OpenClaw/MCP"),
-    no_browser: bool = typer.Option(False, "--no-browser", help="Do not auto-open the verification URL"),
+    no_browser: bool = typer.Option(False, "--no-browser", help="Deprecated: the browser is no longer opened by default"),
+    open_browser: bool = typer.Option(False, "--open-browser", help="Also open the verification URL in the local browser"),
     timeout: int = typer.Option(600, "--timeout", "-t", help="Max wait seconds for user approval"),
     qr_mode: str = typer.Option("auto", "--qr", help="Print a scannable QR: auto/utf8/ascii/none"),
     qr_png: str = typer.Option("", "--qr-png", help="Write the QR to this PNG file (also works with --json)"),
@@ -425,13 +426,14 @@ def device_login(
         print(json.dumps(event, ensure_ascii=False), file=sys.stderr)
         _print_device_qr(uri, qr_mode, qr_png)
     else:
-        rprint(f"[green]1. Open:[/green] {uri}")
+        rprint("[green]1. Scan the QR below with the Lanxin mobile app[/green] → approve on the phone")
         rprint(f"[green]   userCode:[/green] [bold]{auth.user_code}[/bold]")
+        rprint(f"[green]   link:[/green] {uri}")
         if _copy_to_clipboard(uri):
             rprint("[dim](URL copied to clipboard)[/dim]")
         rprint("[yellow]2. Waiting for approval…[/yellow] (Ctrl+C to cancel)")
         _emit_qr_data_uri(_print_device_qr(uri, qr_mode, qr_png, qr_data_uri))
-    if not no_browser and uri:
+    if open_browser and not no_browser and uri:
         try:
             webbrowser.open(uri)
         except Exception:

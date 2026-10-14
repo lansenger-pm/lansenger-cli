@@ -280,6 +280,7 @@ lansenger oauth user-info YOUR_USER_TOKEN
 
 # 设备码登录——无头/远程友好（无需本地回调服务器）；需新版开放平台，旧版会提示回退方案。
 # 终端会直接画出可扫二维码（--qr auto|utf8|ascii|none）；--qr-png 另存 PNG、--qr-data-uri 输出 base64 data: URI，便于嵌到会话/界面
+# 授权确认由用户本人在蓝信手机端扫码/打开链接完成，终端不代为触发；确需打开本机浏览器时加 --open-browser
 lansenger oauth device-login
 
 # 脚本/Agent 可用的低层步骤
