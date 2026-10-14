@@ -338,6 +338,8 @@ lansenger media upload-app /path/to/file.pdf --media-type file
 lansenger media download-to-file MEDIA_ID --output /path/to/save.pdf
 ```
 
+> **Remarque** : `media upload` (4.5.1) nécessite la permission « 上传素材 » (téléversement de médias) dans la console développeur ; sans elle, la plateforme refuse le téléversement.
+
 ### Messages en streaming
 
 ```bash

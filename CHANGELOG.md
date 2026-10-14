@@ -10,13 +10,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
-- `message reply <msg_id>`：用表情回复消息，`--emoji` 取 `TYPE_THUMB` / `TYPE_OK` / `TYPE_ADD_ONE` / `TYPE_FIREWORK` / `TYPE_LOVE` / `TYPE_DOUBT`（SDK `client.reply_message(msg_id, emoji_id=..., user_token=...)`）；`--cancel` 发送取消回复（线上文档 4.6.4.14，`replyType=2`）。emojiId 非法时 CLI 侧直接给出中文错误并 exit 1，不抛 traceback。
+- `message reply <msg_id>`：用表情回复消息，`--emoji` 取 `TYPE_THUMB` / `TYPE_OK` / `TYPE_ADD_ONE` / `TYPE_FIREWORK` / `TYPE_LOVE` / `TYPE_DOUBT`（SDK `client.reply_message(msg_id, emoji_id=..., user_token=...)`）；`--cancel` 发送取消回复（线上文档 4.6.17，`replyType=2`）。emojiId 非法时 CLI 侧直接给出中文错误并 exit 1，不抛 traceback。
 - `message send-authorization-request --chat-id <id>... [--department-id <id>...] [--authorization-type 1] [--entry-id <id>]`：发送授权请求消息（线上文档 4.6.4.14 `authorizationReq` 类型，`authorizationType=1` 表示位置请求授权；SDK `client.send_authorization_request(chat_ids=..., department_ids=..., authorization_type=..., entry_id=...)`）。
 
 ### Changed
 
 - 上述两条命令均为高危写操作（会真的发出消息/发起授权），按本仓退出码契约接入 `confirm_high_risk` 门：缺 `--yes` 时输出结构化确认并以 exit 10 退出，`--dry-run` 只校验参数不发送。人类可见文案为中文，`--json` 字段与 `error_type` 值保持英文。
 - `dep:` `lansenger-sdk` 依赖下限本次**不抬升**：新命令依赖的 1.13.0 尚未发布到 PyPI，抬下限会让 CI 装不上；待 SDK 1.13.0 发布后把下限抬到 `lansenger-sdk>=1.13.0`。
+- `media upload` 文档补「开发者中心需开通上传素材权限」提示（4.5.1，SDK docstring + 5 份 README）。
 
 ## [0.16.0] - 2026-10-14
 
