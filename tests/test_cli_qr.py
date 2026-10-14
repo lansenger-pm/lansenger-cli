@@ -27,18 +27,18 @@ REAL_URI = (
 )
 GOLDEN = {
     SHORT_URI: (
-        "wyT+uyrobBKFWCKdzwCI2JcunVFMAYUisLheVa2krtc=",
-        "i9Q1NppxobevT1xmiih/WzA5TEruPMs0dodJTAWRik4=",
+        "uGumpf5auJIIAMS2SOU/oYPQ1vyX2bM5KzVI7lYNadE=",
+        "Kp+sh4J/boOV2YNLsQ7rsF84c3jLlW1mWvVXh2gqiew=",
         "NIvJf3fvHmpBwcK64gv2ZIqd1sXvCqOsEpOTlT7gAVo=",
     ),
     "HELLO": (
-        "m+bs0clYkhPtWRRl8AHtEm+78Ses0d5pGsbgVqENDiU=",
-        "jLwx5RBmdHIV4i1f0m8TVuzm8dwPeCYM2fyZ9efuoPs=",
+        "gq3lN679CUAfD1VBBxQoRBqwkcONfq9gzzJoUKdZzpk=",
+        "PLAR1kC1yG0vXDiVoB00BrswIzPEFgkuZ3KBj513Z1s=",
         "iL2Rnftct1TueCw+Gz/9tT7Pn/Dhf5eTDhLHygy9JF4=",
     ),
     REAL_URI: (
-        "pLpf5a782rZ5Nd3kCQ2pRFYjzOEasJHJM/+NNyGJCBg=",
-        "ea18Bk8rstoToA/nUSN3mX/38FY2vpKzENFEH9b9JbE=",
+        "ieuhxgwXXboLuGaQwYOCh1tewxywRLK3D/np6gpNQxU=",
+        "ogwrZgF7nl9W8VEoecKt93JejxBEXaunydDYEV6L0JI=",
         "+3xGtu9Q9f8H5L6x7mTOmi9ilTcvJT714AYO9Axbets=",
     ),
 }
@@ -243,3 +243,39 @@ def test_device_login_reports_exchange_failure_instead_of_traceback():
     assert payload["error"]["type"] == "exchange_failed"
     assert "40018" in payload["error"]["message"]
     assert "Traceback" not in result.stdout and "Traceback" not in raw
+
+
+def test_device_authorize_qr_ecc_rejects_unknown_level():
+    result = run(["oauth", "device-authorize", "--qr", "none", "--qr-ecc", "Q"])
+    assert result.exit_code == 1
+    assert "--qr-ecc" in result.stdout
+
+
+def test_device_authorize_qr_ecc_l_is_accepted():
+    result = run(["oauth", "device-authorize", "--qr", "none", "--qr-ecc", "L"])
+    assert result.exit_code == 0
+
+
+def test_device_authorize_guidance_points_at_the_next_step():
+    result = run(["oauth", "device-authorize", "--qr", "none"])
+    assert result.exit_code == 0
+    assert "本命令只申请设备码" in result.stdout
+    assert "device-login" in result.stdout
+    assert "oauth device-poll" in result.stdout
+
+
+def test_device_login_human_output_keeps_the_raw_token_out_of_the_table():
+    approved = fake_result(state="access_approved", oauth2_code="one-time-code")
+    with patch("lansenger_cli.commands.oauth.get_client") as gc, patch("lansenger_cli.commands.oauth.get_store"):
+        client = gc.return_value
+        client.health_check.return_value = True
+        client.request_device_authorization.return_value = AUTH_OK
+        client.poll_device_token.return_value = approved
+        client.exchange_code.return_value = fake_result(
+            success=True, user_token="u" * 36, refresh_token="r" * 36,
+            expires_in=7200, refresh_expires_in=2592000, staff_id="staff-001",
+        )
+        result = runner.invoke(app, ["oauth", "device-login", "--no-browser"])
+    assert result.exit_code == 0
+    assert "staff_id=staff-001" in result.stdout
+    assert "u" * 36 not in result.stdout

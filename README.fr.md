@@ -290,6 +290,8 @@ lansenger oauth device-login
 
 # Étapes de bas niveau pour scripts / agents
 lansenger oauth device-authorize
+# --qr-ecc L|M choisit le niveau de correction (M par défaut, QR plus petit) ;
+# device-authorize ne fait qu'obtenir le code, la confirmation se fait sur l'app mobile
 lansenger oauth device-authorize --qr none --qr-png /tmp/device-qr.png
 lansenger oauth device-authorize --qr none --qr-data-uri   # data: URI for chats/panels
 lansenger oauth device-poll DEVICE_CODE --wait

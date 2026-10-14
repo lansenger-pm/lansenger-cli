@@ -379,7 +379,7 @@ def encode(text: str, ecc: str = "M") -> list[list[bool]]:
     return _build_matrix(_interleave(codewords, version, ecc), version, ecc)
 
 
-def render_text(matrix: list[list[bool]], *, unicode: bool = True, quiet_zone: int = 2) -> str:
+def render_text(matrix: list[list[bool]], *, unicode: bool = True, quiet_zone: int = 4) -> str:
     """Render the matrix as terminal text: UTF-8 half blocks, or ASCII when `unicode` is False."""
     size = len(matrix)
     width = size + quiet_zone * 2

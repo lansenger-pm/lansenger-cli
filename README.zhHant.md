@@ -285,6 +285,7 @@ lansenger oauth device-login
 
 # 腳本/Agent 可用的底層步驟
 lansenger oauth device-authorize
+# --qr-ecc L|M 選擇糾錯等級（預設 M，碼更小）；device-authorize 只申請碼，確認由使用者在藍信手機端完成
 lansenger oauth device-authorize --qr none --qr-png /tmp/device-qr.png
 lansenger oauth device-authorize --qr none --qr-data-uri   # data: URI for chats/panels
 lansenger oauth device-poll DEVICE_CODE --wait

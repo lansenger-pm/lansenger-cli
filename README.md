@@ -290,6 +290,7 @@ lansenger oauth device-login
 
 # Low-level steps for scripts / agents
 lansenger oauth device-authorize
+# --qr-ecc L|M picks the error-correction level (default M, smaller panels)
 lansenger oauth device-authorize --qr none --qr-png /tmp/device-qr.png
 lansenger oauth device-authorize --qr none --qr-data-uri   # data: URI for chats/panels
 lansenger oauth device-poll DEVICE_CODE --wait

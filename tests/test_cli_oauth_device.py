@@ -169,7 +169,7 @@ def test_device_login_full_flow_saves_token(store_mock):
         gc.return_value = _login_client(store_mock, [POLL_PENDING, POLL_APPROVED])
         result = run(["oauth", "device-login", "--no-browser"])
     assert result.exit_code == 0
-    assert "user_token" in result.stdout
+    assert "staff_id" in result.stdout
     wb.assert_not_called()
     store_mock.save_user_token.assert_called_once_with(
         "u" * 36, "r" * 36, 7200, 300, 2592000, staff_id="staff-001",

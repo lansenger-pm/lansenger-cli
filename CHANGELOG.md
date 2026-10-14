@@ -13,11 +13,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - `oauth device-authorize` / `oauth device-login` 终端二维码：默认直接在终端画出可扫二维码（UTF-8 半块字符；渲染时锁定黑底白字，深色终端同样可扫），`--qr auto|utf8|ascii|none` 控制形态或关闭（非 UTF-8 终端降级为 ASCII）。
 - `--qr-png FILE`：把同一张二维码另存为 PNG（供聊天窗口/界面嵌入）；`--json` 模式下 stdout 仍是纯 JSON，落盘提示走 stderr。
 - `--qr-data-uri`：把同一张二维码以 `data:image/png;base64,...` 形式吐出（非 `--json` 模式打印到 stdout，`--json` 模式作为 `{"event":"device_qr"}` 事件写 stderr），供聊天窗口/网页面板等无法读取文件或终端文本的面板直接嵌图。
+- `--qr-ecc L|M`：选择二维码纠错等级（默认 M；L 容量更大、模块更少），终端/PNG/data URI 三种形态同时生效。
 - 零依赖 QR 编码器 `src/lansenger_cli/qr.py`（仅标准库 `struct`/`zlib`；支持版本 1-15、ECC L/M，自动选版与掩码择优），不引入任何第三方依赖。
 
 ### Changed
 
 - `oauth device-login` 默认**不再自动打开本机浏览器**（0.15.x 会 `webbrowser.open`）：设备码流程的授权确认是用户本人在蓝信手机端扫码/打开链接完成的自主行为，终端与对话面板只负责把二维码/链接交给用户，不代为触发。确需打开本机浏览器时用新增的 `--open-browser`（`--no-browser` 保留为兼容用的空开关，已废弃）。
+- 三条 device 命令的**人看文案改为中文**（`--help` 说明、引导语、状态、超时/取消、错误提示）：机器面保持英文不变（`--json` 字段、`error_type`/事件名、退出码 0/1/10）。本仓其余命令仍为英文，属本次按需求的定点改动。
+- `oauth device-authorize` 人看输出不再打印原始字段表，改为「扫码引导 + 二维码 + 下一步命令」：明确提示该命令只申请设备码、不等待确认，并给出 `device-login` / `device-poll <device_code> --wait` 两条后续命令（字段本身仍可经 `--json` 取）。
+- 二维码静默区（quiet zone）由 2 模块改为标准要求的 4 模块；`oauth device-login` 人看输出不再回显 userToken/refreshToken（`--json` 仍返回完整字段）。
 
 ### Fixed
 
