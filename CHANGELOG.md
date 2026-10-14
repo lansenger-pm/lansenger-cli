@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [0.16.1] - 2026-10-14
+
+### Fixed
+
+- `--json` 输出不再被破坏：列表类命令（`group members`、`message query-groups`、`department list`、`chat list`、`calendar list-schedules`、`bot-command list` 等）在 JSON 模式下会额外用 rich 打印一段 Python repr 列表，导致 stdout 变成「JSON 对象 + repr」两段、下游 `json.loads(stdout)` 报 `JSONDecodeError`。列表本身已包含在 result JSON 内，现直接跳过二次输出（`output_list` 在 JSON 模式提前返回）。
+
 ## [0.16.0] - 2026-10-14
 
 ### Added
