@@ -1,9 +1,37 @@
 import typer
 from typing import Optional, List
 
-from lansenger_cli.utils import get_client, output_result, output_list, parse_field_or_json, confirm_high_risk
+from rich import print as rprint
+
+from lansenger_cli.utils import (
+    EXIT_ERROR,
+    confirm_high_risk,
+    get_client,
+    is_json_output,
+    output_list,
+    output_result,
+    parse_field_or_json,
+)
 
 app = typer.Typer(help="Send and manage messages")
+
+EMOJI_IDS = ("TYPE_THUMB", "TYPE_OK", "TYPE_ADD_ONE", "TYPE_FIREWORK", "TYPE_LOVE", "TYPE_DOUBT")
+
+
+def _invalid_parameter(message: str):
+    """Reject a bad argument locally: Chinese error + exit 1, no API call.
+
+    Writes the structured error to stderr in ``--json`` mode so stdout stays pure JSON.
+    """
+    import json
+    import sys
+
+    if is_json_output():
+        payload = {"ok": False, "error": {"type": "invalid_parameter", "message": message}}
+        print(json.dumps(payload, ensure_ascii=False, indent=2), file=sys.stderr)
+    else:
+        rprint(f"[red]错误：[/red]{message}")
+    raise SystemExit(EXIT_ERROR)
 
 
 @app.command("send-text")
@@ -481,3 +509,53 @@ def update_approve_card(
         buttons=parsed_buttons,
     )
     output_result(result, fields=["operation"], title="Update ApproveCard Result")
+
+
+@app.command("reply")
+def reply_message(
+    msg_id: str = typer.Argument(help="要回复的消息 ID（msgId）"),
+    emoji: str = typer.Option("", "--emoji", "-e", help=f"表情类型，可选：{', '.join(EMOJI_IDS)}"),
+    cancel: bool = typer.Option(False, "--cancel", help="取消已有的表情回复（replyType=2，不需要 --emoji）"),
+    user_token: str = typer.Option("", "--user-token", help="用户 Token（私密渠道）"),
+):
+    """用表情回复消息，或用 --cancel 取消该回复（平台文档 4.6.17）"""
+    if cancel:
+        reply_type = 2
+    elif not emoji:
+        _invalid_parameter(f"必须指定 --emoji（可选：{', '.join(EMOJI_IDS)}）或 --cancel。")
+    elif emoji not in EMOJI_IDS:
+        _invalid_parameter(f"表情类型非法：{emoji}（可选：{', '.join(EMOJI_IDS)}）。")
+    else:
+        reply_type = 1
+    client = get_client()
+    result = client.reply_message(
+        msg_id=msg_id,
+        emoji_id="" if cancel else emoji,
+        reply_type=reply_type,
+        user_token=user_token,
+    )
+    output_result(result, fields=["reply_type", "msg_id", "emoji_id"], title="表情回复")
+
+
+@app.command("send-authorization-request")
+def send_authorization_request(
+    chat_ids: Optional[List[str]] = typer.Option(None, "--chat-id", "-C", help="接收方 chatId（员工 openId）"),
+    department_ids: Optional[List[str]] = typer.Option(None, "--dept", "-D", help="接收方部门 ID"),
+    account_id: str = typer.Option("", "--account-id", help="公众号 ID"),
+    entry_id: str = typer.Option("", "--entry-id", help="应用入口选择器"),
+    authorization_type: int = typer.Option(1, "--type", "-t", "--authorization-type", help="授权类型：1=位置请求授权"),
+    user_token: str = typer.Option("", "--user-token", help="用户 Token（私密渠道）"),
+):
+    """发送授权请求消息（authorizationReq，平台文档 4.6.4.14）"""
+    if authorization_type != 1:
+        _invalid_parameter(f"授权类型仅支持 1（位置请求授权），收到：{authorization_type}。")
+    client = get_client()
+    result = client.send_authorization_request(
+        chat_ids=chat_ids,
+        department_ids=department_ids,
+        account_id=account_id,
+        entry_id=entry_id,
+        authorization_type=authorization_type,
+        user_token=user_token,
+    )
+    output_result(result, fields=["message_id", "invalid_staff", "invalid_department"], title="授权请求结果")
