@@ -79,7 +79,7 @@ lansenger health check
 | 命令組 | 說明 | 子命令 |
 |--------|------|--------|
 | `config` | 管理憑證設定 | `set`, `show`, `clear`, `delete-profile`, `list-profiles`, `list-users` |
-| `message` | 傳送與管理訊息 | `send-text`, `send-markdown`, `send-file`, `send-image-url`, `send-link-card`, `send-app-articles`, `send-app-card`, `send-oacard`, `send-bot-message`, `send-group-message`, `send-account-message`, `send-user-message`, `update-dynamic-card`, `revoke`, `query-groups` |
+| `message` | 傳送與管理訊息 | `send-text`, `send-markdown`, `send-file`, `send-image-url`, `send-link-card`, `send-app-articles`, `send-app-card`, `send-oacard`, `send-bot-message`, `send-group-message`, `send-account-message`, `send-user-message`, `update-dynamic-card`, `revoke`, `query-groups`, `reply`, `send-authorization-request` |
 | `group` | 管理群組 | `create`, `info`, `members`, `list`, `check`, `update`, `update-members` |
 | `staff` | 查詢人員資訊 | `basic-info`, `detail`, `ancestors`, `id-mapping`, `org-extra-fields`, `search`, `org-info` |
 | `department` | 查詢部門資訊 | `detail`, `children`, `staffs` |
@@ -157,6 +157,15 @@ lansenger message send-user-message user001 text '{"content":"私聊訊息"}' --
 
 # 撤回訊息
 lansenger message revoke msg001 msg002
+
+# 表情回覆訊息（高危寫操作：加 --yes 確認）
+lansenger message reply msg001 --emoji TYPE_OK --yes
+
+# 取消該表情回覆
+lansenger message reply msg001 --cancel --yes
+
+# 傳送授權請求訊息（authorizationType=1 位置請求授權；高危寫操作：加 --yes 確認）
+lansenger message send-authorization-request --chat-id user001 --yes
 
 # 查詢群組 ID 列表
 lansenger message query-groups --page 0 --size 100
@@ -435,6 +444,8 @@ lansenger config show --profile my-app
 | `message send-account-message`（公眾號） | N | **Y** | **Y** | 需要公眾號能力 |
 | `message send-user-message`（使用者對使用者） | N | **Y** | **Y** | 需要 userToken + OAuth2 |
 | `message revoke` | **Y** | **Y** | **Y** | 撤回自己傳送的訊息 |
+| `message reply` | **Y** | **Y** | **Y** | 表情回覆 / 取消已有回覆（4.6.17）；私密通道可加 `--user-token` |
+| `message send-authorization-request` | **Y** | **Y** | **Y** | 位置請求授權訊息（authorizationReq，4.6.4.14） |
 | `staff *`（通訊錄唯讀） | N | **Y** | **Y** | `search` 額外需要 userToken |
 | `department *` | N | **Y** | **Y** | 僅組織級應用 |
 | `calendar *` | N | **Y** | **Y** | 有 userToken = 使用者身份；無 = 機器人身份 |

@@ -79,7 +79,7 @@ lansenger health check
 | 命令组 | 说明 | 子命令 |
 |--------|------|--------|
 | `config` | 管理凭证配置 | `set`, `show`, `clear`, `delete-profile`, `list-profiles`, `list-users` |
-| `message` | 发送与管理消息 | `send-text`, `send-markdown`, `send-file`, `send-image-url`, `send-link-card`, `send-app-articles`, `send-app-card`, `send-oacard`, `send-bot-message`, `send-group-message`, `send-account-message`, `send-user-message`, `update-dynamic-card`, `revoke`, `query-groups` |
+| `message` | 发送与管理消息 | `send-text`, `send-markdown`, `send-file`, `send-image-url`, `send-link-card`, `send-app-articles`, `send-app-card`, `send-oacard`, `send-bot-message`, `send-group-message`, `send-account-message`, `send-user-message`, `update-dynamic-card`, `revoke`, `query-groups`, `reply`, `send-authorization-request` |
 | `group` | 管理群组 | `create`, `info`, `members`, `list`, `check`, `update`, `update-members` |
 | `staff` | 查询人员信息 | `basic-info`, `detail`, `ancestors`, `id-mapping`, `org-extra-fields`, `search`, `org-info` |
 | `department` | 查询部门信息 | `detail`, `children`, `staffs` |
@@ -157,6 +157,15 @@ lansenger message send-user-message user001 text '{"content":"私聊消息"}' --
 
 # 撤回消息
 lansenger message revoke msg001 msg002
+
+# 表情回复消息（高危写操作：加 --yes 确认）
+lansenger message reply msg001 --emoji TYPE_OK --yes
+
+# 取消该表情回复
+lansenger message reply msg001 --cancel --yes
+
+# 发送授权请求消息（authorizationType=1 位置请求授权；高危写操作：加 --yes 确认）
+lansenger message send-authorization-request --chat-id user001 --yes
 
 # 查询群 ID 列表
 lansenger message query-groups --page 0 --size 100
@@ -463,6 +472,8 @@ lansenger config show --profile my-app
 | `message send-account-message`（公众号） | N | **Y** | **Y** | 需要公众号能力 |
 | `message send-user-message`（用户对用户） | N | **Y** | **Y** | 需要 userToken + OAuth2 |
 | `message revoke` | **Y** | **Y** | **Y** | 撤回自己发送的消息 |
+| `message reply` | **Y** | **Y** | **Y** | 表情回复 / 取消已有回复（4.6.17）；私密渠道可加 `--user-token` |
+| `message send-authorization-request` | **Y** | **Y** | **Y** | 位置请求授权消息（authorizationReq，4.6.4.14） |
 | `staff *`（通讯录只读） | N | **Y** | **Y** | `search` 额外需要 userToken |
 | `department *` | N | **Y** | **Y** | 仅组织级应用 |
 | `calendar *` | N | **Y** | **Y** | 有 userToken = 用户身份；无 = 机器人身份 |

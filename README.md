@@ -79,7 +79,7 @@ lansenger health check
 | Group | Description | Subcommands |
 |--------|------|--------|
 | `config` | Manage credentials | `set`, `show`, `clear`, `delete-profile`, `list-profiles`, `list-users` |
-| `message` | Send & manage messages | `send-text`, `send-markdown`, `send-file`, `send-image-url`, `send-link-card`, `send-app-articles`, `send-app-card`, `send-oacard`, `send-bot-message`, `send-group-message`, `send-account-message`, `send-user-message`, `update-dynamic-card`, `revoke`, `query-groups` |
+| `message` | Send & manage messages | `send-text`, `send-markdown`, `send-file`, `send-image-url`, `send-link-card`, `send-app-articles`, `send-app-card`, `send-oacard`, `send-bot-message`, `send-group-message`, `send-account-message`, `send-user-message`, `update-dynamic-card`, `revoke`, `query-groups`, `reply`, `send-authorization-request` |
 | `group` | Manage groups | `create`, `info`, `members`, `list`, `check`, `update`, `update-members` |
 | `staff` | Query staff info | `basic-info`, `detail`, `ancestors`, `id-mapping`, `org-extra-fields`, `search`, `org-info` |
 | `department` | Query department info | `detail`, `children`, `staffs` |
@@ -158,6 +158,15 @@ lansenger message send-user-message user001 text '{"content":"Private message"}'
 
 # Revoke messages
 lansenger message revoke msg001 msg002
+
+# Reply to a message with an emoji (high-risk write: confirm with --yes)
+lansenger message reply msg001 --emoji TYPE_OK --yes
+
+# Cancel that emoji reply
+lansenger message reply msg001 --cancel --yes
+
+# Send an authorization request (authorizationType=1: location permission; high-risk write: confirm with --yes)
+lansenger message send-authorization-request --chat-id user001 --yes
 
 # Query group ID list
 lansenger message query-groups --page 0 --size 100
@@ -468,6 +477,8 @@ The Lansenger platform has three identity types with different API access:
 | `message send-account-message` (public account) | N | **Y** | **Y** | Requires public account capability |
 | `message send-user-message` (user-to-user) | N | **Y** | **Y** | Requires userToken + OAuth2 |
 | `message revoke` | **Y** | **Y** | **Y** | Revoke own messages |
+| `message reply` | **Y** | **Y** | **Y** | Emoji reply / cancel an existing reply (4.6.17); `--user-token` for the private channel |
+| `message send-authorization-request` | **Y** | **Y** | **Y** | Location permission request message (authorizationReq, 4.6.4.14) |
 | `staff *` (contacts read-only) | N | **Y** | **Y** | `search` additionally requires userToken |
 | `department *` | N | **Y** | **Y** | Org-level apps only |
 | `calendar *` | N | **Y** | **Y** | With userToken = user identity; without = bot identity |
