@@ -16,6 +16,8 @@
 
 ## 工具坑
 
+- [2026-10-14] **README 同步点每份文件有三处，不止两处**：命令总览表 / 对应示例章节 / 「身份能力矩阵」逐命令行（`## Identity & Permissions`）→ 只改前两处会漏矩阵行（本轮 5 份一次性核查才发现）。处置：同步后按 `grep -c '<新子命令>' README*.md` 五份计数一致（预期 ≥3）再提交；`README.fr.md` 常被批量编辑漏掉，逐份点名。
+- [2026-10-14] **任务书给的 SDK 新方法签名是摘要，不是全签名**：按摘要写 CLI 会漏参——`reply_message` 实为 `(msg_id, *, emoji_id, reply_type, user_token)`、`send_authorization_request` 实为 `(*, chat_ids, department_ids, account_id, entry_id, authorization_type, user_token)` → 处置：实现前回读 SDK 源码（`lansenger-sdk-python/src/lansenger_sdk/sync_client.py`）逐字对齐关键字；mock 测试对错误关键字是瞎的（MagicMock 照收），只有回读源码能挡。
 - [2026-10-13] 历史 `.gitignore` 把 `AGENTS.md`、`docs/` 整体忽略，而 release.yml 的报错信息引用 AGENTS.md（当时并不存在）→ Harness 化时已从 .gitignore 移除（✅机制：约束产物必须入库；AGENTS.md 由平台自动加载）。
 - [2026-10-13] pyproject ruff ignore B008 是为 typer 惯用法（`typer.Option(...)` 作默认值）放行，不是失误；改 lint 配置前先查这条历史。
 - [2026-10-13] release.yml 对 `git tag v*` 与 pyproject version 做硬校验，报错信息示例：`Version mismatch — tag=… pyproject=…` → 发版必须同 PR 改齐 version+CHANGELOG，tag 合并后打。
