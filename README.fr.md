@@ -58,6 +58,8 @@ export LANSENGER_ENCODING_KEY=YOUR_ENCODING_KEY
 export LANSENGER_CALLBACK_TOKEN=YOUR_CALLBACK_TOKEN
 ```
 
+> **Mode jeton externe** : si `LANSENGER_APP_TOKEN` est défini, il prime sur les identifiants d'application ci-dessus. Un jeton externe expiré ne donnait qu'une erreur vague `APP_TOKEN invalide` ; depuis `lansenger-sdk` 1.12.2, déclarez son expiration avec `LANSENGER_APP_TOKEN_EXPIRES_AT` (secondes ou millisecondes) et le SDK obtiendra un nouveau jeton via `LANSENGER_APP_ID` / `LANSENGER_APP_SECRET` ; sans identifiants d'application, l'erreur `LANSENGER_APP_TOKEN expired` est explicite.
+
 ### 2. Voir la configuration
 
 ```bash

@@ -58,6 +58,8 @@ export LANSENGER_ENCODING_KEY=YOUR_ENCODING_KEY
 export LANSENGER_CALLBACK_TOKEN=YOUR_CALLBACK_TOKEN
 ```
 
+> **External token mode**: `LANSENGER_APP_TOKEN` takes precedence over the app credentials above. An expired external token only produced a vague `invalid APP_TOKEN` error — since `lansenger-sdk` 1.12.2 declare its expiry with `LANSENGER_APP_TOKEN_EXPIRES_AT` (seconds or milliseconds) and the SDK will obtain a fresh appToken from `LANSENGER_APP_ID` / `LANSENGER_APP_SECRET` instead; without app credentials it now fails with an explicit `LANSENGER_APP_TOKEN expired` error.
+
 ### 2. View Configuration
 
 ```bash

@@ -58,6 +58,8 @@ export LANSENGER_ENCODING_KEY=YOUR_ENCODING_KEY
 export LANSENGER_CALLBACK_TOKEN=YOUR_CALLBACK_TOKEN
 ```
 
+> **外部 Token 模式**：一旦設定了 `LANSENGER_APP_TOKEN`，它的優先級高於上面的應用憑證。過期的外部 token 以前只會報含糊的 `無效的 APP_TOKEN`；自 `lansenger-sdk` 1.12.2 起用 `LANSENGER_APP_TOKEN_EXPIRES_AT`（秒或毫秒）宣告過期時間，SDK 會自動改用 `LANSENGER_APP_ID` / `LANSENGER_APP_SECRET` 換取新 appToken；沒有應用憑證時會明確報 `LANSENGER_APP_TOKEN expired`。
+
 ### 2. 檢視設定
 
 ```bash
