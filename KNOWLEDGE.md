@@ -29,6 +29,9 @@
 - [2026-10-13] **钉 `lansenger-sdk>=1.12.0` 后 verify 必红直到 SDK 发布**：`uv run --frozen` 只是不更新锁，但每次仍向 PyPI 重新解析依赖（--frozen ≠ 离线），PyPI 只有 ≤1.11.0 时 lint/test 两步解析直接失败。发布顺序：SDK 仓 tag v1.12.0 → release.yml 发 PyPI → CLI verify/CI 才能绿。过渡期验证方案：`uv pip install --python .venv/bin/python ../lansenger-sdk-python` 后直跑 `.venv/bin/python -m pytest`（2026-10-13 已实证 62 例全绿 + ruff 干净）。
 - [2026-10-13] **venv 内 SDK 快照漂移**：`uv pip install ../lansenger-sdk-python` 是普通副本（非 editable），SDK 源码后续修复（如 P0 passport_url 透传）**不会自动生效**——E2E 运行时才暴露（`LansengerConfigError: passport_url is required`，尽管单测全绿）。处置：E2E 前 `uv pip install --reinstall` 重装；教训：**单测 mock 了 get_client、评审看的是源码，只有运行时能抓安装副本漂移**——真实环境 E2E 是必要层（✅机制：evaluation.md §11.5 已固化 E2E 记录）。
 
+- [2026-10-14] **rich 15 把模块级 `rich.print` 收窄成内建 `print` 签名**：`from rich import print as rprint; rprint(x, style="...")` 在 rich 13/14 可用，依赖解析到 15.0.0 后直接 `TypeError: print() got an unexpected keyword argument 'style'`（`soft_wrap`/`highlight` 同理）→ 需要样式的输出一律走 `Console.print`（本仓 `utils.console`，或域模块内的 `console = Console()`）。教训：依赖写 `rich>=13` 时不要依赖「模块级 print 的高级参数」——CI 与本地都装最新版，只有测试能提前抓到。
+- [2026-10-14] **golden 哈希会被自家安全门拦下**：测试里存 `sha256(...).hexdigest()`（64 位 hex）触发 `long-hex-value` → `verify.sh` FAIL。处置：golden 改存 **base64(sha256)**（`base64.b64encode(hashlib.sha256(raw).digest()).decode()`），逐字节等价比对能力不变，又不落 32+ hex 形态（✅机制：tests/test_cli_qr.py 为范例，后续需要 golden 的用例照此办理；勿把测试向量塞进 allowlist）。
+
 ## 事故档案
 
 （暂无；按 incident-response.md 处理过的真实事件在此登记脱敏摘要。）

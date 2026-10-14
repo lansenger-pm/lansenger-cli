@@ -6,6 +6,30 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [0.16.0] - 2026-10-14
+
+### Added
+
+- `oauth device-authorize` / `oauth device-login` 终端二维码：默认直接在终端画出可扫二维码（UTF-8 半块字符；渲染时锁定黑底白字，深色终端同样可扫），`--qr auto|utf8|ascii|none` 控制形态或关闭（非 UTF-8 终端降级为 ASCII）。
+- `--qr-png FILE`：把同一张二维码另存为 PNG（供聊天窗口/界面嵌入）；`--json` 模式下 stdout 仍是纯 JSON，落盘提示走 stderr。
+- `--qr-data-uri`：把同一张二维码以 `data:image/png;base64,...` 形式吐出（非 `--json` 模式打印到 stdout，`--json` 模式作为 `{"event":"device_qr"}` 事件写 stderr），供聊天窗口/网页面板等无法读取文件或终端文本的面板直接嵌图。
+- `--qr-ecc L|M`：选择二维码纠错等级（默认 M；L 容量更大、模块更少），终端/PNG/data URI 三种形态同时生效。
+- 零依赖 QR 编码器 `src/lansenger_cli/qr.py`（仅标准库 `struct`/`zlib`；支持版本 1-15、ECC L/M，自动选版与掩码择优），不引入任何第三方依赖。
+
+### Changed
+
+- `oauth device-login` 默认**不再自动打开本机浏览器**（0.15.x 会 `webbrowser.open`）：设备码流程的授权确认是用户本人在蓝信手机端扫码/打开链接完成的自主行为，终端与对话面板只负责把二维码/链接交给用户，不代为触发。确需打开本机浏览器时用新增的 `--open-browser`（`--no-browser` 保留为兼容用的空开关，已废弃）。
+- 三条 device 命令的**人看文案改为中文**（`--help` 说明、引导语、状态、超时/取消、错误提示）：机器面保持英文不变（`--json` 字段、`error_type`/事件名、退出码 0/1/10）。本仓其余命令仍为英文，属本次按需求的定点改动。
+- `oauth device-authorize` 人看输出不再打印原始字段表，改为「扫码引导 + 二维码 + 下一步命令」：明确提示该命令只申请设备码、不等待确认，并给出 `device-login` / `device-poll <device_code> --wait` 两条后续命令（字段本身仍可经 `--json` 取）。
+- 文档：README 增补「外部 Token 模式」说明 —— `LANSENGER_APP_TOKEN` 的优先级高于应用凭证，过期时只会报含糊的`无效的 APP_TOKEN`；`lansenger-sdk` 1.12.2 起可用 `LANSENGER_APP_TOKEN_EXPIRES_AT` 声明过期时间，SDK 会自动用 `LANSENGER_APP_ID` / `LANSENGER_APP_SECRET` 换取新 appToken，无应用凭证时给出明确报错。同时 `dep:` 依赖下限抬到 `lansenger-sdk>=1.12.2`（该版本已在 PyPI 发布），全量回归 92 例通过。
+- 二维码静默区（quiet zone）由 2 模块改为标准要求的 4 模块；`oauth device-login` 人看输出不再回显 userToken/refreshToken（`--json` 仍返回完整字段）。
+- 终端二维码改用**色块半块**渲染：仍是一行两模块，但 `▀` 的上/下两半分别用前景/背景色画（只用 16 色黑/白），模块之间不再依赖字体字形的拼接，消除半块字符在不少终端上出现的横向缝隙；终端不支持颜色（`NO_COLOR`/`TERM=dumb`/重定向）或非 UTF-8 时，仍回退为原来的纯字符块渲染。
+
+### Fixed
+
+- `oauth device-login` 兑换前先做凭据自检（`health_check()`）：app_id/app_secret 换不到 appToken 时立即 exit 1，给出 `auth_failed` 结构化错误与修复提示，避免用户扫码授权后才发现兑换失败。
+- `oauth device-login` 兑换阶段的 SDK 异常（凭证/网络）不再抛裸 traceback：统一为 `exchange_failed` 结构化错误 + 退出 1，并说明「授权已通过，仅兑换失败」。
+
 ## [0.15.1] - 2026-10-13
 
 ### Fixed

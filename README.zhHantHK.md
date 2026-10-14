@@ -58,6 +58,8 @@ export LANSENGER_ENCODING_KEY=YOUR_ENCODING_KEY
 export LANSENGER_CALLBACK_TOKEN=YOUR_CALLBACK_TOKEN
 ```
 
+> **外部 Token 模式**：一旦設定了 `LANSENGER_APP_TOKEN`，它的優先級高於上面的應用憑證。過期的外部 token 以前只會報含糊的 `無效的 APP_TOKEN`；自 `lansenger-sdk` 1.12.2 起用 `LANSENGER_APP_TOKEN_EXPIRES_AT`（秒或毫秒）宣告過期時間，SDK 會自動改用 `LANSENGER_APP_ID` / `LANSENGER_APP_SECRET` 換取新 appToken；沒有應用憑證時會明確報 `LANSENGER_APP_TOKEN expired`。
+
 ### 2. 檢視設定
 
 ```bash
@@ -278,11 +280,17 @@ lansenger oauth refresh-token YOUR_REFRESH_TOKEN
 # 取得使用者資訊
 lansenger oauth user-info YOUR_USER_TOKEN
 
-# 裝置碼登入——無頭/遠端友善（無需本機回呼伺服器）；需新版開放平台，舊版會提示回退方案
+# 裝置碼登入——無頭/遠端友善（無需本機回呼伺服器）；需新版開放平台，舊版會提示回退方案。
+# 終端會直接畫出可掃 QR Code（--qr auto|utf8|ascii|none）；--qr-png 另存 PNG、--qr-data-uri 輸出 base64 data: URI，便於嵌到會話/介面
+# 終端 QR Code 用「色塊半塊」繪製（無色終端自動回退為純字元塊）
+# 授權確認由使用者本人在藍信手機端掃碼/開啟連結完成，終端不代為觸發；確需開啟本機瀏覽器時加 --open-browser
 lansenger oauth device-login
 
 # 腳本/Agent 可用的底層步驟
 lansenger oauth device-authorize
+# --qr-ecc L|M 選擇糾錯等級（預設 M，碼更小）；device-authorize 只申請碼，確認由使用者在藍信手機端完成
+lansenger oauth device-authorize --qr none --qr-png /tmp/device-qr.png
+lansenger oauth device-authorize --qr none --qr-data-uri   # data: URI for chats/panels
 lansenger oauth device-poll DEVICE_CODE --wait
 ```
 

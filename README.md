@@ -58,6 +58,8 @@ export LANSENGER_ENCODING_KEY=YOUR_ENCODING_KEY
 export LANSENGER_CALLBACK_TOKEN=YOUR_CALLBACK_TOKEN
 ```
 
+> **External token mode**: `LANSENGER_APP_TOKEN` takes precedence over the app credentials above. An expired external token only produced a vague `invalid APP_TOKEN` error — since `lansenger-sdk` 1.12.2 declare its expiry with `LANSENGER_APP_TOKEN_EXPIRES_AT` (seconds or milliseconds) and the SDK will obtain a fresh appToken from `LANSENGER_APP_ID` / `LANSENGER_APP_SECRET` instead; without app credentials it now fails with an explicit `LANSENGER_APP_TOKEN expired` error.
+
 ### 2. View Configuration
 
 ```bash
@@ -280,11 +282,20 @@ lansenger oauth refresh-token YOUR_REFRESH_TOKEN
 lansenger oauth user-info YOUR_USER_TOKEN
 
 # Device code login — headless/remote friendly (no localhost callback server);
-# requires the new open platform, legacy servers print a fallback hint
+# requires the new open platform, legacy servers print a fallback hint.
+# A scannable QR is drawn in the terminal (--qr auto|utf8|ascii|none); --qr-png
+# Terminal QR is painted with colour half-blocks (falls back to plain block characters when colour is off)
+# also saves it as a PNG, --qr-data-uri emits the same PNG as a base64 data:
+# URI for chats and web panels that cannot read a file or terminal text.
+# Approval is the user's own act on the Lanxin mobile app (scan the QR / open
+# the link); the CLI never opens a browser unless you pass --open-browser
 lansenger oauth device-login
 
 # Low-level steps for scripts / agents
 lansenger oauth device-authorize
+# --qr-ecc L|M picks the error-correction level (default M, smaller panels)
+lansenger oauth device-authorize --qr none --qr-png /tmp/device-qr.png
+lansenger oauth device-authorize --qr none --qr-data-uri   # data: URI for chats/panels
 lansenger oauth device-poll DEVICE_CODE --wait
 ```
 

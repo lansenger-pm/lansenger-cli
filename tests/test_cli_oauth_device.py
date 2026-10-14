@@ -169,19 +169,29 @@ def test_device_login_full_flow_saves_token(store_mock):
         gc.return_value = _login_client(store_mock, [POLL_PENDING, POLL_APPROVED])
         result = run(["oauth", "device-login", "--no-browser"])
     assert result.exit_code == 0
-    assert "user_token" in result.stdout
+    assert "staff_id" in result.stdout
     wb.assert_not_called()
     store_mock.save_user_token.assert_called_once_with(
         "u" * 36, "r" * 36, 7200, 300, 2592000, staff_id="staff-001",
     )
 
 
-def test_device_login_opens_browser_by_default(store_mock):
+def test_device_login_does_not_open_browser_by_default(store_mock):
     with patch("lansenger_cli.commands.oauth.get_client") as gc, \
          patch.object(oauth_mod, "_sleep"), \
          patch.object(oauth_mod.webbrowser, "open") as wb:
         gc.return_value = _login_client(store_mock, [POLL_APPROVED])
         result = run(["oauth", "device-login"])
+    assert result.exit_code == 0
+    wb.assert_not_called()
+
+
+def test_device_login_opens_browser_only_with_the_flag(store_mock):
+    with patch("lansenger_cli.commands.oauth.get_client") as gc, \
+         patch.object(oauth_mod, "_sleep"), \
+         patch.object(oauth_mod.webbrowser, "open") as wb:
+        gc.return_value = _login_client(store_mock, [POLL_APPROVED])
+        result = run(["oauth", "device-login", "--open-browser"])
     assert result.exit_code == 0
     wb.assert_called_once_with(AUTH_OK.verification_uri_complete)
 

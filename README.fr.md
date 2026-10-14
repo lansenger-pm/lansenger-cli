@@ -58,6 +58,8 @@ export LANSENGER_ENCODING_KEY=YOUR_ENCODING_KEY
 export LANSENGER_CALLBACK_TOKEN=YOUR_CALLBACK_TOKEN
 ```
 
+> **Mode jeton externe** : si `LANSENGER_APP_TOKEN` est défini, il prime sur les identifiants d'application ci-dessus. Un jeton externe expiré ne donnait qu'une erreur vague `APP_TOKEN invalide` ; depuis `lansenger-sdk` 1.12.2, déclarez son expiration avec `LANSENGER_APP_TOKEN_EXPIRES_AT` (secondes ou millisecondes) et le SDK obtiendra un nouveau jeton via `LANSENGER_APP_ID` / `LANSENGER_APP_SECRET` ; sans identifiants d'application, l'erreur `LANSENGER_APP_TOKEN expired` est explicite.
+
 ### 2. Voir la configuration
 
 ```bash
@@ -280,11 +282,21 @@ lansenger oauth user-info YOUR_USER_TOKEN
 
 # Connexion par code d'appareil — adaptée aux environnements headless/distants
 # (sans serveur de callback local) ; nécessite la nouvelle plateforme ouverte,
-# les anciennes versions affichent une solution de repli
+# les anciennes versions affichent une solution de repli.
+# Un QR code scannable est dessiné dans le terminal (--qr auto|utf8|ascii|none) ;
+# Le QR du terminal est peint en demi-blocs colores (retour aux blocs simples sans couleur)
+# --qr-png enregistre le même QR en PNG, --qr-data-uri l'émet en data: URI base64
+# (pour les chats et interfaces web qui ne peuvent pas lire un fichier)
+# L'approbation est un acte de l'utilisateur sur l'application mobile Lanxin
+# (scanner le QR / ouvrir le lien) ; le CLI n'ouvre jamais de navigateur sauf --open-browser
 lansenger oauth device-login
 
 # Étapes de bas niveau pour scripts / agents
 lansenger oauth device-authorize
+# --qr-ecc L|M choisit le niveau de correction (M par défaut, QR plus petit) ;
+# device-authorize ne fait qu'obtenir le code, la confirmation se fait sur l'app mobile
+lansenger oauth device-authorize --qr none --qr-png /tmp/device-qr.png
+lansenger oauth device-authorize --qr none --qr-data-uri   # data: URI for chats/panels
 lansenger oauth device-poll DEVICE_CODE --wait
 ```
 
