@@ -17,7 +17,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
-- 本次**不抬** `lansenger-sdk` 依赖下限（仍为 `>=1.12.2`）：CLI 侧先只做封装，待 `lansenger-sdk` 1.13.0 上 PyPI 后再单独提交把下限抬到 `>=1.13.0`。CLI 单测全部 mock 客户端，在本地 1.12.2 环境下同样通过。
+- `dep:` — `lansenger-sdk` 下限由 `>=1.12.2` 抬到 `>=1.13.0`（1.13.0 已发布到 PyPI；表情回复与授权请求两个方法在 1.13.0 才存在，0.16.x 配旧 SDK 会在运行期报方法缺失）。全量回归 121 例通过。
 - `media upload` 文档补「开发者中心需开通上传素材权限」提示（4.5.1，SDK docstring + 5 份 README）。
 
 ## [0.16.1] - 2026-10-14
