@@ -113,12 +113,11 @@ def fetch_schedule_list(
         calendar_id=calendar_id, start_time=start_time, end_time=end_time,
         user_token=user_token, user_id=user_id,
     )
+    output_result(result, fields=[], title="Schedule List")
     if result.success and result.schedule_list:
         output_list(result.schedule_list, columns=["Schedule ID", "Summary"], row_mapper=lambda s: [
             s.get("scheduleId", ""), s.get("summary", ""),
         ])
-    else:
-        output_result(result, title="Schedule List")
 
 
 @app.command("attendees")

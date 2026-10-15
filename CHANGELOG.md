@@ -10,7 +10,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
-- `--json` 输出不再被破坏：列表类命令（`group members`、`message query-groups`、`department list`、`chat list`、`calendar list-schedules`、`bot-command list` 等）在 JSON 模式下会额外用 rich 打印一段 Python repr 列表，导致 stdout 变成「JSON 对象 + repr」两段、下游 `json.loads(stdout)` 报 `JSONDecodeError`。列表本身已包含在 result JSON 内，现直接跳过二次输出（`output_list` 在 JSON 模式提前返回）。
+- `--json` 的 stdout 保证恰好一份 JSON 文档，两种历史形态都修掉：
+    - **冗余 repr**：`group members`、`message query-groups`、`department list`、`chat list`、`bot-command list` 等命令在 JSON 模式下会额外用 rich 打印一段 Python repr 列表，stdout 变成「JSON 对象 + repr」两段、下游 `json.loads(stdout)` 报 `JSONDecodeError`。列表本身已包含在 result JSON 内，现直接跳过二次输出（`output_list` 在 JSON 模式提前返回）。
+    - **列表当唯一输出**：`personal_app list`、`calendar list-schedules` 成功路径只调 `output_list`，JSON 模式要么输出纯 repr、要么（修复后若不补）什么都不输出。现统一为既有模式：先 `output_result` 输出完整 result JSON（`to_dict` 含 `app_list`/`schedule_list`），条目表格仅在人类模式追加。
 
 ## [0.16.0] - 2026-10-14
 

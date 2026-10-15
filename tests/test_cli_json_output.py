@@ -16,15 +16,18 @@ from lansenger_cli.main import app
 runner = CliRunner()
 
 
+CLI_NAMES = {"personal_app": "personal-app"}  # 子命令注册名（kebab）与模块名（下划线）不同者在此映射
+
+
 def _invoke_json(group: str, method: str, result):
     with patch(f"lansenger_cli.commands.{group}.get_client") as gc:
         client = MagicMock()
         getattr(client, method).return_value = result
         gc.return_value = client
-        return runner.invoke(app, ["--json", group, *ARGS[group]])
+        return runner.invoke(app, ["--json", CLI_NAMES.get(group, group), *ARGS[group]])
 
 
-ARGS = {"group": ["members", "g-1"], "message": ["query-groups"]}
+ARGS = {"group": ["members", "g-1"], "message": ["query-groups"], "personal_app": ["list"], "calendar": ["list-schedules", "cal-1", "0", "9"]}
 
 
 def test_group_members_json_stdout_is_a_single_document():
@@ -53,3 +56,30 @@ def test_query_groups_json_stdout_is_a_single_document():
     assert out.exit_code == 0, out.output
     payload = json.loads(out.stdout)
     assert payload["group_ids"] == ["g-1"]
+
+
+def test_personal_app_list_json_stdout_is_a_single_document():
+    """output_list 是该命令成功路径的唯一列表输出的形态：JSON 模式必须由 output_result 出一份 JSON。"""
+    result = MagicMock()
+    result.success = True
+    result.app_list = [
+        {"appId": "123-456", "appName": "A", "description": ""},
+    ]
+    result.to_dict.return_value = {"success": True, "app_list": result.app_list}
+    out = _invoke_json("personal_app", "fetch_personal_app_list", result)
+    assert out.exit_code == 0, out.output
+    payload = json.loads(out.stdout)
+    assert payload["app_list"][0]["appId"] == "123-456"
+
+
+def test_calendar_list_schedules_json_stdout_is_a_single_document():
+    result = MagicMock()
+    result.success = True
+    result.schedule_list = [
+        {"scheduleId": "s-1", "summary": "demo"},
+    ]
+    result.to_dict.return_value = {"success": True, "schedule_list": result.schedule_list}
+    out = _invoke_json("calendar", "fetch_schedule_list", result)
+    assert out.exit_code == 0, out.output
+    payload = json.loads(out.stdout)
+    assert payload["schedule_list"][0]["scheduleId"] == "s-1"
