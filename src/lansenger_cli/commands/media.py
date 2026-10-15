@@ -5,7 +5,7 @@ from rich import print as rprint
 from lansenger_cli.utils import EXIT_ERROR, get_client, is_json_output, output_result
 from lansenger_sdk import LansengerFileError
 
-app = typer.Typer(help="Upload and download media files")
+app = typer.Typer(help="Upload and download media files (uploading needs the 「上传素材」 permission in the developer console)")
 
 
 @app.command("upload")
@@ -14,7 +14,10 @@ def upload_media(
     media_type: int = typer.Option(2, "--media-type", "-t", help="1=video, 2=image, 3=audio (4.5.1 core service)"),
     user_token: str = typer.Option("", "--user-token", help="User token (optional for 4.5.1)"),
 ):
-    """Upload media file (4.5.1 core service)"""
+    """Upload media file (4.5.1 core service)
+
+    Needs the 「上传素材」(media upload) permission in the developer console, otherwise the platform rejects the upload.
+    """
     client = get_client()
     result = client.upload_media(file_path=file_path, media_type=media_type, user_token=user_token)
     output_result(result, fields=["message_id", "created_time"], title="Upload Media Result (4.5.1)")

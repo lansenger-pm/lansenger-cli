@@ -79,7 +79,7 @@ lansenger health check
 | 命令组 | 说明 | 子命令 |
 |--------|------|--------|
 | `config` | 管理凭证配置 | `set`, `show`, `clear`, `delete-profile`, `list-profiles`, `list-users` |
-| `message` | 发送与管理消息 | `send-text`, `send-markdown`, `send-file`, `send-image-url`, `send-link-card`, `send-app-articles`, `send-app-card`, `send-oacard`, `send-bot-message`, `send-group-message`, `send-account-message`, `send-user-message`, `update-dynamic-card`, `revoke`, `query-groups` |
+| `message` | 发送与管理消息 | `send-text`, `send-markdown`, `send-file`, `send-image-url`, `send-link-card`, `send-app-articles`, `send-app-card`, `send-oacard`, `send-bot-message`, `send-group-message`, `send-account-message`, `send-user-message`, `update-dynamic-card`, `revoke`, `query-groups`, `reply`, `send-authorization-request` |
 | `group` | 管理群组 | `create`, `info`, `members`, `list`, `check`, `update`, `update-members` |
 | `staff` | 查询人员信息 | `basic-info`, `detail`, `ancestors`, `id-mapping`, `org-extra-fields`, `search`, `org-info` |
 | `department` | 查询部门信息 | `detail`, `children`, `staffs` |
@@ -157,6 +157,15 @@ lansenger message send-user-message user001 text '{"content":"私聊消息"}' --
 
 # 撤回消息
 lansenger message revoke msg001 msg002
+
+# 用表情回复消息
+lansenger message reply msg001 --emoji TYPE_OK
+
+# 取消该表情回复
+lansenger message reply msg001 --emoji TYPE_OK --cancel
+
+# 给某位员工发送授权请求消息（仅支持机器人 → 员工私聊；authorizationType=1 即位置请求授权）
+lansenger message send-authorization-request user001
 
 # 查询群 ID 列表
 lansenger message query-groups --page 0 --size 100
@@ -323,6 +332,8 @@ lansenger media upload-app /path/to/file.pdf --media-type file
 lansenger media download-to-file MEDIA_ID --output /path/to/save.pdf
 ```
 
+> **注意**：`media upload`（4.5.1）需要先在开发者中心开通「上传素材」权限，否则平台会拒绝上传。
+
 ### 流式消息
 
 ```bash
@@ -463,6 +474,8 @@ lansenger config show --profile my-app
 | `message send-account-message`（公众号） | N | **Y** | **Y** | 需要公众号能力 |
 | `message send-user-message`（用户对用户） | N | **Y** | **Y** | 需要 userToken + OAuth2 |
 | `message revoke` | **Y** | **Y** | **Y** | 撤回自己发送的消息 |
+| `message reply` | **Y** | **Y** | **Y** | 表情回复 / 取消表情回复（可逆，不过 `--yes` 门） |
+| `message send-authorization-request` | N | **Y** | **Y** | 走「机器人 → 员工私聊」通道发送 authorizationReq；`--type 1` = 位置请求授权 |
 | `staff *`（通讯录只读） | N | **Y** | **Y** | `search` 额外需要 userToken |
 | `department *` | N | **Y** | **Y** | 仅组织级应用 |
 | `calendar *` | N | **Y** | **Y** | 有 userToken = 用户身份；无 = 机器人身份 |

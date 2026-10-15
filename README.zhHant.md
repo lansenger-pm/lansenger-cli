@@ -79,7 +79,7 @@ lansenger health check
 | 命令組 | 說明 | 子命令 |
 |--------|------|--------|
 | `config` | 管理憑證設定 | `set`, `show`, `clear`, `delete-profile`, `list-profiles`, `list-users` |
-| `message` | 傳送與管理訊息 | `send-text`, `send-markdown`, `send-file`, `send-image-url`, `send-link-card`, `send-app-articles`, `send-app-card`, `send-oacard`, `send-bot-message`, `send-group-message`, `send-account-message`, `send-user-message`, `update-dynamic-card`, `revoke`, `query-groups` |
+| `message` | 傳送與管理訊息 | `send-text`, `send-markdown`, `send-file`, `send-image-url`, `send-link-card`, `send-app-articles`, `send-app-card`, `send-oacard`, `send-bot-message`, `send-group-message`, `send-account-message`, `send-user-message`, `update-dynamic-card`, `revoke`, `query-groups`, `reply`, `send-authorization-request` |
 | `group` | 管理群組 | `create`, `info`, `members`, `list`, `check`, `update`, `update-members` |
 | `staff` | 查詢人員資訊 | `basic-info`, `detail`, `ancestors`, `id-mapping`, `org-extra-fields`, `search`, `org-info` |
 | `department` | 查詢部門資訊 | `detail`, `children`, `staffs` |
@@ -157,6 +157,15 @@ lansenger message send-user-message user001 text '{"content":"私聊訊息"}' --
 
 # 撤回訊息
 lansenger message revoke msg001 msg002
+
+# 用表情回覆訊息
+lansenger message reply msg001 --emoji TYPE_OK
+
+# 取消該表情回覆
+lansenger message reply msg001 --emoji TYPE_OK --cancel
+
+# 給某位員工傳送授權請求訊息（僅支援機器人 → 員工私聊；authorizationType=1 即位置請求授權）
+lansenger message send-authorization-request user001
 
 # 查詢群組 ID 列表
 lansenger message query-groups --page 0 --size 100
@@ -323,6 +332,8 @@ lansenger media upload-app /path/to/file.pdf --media-type file
 lansenger media download-to-file MEDIA_ID --output /path/to/save.pdf
 ```
 
+> **注意**：`media upload`（4.5.1）需要先在開發者中心開通「上傳素材」權限，否則平台會拒絕上傳。
+
 ### 串流訊息
 
 ```bash
@@ -435,6 +446,8 @@ lansenger config show --profile my-app
 | `message send-account-message`（公眾號） | N | **Y** | **Y** | 需要公眾號能力 |
 | `message send-user-message`（使用者對使用者） | N | **Y** | **Y** | 需要 userToken + OAuth2 |
 | `message revoke` | **Y** | **Y** | **Y** | 撤回自己傳送的訊息 |
+| `message reply` | **Y** | **Y** | **Y** | 表情回覆 / 取消表情回覆（可逆，不過 `--yes` 門） |
+| `message send-authorization-request` | N | **Y** | **Y** | 走「機器人 → 員工私聊」通道傳送 authorizationReq；`--type 1` = 位置請求授權 |
 | `staff *`（通訊錄唯讀） | N | **Y** | **Y** | `search` 額外需要 userToken |
 | `department *` | N | **Y** | **Y** | 僅組織級應用 |
 | `calendar *` | N | **Y** | **Y** | 有 userToken = 使用者身份；無 = 機器人身份 |

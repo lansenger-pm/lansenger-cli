@@ -79,7 +79,7 @@ lansenger health check
 | Groupe | Description | Sous-commandes |
 |--------|------|--------|
 | `config` | Gérer les identifiants | `set`, `show`, `clear`, `delete-profile`, `list-profiles`, `list-users` |
-| `message` | Envoyer et gérer les messages | `send-text`, `send-markdown`, `send-file`, `send-image-url`, `send-link-card`, `send-app-articles`, `send-app-card`, `send-oacard`, `send-bot-message`, `send-group-message`, `send-account-message`, `send-user-message`, `update-dynamic-card`, `revoke`, `query-groups` |
+| `message` | Envoyer et gérer les messages | `send-text`, `send-markdown`, `send-file`, `send-image-url`, `send-link-card`, `send-app-articles`, `send-app-card`, `send-oacard`, `send-bot-message`, `send-group-message`, `send-account-message`, `send-user-message`, `update-dynamic-card`, `revoke`, `query-groups`, `reply`, `send-authorization-request` |
 | `group` | Gérer les groupes | `create`, `info`, `members`, `list`, `check`, `update`, `update-members` |
 | `staff` | Interroger les infos du personnel | `basic-info`, `detail`, `ancestors`, `id-mapping`, `org-extra-fields`, `search`, `org-info` |
 | `department` | Interroger les départements | `detail`, `children`, `staffs` |
@@ -157,6 +157,15 @@ lansenger message send-user-message user001 text '{"content":"Message privé"}' 
 
 # Révoquer des messages
 lansenger message revoke msg001 msg002
+
+# Répondre à un message avec un emoji
+lansenger message reply msg001 --emoji TYPE_OK
+
+# Annuler cette réponse emoji
+lansenger message reply msg001 --emoji TYPE_OK --cancel
+
+# Envoyer une demande d'autorisation a un collaborateur (bot -> discussion privee uniquement ; authorizationType=1 = autorisation de localisation)
+lansenger message send-authorization-request user001
 
 # Rechercher la liste des identifiants de groupe
 lansenger message query-groups --page 0 --size 100
@@ -329,6 +338,8 @@ lansenger media upload-app /path/to/file.pdf --media-type file
 lansenger media download-to-file MEDIA_ID --output /path/to/save.pdf
 ```
 
+> **Remarque** : `media upload` (4.5.1) nécessite la permission « 上传素材 » (téléversement de médias) dans la console développeur ; sans elle, la plateforme refuse le téléversement.
+
 ### Messages en streaming
 
 ```bash
@@ -469,6 +480,8 @@ La plateforme Lansenger propose trois types d'identité avec différents accès 
 | `message send-account-message` (compte public) | N | **Y** | **Y** | Nécessite la capacité compte public |
 | `message send-user-message` (utilisateur à utilisateur) | N | **Y** | **Y** | Nécessite userToken + OAuth2 |
 | `message revoke` | **Y** | **Y** | **Y** | Révoquer ses propres messages |
+| `message reply` | **Y** | **Y** | **Y** | Réponse emoji / annulation (réversible, donc pas de garde `--yes`) |
+| `message send-authorization-request` | N | **Y** | **Y** | authorizationReq via le canal bot -> discussion privee ; `--type 1` = autorisation de localisation |
 | `staff *` (contacts lecture seule) | N | **Y** | **Y** | `search` nécessite en plus userToken |
 | `department *` | N | **Y** | **Y** | Applications niveau organisation uniquement |
 | `calendar *` | N | **Y** | **Y** | Avec userToken = identité utilisateur ; sans = identité robot |

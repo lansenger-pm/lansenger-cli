@@ -112,7 +112,7 @@ wheels = [
 
 [[package]]
 name = "lansenger-cli"
-version = "0.16.1"
+version = "0.17.0"
 source = { editable = "." }
 dependencies = [
     { name = "lansenger-sdk" },
@@ -132,7 +132,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "lansenger-sdk", specifier = ">=1.12.2" },
+    { name = "lansenger-sdk", specifier = ">=1.13.0" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=7" },
     { name = "rich", specifier = ">=13" },
     { name = "typer", specifier = ">=0.9" },
@@ -144,14 +144,14 @@ dev = [{ name = "ruff", specifier = ">=0.15.22" }]
 
 [[package]]
 name = "lansenger-sdk"
-version = "1.12.2"
+version = "1.13.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "httpx" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/e3/0a/ab96875b22d36dc6e94eed406931d914e9da4bfca848462b87db4061e912/lansenger_sdk-1.12.2.tar.gz", hash = "sha256:abcd3cb4ef275b26a2fd73b3381e760ba283cb7a90dde39813d71411203fcf35", size = 150115, upload-time = "2026-10-14T08:30:50.907Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/35/e9/5b7a66eccaadab7c134bd0631ba5f6ab21b07b1074ef71bee7c6b6b0207a/lansenger_sdk-1.13.0.tar.gz", hash = "sha256:8f1546c1beec06c626c1f630d07538e86ffc2b8119db86ef21a714ff3f64e067", size = 158916, upload-time = "2026-10-15T07:08:51.041Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/61/c1/92459fe0fe737047d12254d310d8665f2b702defb7dd3414f9208641e28c/lansenger_sdk-1.12.2-py3-none-any.whl", hash = "sha256:d6d4c91ea81f7111ebe82da4fd631b8ec82c21cd47b0085c87dedf921200f6b1", size = 116395, upload-time = "2026-10-14T08:30:49.522Z" },
+    { url = "https://files.pythonhosted.org/packages/e3/77/e66a88150dbed5ad3265a4d2d429ae8c694463b9acf7f09438a67dfc66e4/lansenger_sdk-1.13.0-py3-none-any.whl", hash = "sha256:04b5f3a5f590888b2f31d722595af9c6056c74946155671094a584677800d2fc", size = 122328, upload-time = "2026-10-15T07:08:49.55Z" },
 ]
 
 [[package]]
