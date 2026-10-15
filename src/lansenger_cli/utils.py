@@ -345,7 +345,9 @@ def output_result(result, fields: list[str] | None = None, title: str = ""):
 
 def output_list(items: list, columns: list[str], title: str = "", row_mapper=None):
     if is_json_output():
-        rprint([_result_to_dict(item) if hasattr(item, "to_dict") or dataclasses.is_dataclass(item) else item for item in items])
+        # The caller has already emitted the full result JSON, which carries these
+        # items; printing them again as a Python repr would append a second,
+        # non-JSON chunk to stdout and break machine consumers (`json.loads`).
         return
     if not items:
         rprint("[yellow]No results.[/yellow]")

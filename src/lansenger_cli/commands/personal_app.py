@@ -78,9 +78,8 @@ def list_personal_apps(
     """List personal apps/bots"""
     client = get_client()
     result = client.fetch_personal_app_list(user_token=user_token)
+    output_result(result, fields=[], title="Personal App List")
     if result.success and result.app_list:
         output_list(result.app_list, columns=["App ID", "Name", "Description"], row_mapper=lambda a: [
             a.get("appId", ""), a.get("appName", ""), a.get("description", ""),
         ])
-    else:
-        output_result(result, title="Personal App List")
