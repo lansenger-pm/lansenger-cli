@@ -86,6 +86,7 @@ lansenger health check
 | `calendar` | Calendrier et planification | `primary`, `create-schedule`, `fetch-schedule`, `delete-schedule`, `list-schedules`, `attendees`, `add-attendees`, `delete-attendees`, `update-attendees`, `update-schedule`, `attendee-meta` |
 | `bot-command` | Commandes de bot | `create`, `query`, `delete` |
 | `personal-app` | Applications personnelles | `create`, `update`, `info`, `delete`, `list` |
+| `recording` | API d'enregistrement intelligent | `list`, `detail`, `transcribe`, `summary`, `tags`, `templates` |
 | `oauth` | Authentification OAuth2 | `authorize-url`, `device-authorize`, `device-login`, `device-poll`, `exchange-code`, `local-callback`, `refresh-token`, `user-info`, `parse-callback`, `validate-state` |
 | `callback` | Analyse des événements callback | `parse-payload`, `decrypt-payload`, `verify-signature`, `event-types` |
 | `media` | Opérations sur les fichiers média | `upload`, `upload-app`, `download`, `download-to-file` |
@@ -377,6 +378,36 @@ lansenger videoconference vod-download org1 staff001 --vods '[{"vodId":"v1"}]'
 # Configuration organisationnelle (PRS >=3.8)
 lansenger videoconference org-conf org1
 ```
+
+### Enregistrement intelligent (智能录音)
+
+```bash
+# Liste des enregistrements (paginée ; l'ordre de retour n'est pas défini par le serveur)
+lansenger --as staff_001 recording list --page 1 --page-size 20
+
+# Interroger le détail jusqu'à ce que convertState / summaryState passe à 3 (échec) ou 4 (terminé)
+lansenger --as staff_001 recording detail rec-123
+
+# Lancer une transcription ASR (asynchrone, consomme le quota de l'organisation)
+lansenger --as staff_001 recording transcribe rec-123 --yes
+
+# Lancer un compte rendu de réunion avec modèle facultatif (asynchrone, consomme le quota)
+lansenger --as staff_001 recording summary rec-123 --template-id tpl-9 --yes
+
+# Prévisualiser la requête sans appeler l'API
+lansenger --as staff_001 recording transcribe rec-123 --dry-run
+
+# Étiquettes de l'employé courant / modèles visibles par l'organisation
+lansenger --as staff_001 recording tags
+lansenger --as staff_001 recording templates --page 1 --page-size 20
+```
+
+`transcribe` et `summary` sont des écritures à haut risque : elles consomment le quota ASR /
+compte rendu de l'organisation et sont irréversibles ; sans `--yes` elles affichent un aperçu
+structuré et sortent avec le code 10. `--dry-run` permet de répéter la requête sans appel.
+La sortie lisible par machine utilise l'option globale `--json/-j` (avant la sous-commande).
+
+Les exemples utilisent l'option globale `--as <staff_id>` pour charger le `user_token` de cet employé depuis le stockage des identifiants ; en mode external, passez plutôt les options globales `--app-token` / `--user-token`.
 
 ## Options globales
 

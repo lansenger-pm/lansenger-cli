@@ -6,6 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [0.18.0] - 2026-10-30
+
+### Added
+
+- `recording` 命令组（智能录音 6 接口）：`recording list`（分页列表）、`recording detail`（详情）、`recording tags`（标签）、`recording templates`（摘要模板分页列表）、`recording transcribe`（发起转写任务）、`recording summary`（按模板发起摘要任务）。6 个子命令均支持 `--json`；表格列名与平台字段一一对应（`recording_id` / `duration(ms)` / `convert_state` / `summary_state` / `template_state` 等），详情缺省字段显示 `-`。
+- `recording transcribe` / `recording summary` 属高危写：不带 `--yes` 时打印结构化确认要求并以退出码 10 结束；`--dry-run` 只校验参数、打印 `DRY RUN` 预览、不发起任何 API 请求；`--json` 模式下确认要求写 stderr（`error.type=confirmation_required`），dry-run 预览写 stdout（`ok/dry_run/would_perform`）。
+
+### Changed
+
+- `dep:` — `lansenger-sdk` 下限维持 `>=1.13.0`：智能录音的 6 个 SDK 方法随 SDK 1.14.0 发布，CLI 侧按鸭子类型调用、不引用未发布的 SDK 结果类型，故本版不抬下限、不阻塞 0.18.0 发版；1.14.0 发布后再单独抬下限。全量回归 144 例通过（121 基线 + 新增 23）。
+
 ## [0.17.0] - 2026-10-14
 
 ### Added

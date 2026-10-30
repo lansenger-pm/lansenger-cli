@@ -11,7 +11,7 @@ flowchart TD
 
     subgraph CLI包["lansenger-cli"]
         MAIN["main.py<br/>app 装配 + 全局选项 callback<br/>--json / --profile / --as / --app-token / --user-token / --verbose"]
-        CMDS["commands/（16 域，彼此零横向依赖）<br/>config · message · group · staff · department · calendar<br/>oauth · callback · media · streaming · chat · health<br/>bot-command · personal-app · videoconference"]
+        CMDS["commands/（16 域，彼此零横向依赖）<br/>config · message · group · staff · department · calendar<br/>oauth · callback · media · streaming · chat · health<br/>bot-command · personal-app · videoconference · recording"]
         UTILS["utils.py<br/>全局状态 setter · get_client 工厂 · 退出码契约 0/1/10<br/>confirm_high_risk 高危门 · output_result 输出契约"]
         QR["qr.py<br/>零依赖 QR 编码/渲染（版本 1-15 / ECC L-M）<br/>终端半块字符 + 1-bit PNG（设备码登录用）"]
     end
@@ -63,7 +63,7 @@ flowchart TD
 | 层 | 本仓落位 | 现状 |
 |---|---|---|
 | T0 纯函数 | utils 的输出格式化 / 参数解析 | 隐式（经 T1 覆盖） |
-| T1 域逻辑 | `commands.<域>` 参数组装与结果处理 | 8/17 域/模块有测试（config/health/media/videoconference/oauth/qr/high-risk-gate/logging 等），92 例 |
+| T1 域逻辑 | `commands.<域>` 参数组装与结果处理 | 12 个测试文件（7 个命令域 + qr/utils 等共享层：config/health/media/videoconference/oauth/message/recording…），144 例 |
 | T2 集成 | CliRunner 全局选项 + 退出码 + 高危门 | ✅ test_high_risk_gate.py / test_cli_config.py |
 | 缺口 | group/staff/department/calendar/callback/streaming/chat/bot-command/personal-app 无专门测试文件 | ⚠️ 演进项：新改动域必须补最小回归，存量渐进补齐 |
 

@@ -86,6 +86,7 @@ lansenger health check
 | `calendar` | 行事曆操作 | `primary`, `create-schedule`, `fetch-schedule`, `delete-schedule`, `list-schedules`, `attendees`, `add-attendees`, `delete-attendees`, `update-attendees`, `update-schedule`, `attendee-meta` |
 | `bot-command` | 機器人命令 | `create`, `query`, `delete` |
 | `personal-app` | 個人應用 | `create`, `update`, `info`, `delete`, `list` |
+| `recording` | 智能錄音開放能力 | `list`, `detail`, `transcribe`, `summary`, `tags`, `templates` |
 | `oauth` | OAuth2 使用者認證 | `authorize-url`, `device-authorize`, `device-login`, `device-poll`, `exchange-code`, `local-callback`, `refresh-token`, `user-info`, `parse-callback`, `validate-state` |
 | `callback` | 回呼事件解析 | `parse-payload`, `decrypt-payload`, `verify-signature`, `event-types` |
 | `media` | 媒體檔案操作 | `upload`, `upload-app`, `download`, `download-to-file` |
@@ -343,6 +344,35 @@ lansenger streaming create user123 single stream-session-001
 # 取得串流訊息狀態
 lansenger streaming fetch MSG_ID
 ```
+
+### 智慧錄音
+
+```bash
+# 錄音列表（分頁，回傳順序由伺服器決定、未定義）
+lansenger --as staff_001 recording list --page 1 --page-size 20
+
+# 輪詢錄音詳情，直到 convertState / summaryState 變為 3（失敗）或 4（完成）
+lansenger --as staff_001 recording detail rec-123
+
+# 提交 ASR 轉寫任務（非同步，消耗組織配額）
+lansenger --as staff_001 recording transcribe rec-123 --yes
+
+# 提交會議紀要任務，可指定紀要範本（非同步，消耗組織配額）
+lansenger --as staff_001 recording summary rec-123 --template-id tpl-9 --yes
+
+# 只預覽請求、不呼叫介面
+lansenger --as staff_001 recording transcribe rec-123 --dry-run
+
+# 目前員工的錄音標籤 / 組織可見的紀要範本
+lansenger --as staff_001 recording tags
+lansenger --as staff_001 recording templates --page 1 --page-size 20
+```
+
+`transcribe` 與 `summary` 屬高風險寫入：會消耗組織 ASR / 紀要配額且不可撤銷，未帶 `--yes` 時
+只列印結構化預覽並以結束碼 10 結束；`--dry-run` 可在腳本中安全預演。
+機器可讀輸出使用全域 `--json/-j`（放在子命令之前）。
+
+範例用全域 `--as <staff_id>` 從憑證儲存取該員工的 `user_token`；external 模式改用全域 `--app-token` / `--user-token` 明確傳入。
 
 ## 全域選項
 

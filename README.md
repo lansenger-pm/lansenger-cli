@@ -87,6 +87,7 @@ lansenger health check
 | `bot-command` | Bot slash commands | `create`, `query`, `delete` |
 | `personal-app` | Personal apps/bots | `create`, `update`, `info`, `delete`, `list` |
 | `videoconference` | Videoconference open APIs (视频会议开放能力) | `create`, `modify`, `cancel`, `stop`, `detail`, `list`, `record-list`, `simplerecord`, `fixroom-list`, `status`, `subscribe`, `params`, `history`, `active`, `member-control`, `invite`, `member-list`, `vod-list`, `vod-download`, `org-conf` |
+| `recording` | Smart recording open APIs (智能录音) | `list`, `detail`, `transcribe`, `summary`, `tags`, `templates` |
 | `oauth` | OAuth2 user auth | `authorize-url`, `device-authorize`, `device-login`, `device-poll`, `exchange-code`, `local-callback`, `refresh-token`, `user-info`, `parse-callback`, `validate-state` |
 | `callback` | Callback event parsing | `parse-payload`, `decrypt-payload`, `verify-signature`, `event-types` |
 | `media` | Media file operations | `upload`, `upload-app`, `download`, `download-to-file` |
@@ -376,6 +377,36 @@ lansenger videoconference vod-download org1 staff001 --vods '[{"vodId":"v1"}]'
 # Org config (PRS >=3.8)
 lansenger videoconference org-conf org1
 ```
+
+### Smart Recording (智能录音)
+
+```bash
+# List recordings (paged; the server does not define the order)
+lansenger --as staff_001 recording list --page 1 --page-size 20
+
+# Poll a recording's detail until convertState / summaryState reach 3 (failed) or 4 (done)
+lansenger --as staff_001 recording detail rec-123
+
+# Submit an ASR transcription task (async, consumes the org's quota)
+lansenger --as staff_001 recording transcribe rec-123 --yes
+
+# Submit a meeting-summary task with an optional template (async, consumes quota)
+lansenger --as staff_001 recording summary rec-123 --template-id tpl-9 --yes
+
+# Preview the request without calling the API
+lansenger --as staff_001 recording transcribe rec-123 --dry-run
+
+# Tags of the current staff / summary templates visible to the organization
+lansenger --as staff_001 recording tags
+lansenger --as staff_001 recording templates --page 1 --page-size 20
+```
+
+`transcribe` and `summary` are high-risk writes: they consume the organization's ASR / summary
+quota and cannot be undone. Without `--yes` they print a structured preview and exit with code 10;
+`--dry-run` is the script-friendly way to rehearse the request. Use the global `--json/-j` option
+(before the subcommand) for machine-readable output.
+
+The examples use the global `--as <staff_id>` option to load that staff member's `user_token` from the credential store; in external mode, pass the global `--app-token` / `--user-token` instead.
 
 ## Global Options
 

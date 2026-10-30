@@ -19,6 +19,7 @@ from lansenger_cli.commands import (
     bot_command as bot_command_cmd,
     personal_app as personal_app_cmd,
     videoconference as videoconference_cmd,
+    recording as recording_cmd,
 )
 
 app = typer.Typer(
@@ -43,6 +44,7 @@ app.add_typer(health_cmd.app, name="health")
 app.add_typer(bot_command_cmd.app, name="bot-command")
 app.add_typer(personal_app_cmd.app, name="personal-app")
 app.add_typer(videoconference_cmd.app, name="videoconference")
+app.add_typer(recording_cmd.app, name="recording")
 
 
 @app.callback(invoke_without_command=True)

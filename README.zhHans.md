@@ -86,6 +86,7 @@ lansenger health check
 | `calendar` | 日程操作 | `primary`, `create-schedule`, `fetch-schedule`, `delete-schedule`, `list-schedules`, `attendees`, `add-attendees`, `delete-attendees`, `update-attendees`, `update-schedule`, `attendee-meta` |
 | `bot-command` | 机器人命令 | `create`, `query`, `delete` |
 | `personal-app` | 个人应用 | `create`, `update`, `info`, `delete`, `list` |
+| `recording` | 智能录音开放能力 | `list`, `detail`, `transcribe`, `summary`, `tags`, `templates` |
 | `oauth` | OAuth2 用户认证 | `authorize-url`, `device-authorize`, `device-login`, `device-poll`, `exchange-code`, `local-callback`, `refresh-token`, `user-info`, `parse-callback`, `validate-state` |
 | `callback` | 回调事件解析 | `parse-payload`, `decrypt-payload`, `verify-signature`, `event-types` |
 | `media` | 媒体文件操作 | `upload`, `upload-app`, `download`, `download-to-file` |
@@ -371,6 +372,35 @@ lansenger videoconference vod-download org1 staff001 --vods '[{"vodId":"v1"}]'
 # 组织会议配置（PRS >=3.8）
 lansenger videoconference org-conf org1
 ```
+
+### 智能录音
+
+```bash
+# 录音列表（分页，返回顺序由服务端决定、未定义）
+lansenger --as staff_001 recording list --page 1 --page-size 20
+
+# 轮询录音详情，直到 convertState / summaryState 变为 3（失败）或 4（完成）
+lansenger --as staff_001 recording detail rec-123
+
+# 提交 ASR 转写任务（异步，消耗组织配额）
+lansenger --as staff_001 recording transcribe rec-123 --yes
+
+# 提交会议纪要任务，可指定纪要模板（异步，消耗组织配额）
+lansenger --as staff_001 recording summary rec-123 --template-id tpl-9 --yes
+
+# 只预览请求、不调用接口
+lansenger --as staff_001 recording transcribe rec-123 --dry-run
+
+# 当前员工的录音标签 / 组织可见的纪要模板
+lansenger --as staff_001 recording tags
+lansenger --as staff_001 recording templates --page 1 --page-size 20
+```
+
+`transcribe` 与 `summary` 属高危写：会消耗组织 ASR / 纪要配额且不可撤销，未带 `--yes` 时
+只打印结构化预览并以退出码 10 结束；`--dry-run` 可在脚本中安全预演。
+机器可读输出使用全局 `--json/-j`（放在子命令之前）。
+
+示例用全局 `--as <staff_id>` 从凭证存储取该员工的 `user_token`；external 模式改用全局 `--app-token` / `--user-token` 显式传入。
 
 ## 全局选项
 
